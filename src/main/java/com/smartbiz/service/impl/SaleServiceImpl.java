@@ -1,5 +1,7 @@
 package com.smartbiz.service.impl;
 
+import com.smartbiz.dto.SaleRequestDto;
+import com.smartbiz.dto.SaleResponseDto;
 import com.smartbiz.entity.Business;
 import com.smartbiz.entity.Customer;
 import com.smartbiz.entity.Sale;
@@ -32,70 +34,86 @@ public class SaleServiceImpl implements SaleService {
     }
 
     @Override
-    public Sale saveSale(Sale sale) {
-        Long businessId = sale.getBusiness().getId();
-        Long customerId = sale.getCustomer().getId();
-        Long userId = sale.getUser().getId();
-
-        Business business = businessRepository.findById(businessId)
+    public SaleResponseDto saveSale(SaleRequestDto request) {
+        Business business = businessRepository.findById(request.getBusinessId())
                 .orElseThrow(() -> new RuntimeException("Business not found"));
 
-        Customer customer = customerRepository.findById(customerId)
+        Customer customer = customerRepository.findById(request.getCustomerId())
                 .orElseThrow(() -> new RuntimeException("Customer not found"));
 
-        User user = userRepository.findById(userId)
+        User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        sale.setBusiness(business);
-        sale.setCustomer(customer);
-        sale.setUser(user);
+        Sale sale = Sale.builder()
+                .totalAmount(request.getTotalAmount())
+                .paymentMethod(request.getPaymentMethod())
+                .status(request.getStatus())
+                .business(business)
+                .customer(customer)
+                .user(user)
+                .build();
 
-        return saleRepository.save(sale);
+        Sale saved = saleRepository.save(sale);
+        return mapToDto(saved);
     }
 
     @Override
-    public List<Sale> getAllSales() {
-        return saleRepository.findAll();
+    public List<SaleResponseDto> getAllSales() {
+        return saleRepository.findAll()
+                .stream()
+                .map(this::mapToDto)
+                .toList();
     }
 
     @Override
-    public Sale getSaleById(Long id) {
-        return saleRepository.findById(id).orElse(null);
+    public SaleResponseDto getSaleById(Long id) {
+        Sale sale = saleRepository.findById(id).orElse(null);
+        return sale == null ? null : mapToDto(sale);
     }
 
     @Override
-    public Sale updateSale(Long id, Sale sale) {
-        Sale existingSale = saleRepository.findById(id).orElse(null);
+    public SaleResponseDto updateSale(Long id, SaleRequestDto request) {
+        Sale existing = saleRepository.findById(id).orElse(null);
 
-        if (existingSale == null) {
+        if (existing == null) {
             return null;
         }
 
-        Long businessId = sale.getBusiness().getId();
-        Long customerId = sale.getCustomer().getId();
-        Long userId = sale.getUser().getId();
-
-        Business business = businessRepository.findById(businessId)
+        Business business = businessRepository.findById(request.getBusinessId())
                 .orElseThrow(() -> new RuntimeException("Business not found"));
 
-        Customer customer = customerRepository.findById(customerId)
+        Customer customer = customerRepository.findById(request.getCustomerId())
                 .orElseThrow(() -> new RuntimeException("Customer not found"));
 
-        User user = userRepository.findById(userId)
+        User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        existingSale.setTotalAmount(sale.getTotalAmount());
-        existingSale.setPaymentMethod(sale.getPaymentMethod());
-        existingSale.setStatus(sale.getStatus());
-        existingSale.setBusiness(business);
-        existingSale.setCustomer(customer);
-        existingSale.setUser(user);
+        existing.setTotalAmount(request.getTotalAmount());
+        existing.setPaymentMethod(request.getPaymentMethod());
+        existing.setStatus(request.getStatus());
+        existing.setBusiness(business);
+        existing.setCustomer(customer);
+        existing.setUser(user);
 
-        return saleRepository.save(existingSale);
+        Sale updated = saleRepository.save(existing);
+        return mapToDto(updated);
     }
 
     @Override
     public void deleteSale(Long id) {
         saleRepository.deleteById(id);
+    }
+
+    private SaleResponseDto mapToDto(Sale sale) {
+        return SaleResponseDto.builder()
+                .id(sale.getId())
+                .saleDate(sale.getSaleDate())
+                .totalAmount(sale.getTotalAmount())
+                .paymentMethod(sale.getPaymentMethod())
+                .status(sale.getStatus())
+                .businessId(sale.getBusiness().getId())
+                .customerId(sale.getCustomer().getId())
+                .userId(sale.getUser().getId())
+                .build();
     }
 }

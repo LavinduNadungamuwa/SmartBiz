@@ -1,6 +1,7 @@
 package com.smartbiz.controller;
 
-import com.smartbiz.entity.Customer;
+import com.smartbiz.dto.CustomerRequestDto;
+import com.smartbiz.dto.CustomerResponseDto;
 import com.smartbiz.service.CustomerService;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,23 +19,24 @@ public class CustomerController {
     }
 
     @PostMapping
-    public Customer createCustomer(@RequestBody Customer customer) {
-        return customerService.saveCustomer(customer);
+    public CustomerResponseDto createCustomer(@RequestBody CustomerRequestDto request) {
+        return customerService.saveCustomer(request);
     }
 
     @GetMapping
-    public List<Customer> getAllCustomers() {
+    public List<CustomerResponseDto> getAllCustomers() {
         return customerService.getAllCustomers();
     }
 
     @GetMapping("/{id}")
-    public Customer getCustomerById(@PathVariable Long id) {
+    public CustomerResponseDto getCustomerById(@PathVariable Long id) {
         return customerService.getCustomerById(id);
     }
 
     @PutMapping("/{id}")
-    public Customer updateCustomer(@PathVariable Long id, @RequestBody Customer customer) {
-        return customerService.updateCustomer(id, customer);
+    public CustomerResponseDto updateCustomer(@PathVariable Long id,
+                                              @RequestBody CustomerRequestDto request) {
+        return customerService.updateCustomer(id, request);
     }
 
     @DeleteMapping("/{id}")

@@ -1,13 +1,14 @@
 package com.smartbiz.service;
 
-import com.smartbiz.entity.Customer;
+import com.smartbiz.dto.CustomerRequestDto;
+import com.smartbiz.dto.CustomerResponseDto;
 
 import java.util.List;
 
 public interface CustomerService {
-    Customer saveCustomer(Customer customer);
-    List<Customer> getAllCustomers();
-    Customer getCustomerById(Long id);
-    Customer updateCustomer(Long id, Customer customer);
+    CustomerResponseDto saveCustomer(CustomerRequestDto request);
+    List<CustomerResponseDto> getAllCustomers();
+    CustomerResponseDto getCustomerById(Long id);
+    CustomerResponseDto updateCustomer(Long id, CustomerRequestDto request);
     void deleteCustomer(Long id);
 }

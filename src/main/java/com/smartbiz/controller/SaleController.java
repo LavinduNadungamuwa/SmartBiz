@@ -1,6 +1,7 @@
 package com.smartbiz.controller;
 
-import com.smartbiz.entity.Sale;
+import com.smartbiz.dto.SaleRequestDto;
+import com.smartbiz.dto.SaleResponseDto;
 import com.smartbiz.service.SaleService;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,23 +19,24 @@ public class SaleController {
     }
 
     @PostMapping
-    public Sale createSale(@RequestBody Sale sale) {
-        return saleService.saveSale(sale);
+    public SaleResponseDto createSale(@RequestBody SaleRequestDto request) {
+        return saleService.saveSale(request);
     }
 
     @GetMapping
-    public List<Sale> getAllSales() {
+    public List<SaleResponseDto> getAllSales() {
         return saleService.getAllSales();
     }
 
     @GetMapping("/{id}")
-    public Sale getSaleById(@PathVariable Long id) {
+    public SaleResponseDto getSaleById(@PathVariable Long id) {
         return saleService.getSaleById(id);
     }
 
     @PutMapping("/{id}")
-    public Sale updateSale(@PathVariable Long id, @RequestBody Sale sale) {
-        return saleService.updateSale(id, sale);
+    public SaleResponseDto updateSale(@PathVariable Long id,
+                                      @RequestBody SaleRequestDto request) {
+        return saleService.updateSale(id, request);
     }
 
     @DeleteMapping("/{id}")

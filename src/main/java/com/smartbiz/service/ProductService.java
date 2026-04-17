@@ -1,12 +1,14 @@
 package com.smartbiz.service;
 
-import com.smartbiz.entity.Product;
+import com.smartbiz.dto.ProductRequestDto;
+import com.smartbiz.dto.ProductResponseDto;
+
 import java.util.List;
 
 public interface ProductService {
-    Product saveProduct(Product product);
-    List<Product> getAllProducts();
-    Product getProductById(Long id);
-    Product updateProduct(Long id, Product product);
+    ProductResponseDto saveProduct(ProductRequestDto request);
+    List<ProductResponseDto> getAllProducts();
+    ProductResponseDto getProductById(Long id);
+    ProductResponseDto updateProduct(Long id, ProductRequestDto request);
     void deleteProduct(Long id);
 }

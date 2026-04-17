@@ -1,13 +1,14 @@
 package com.smartbiz.service;
 
-import com.smartbiz.entity.Sale;
+import com.smartbiz.dto.SaleRequestDto;
+import com.smartbiz.dto.SaleResponseDto;
 
 import java.util.List;
 
 public interface SaleService {
-    Sale saveSale(Sale sale);
-    List<Sale> getAllSales();
-    Sale getSaleById(Long id);
-    Sale updateSale(Long id, Sale sale);
+    SaleResponseDto saveSale(SaleRequestDto request);
+    List<SaleResponseDto> getAllSales();
+    SaleResponseDto getSaleById(Long id);
+    SaleResponseDto updateSale(Long id, SaleRequestDto request);
     void deleteSale(Long id);
 }

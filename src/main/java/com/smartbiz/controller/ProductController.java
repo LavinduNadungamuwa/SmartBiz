@@ -1,6 +1,7 @@
 package com.smartbiz.controller;
 
-import com.smartbiz.entity.Product;
+import com.smartbiz.dto.ProductRequestDto;
+import com.smartbiz.dto.ProductResponseDto;
 import com.smartbiz.service.ProductService;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,23 +19,24 @@ public class ProductController {
     }
 
     @PostMapping
-    public Product createProduct(@RequestBody Product product) {
-        return productService.saveProduct(product);
+    public ProductResponseDto createProduct(@RequestBody ProductRequestDto request) {
+        return productService.saveProduct(request);
     }
 
     @GetMapping
-    public List<Product> getAllProducts() {
+    public List<ProductResponseDto> getAllProducts() {
         return productService.getAllProducts();
     }
 
     @GetMapping("/{id}")
-    public Product getProductById(@PathVariable Long id) {
+    public ProductResponseDto getProductById(@PathVariable Long id) {
         return productService.getProductById(id);
     }
 
     @PutMapping("/{id}")
-    public Product updateProduct(@PathVariable Long id, @RequestBody Product product) {
-        return productService.updateProduct(id, product);
+    public ProductResponseDto updateProduct(@PathVariable Long id,
+                                            @RequestBody ProductRequestDto request) {
+        return productService.updateProduct(id, request);
     }
 
     @DeleteMapping("/{id}")

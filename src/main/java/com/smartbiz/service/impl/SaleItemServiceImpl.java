@@ -1,5 +1,7 @@
 package com.smartbiz.service.impl;
 
+import com.smartbiz.dto.SaleItemRequestDto;
+import com.smartbiz.dto.SaleItemResponseDto;
 import com.smartbiz.entity.Product;
 import com.smartbiz.entity.Sale;
 import com.smartbiz.entity.SaleItem;
@@ -28,110 +30,82 @@ public class SaleItemServiceImpl implements SaleItemService {
     }
 
     @Override
-    public SaleItem saveSaleItem(SaleItem saleItem) {
-        if (saleItem.getSale() == null || saleItem.getSale().getId() == null) {
-            throw new RuntimeException("Sale ID is missing");
-        }
+    public SaleItemResponseDto saveSaleItem(SaleItemRequestDto request) {
+        Sale sale = saleRepository.findById(request.getSaleId())
+                .orElseThrow(() -> new RuntimeException("Sale not found"));
 
-        if (saleItem.getProduct() == null || saleItem.getProduct().getId() == null) {
-            throw new RuntimeException("Product ID is missing");
-        }
-
-        if (saleItem.getQuantity() == null || saleItem.getQuantity() <= 0) {
-            throw new RuntimeException("Quantity must be greater than 0");
-        }
-
-        Long saleId = saleItem.getSale().getId();
-        Long productId = saleItem.getProduct().getId();
-
-        Sale sale = saleRepository.findById(saleId)
-                .orElseThrow(() -> new RuntimeException("Sale not found with ID: " + saleId));
-
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Product not found with ID: " + productId));
-
-        if (product.getUnitPrice() == null) {
-            throw new RuntimeException("Product unit price is missing");
-        }
+        Product product = productRepository.findById(request.getProductId())
+                .orElseThrow(() -> new RuntimeException("Product not found"));
 
         BigDecimal unitPrice = product.getUnitPrice();
-        BigDecimal subtotal = unitPrice.multiply(BigDecimal.valueOf(saleItem.getQuantity()));
+        BigDecimal subtotal = unitPrice.multiply(BigDecimal.valueOf(request.getQuantity()));
 
-        saleItem.setSale(sale);
-        saleItem.setProduct(product);
-        saleItem.setUnitPrice(unitPrice);
-        saleItem.setSubtotal(subtotal);
+        SaleItem saleItem = SaleItem.builder()
+                .quantity(request.getQuantity())
+                .unitPrice(unitPrice)
+                .subtotal(subtotal)
+                .sale(sale)
+                .product(product)
+                .build();
 
-        SaleItem savedItem = saleItemRepository.save(saleItem);
-
-        savedItem.setSale(null);
-        savedItem.setProduct(null);
-
-        return savedItem;
+        SaleItem saved = saleItemRepository.save(saleItem);
+        return mapToDto(saved);
     }
 
     @Override
-    public List<SaleItem> getAllSaleItems() {
-        return saleItemRepository.findAll();
+    public List<SaleItemResponseDto> getAllSaleItems() {
+        return saleItemRepository.findAll()
+                .stream()
+                .map(this::mapToDto)
+                .toList();
     }
 
     @Override
-    public SaleItem getSaleItemById(Long id) {
-        return saleItemRepository.findById(id).orElse(null);
+    public SaleItemResponseDto getSaleItemById(Long id) {
+        SaleItem saleItem = saleItemRepository.findById(id).orElse(null);
+        return saleItem == null ? null : mapToDto(saleItem);
     }
 
     @Override
-    public SaleItem updateSaleItem(Long id, SaleItem saleItem) {
-        SaleItem existingSaleItem = saleItemRepository.findById(id).orElse(null);
+    public SaleItemResponseDto updateSaleItem(Long id, SaleItemRequestDto request) {
+        SaleItem existing = saleItemRepository.findById(id).orElse(null);
 
-        if (existingSaleItem == null) {
+        if (existing == null) {
             return null;
         }
 
-        if (saleItem.getSale() == null || saleItem.getSale().getId() == null) {
-            throw new RuntimeException("Sale ID is missing");
-        }
+        Sale sale = saleRepository.findById(request.getSaleId())
+                .orElseThrow(() -> new RuntimeException("Sale not found"));
 
-        if (saleItem.getProduct() == null || saleItem.getProduct().getId() == null) {
-            throw new RuntimeException("Product ID is missing");
-        }
-
-        if (saleItem.getQuantity() == null || saleItem.getQuantity() <= 0) {
-            throw new RuntimeException("Quantity must be greater than 0");
-        }
-
-        Long saleId = saleItem.getSale().getId();
-        Long productId = saleItem.getProduct().getId();
-
-        Sale sale = saleRepository.findById(saleId)
-                .orElseThrow(() -> new RuntimeException("Sale not found with ID: " + saleId));
-
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Product not found with ID: " + productId));
-
-        if (product.getUnitPrice() == null) {
-            throw new RuntimeException("Product unit price is missing");
-        }
+        Product product = productRepository.findById(request.getProductId())
+                .orElseThrow(() -> new RuntimeException("Product not found"));
 
         BigDecimal unitPrice = product.getUnitPrice();
-        BigDecimal subtotal = unitPrice.multiply(BigDecimal.valueOf(saleItem.getQuantity()));
+        BigDecimal subtotal = unitPrice.multiply(BigDecimal.valueOf(request.getQuantity()));
 
-        existingSaleItem.setSale(sale);
-        existingSaleItem.setProduct(product);
-        existingSaleItem.setQuantity(saleItem.getQuantity());
-        existingSaleItem.setUnitPrice(unitPrice);
-        existingSaleItem.setSubtotal(subtotal);
+        existing.setQuantity(request.getQuantity());
+        existing.setUnitPrice(unitPrice);
+        existing.setSubtotal(subtotal);
+        existing.setSale(sale);
+        existing.setProduct(product);
 
-        SaleItem updatedItem = saleItemRepository.save(existingSaleItem);
-
-        updatedItem.setSale(null);
-        updatedItem.setProduct(null);
-
-        return updatedItem;
+        SaleItem updated = saleItemRepository.save(existing);
+        return mapToDto(updated);
     }
 
     @Override
     public void deleteSaleItem(Long id) {
         saleItemRepository.deleteById(id);
+    }
+
+    private SaleItemResponseDto mapToDto(SaleItem saleItem) {
+        return SaleItemResponseDto.builder()
+                .id(saleItem.getId())
+                .quantity(saleItem.getQuantity())
+                .unitPrice(saleItem.getUnitPrice())
+                .subtotal(saleItem.getSubtotal())
+                .saleId(saleItem.getSale().getId())
+                .productId(saleItem.getProduct().getId())
+                .build();
     }
 }

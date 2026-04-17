@@ -1,6 +1,7 @@
 package com.smartbiz.controller;
 
-import com.smartbiz.entity.SaleItem;
+import com.smartbiz.dto.SaleItemRequestDto;
+import com.smartbiz.dto.SaleItemResponseDto;
 import com.smartbiz.service.SaleItemService;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,23 +19,24 @@ public class SaleItemController {
     }
 
     @PostMapping
-    public SaleItem createSaleItem(@RequestBody SaleItem saleItem) {
-        return saleItemService.saveSaleItem(saleItem);
+    public SaleItemResponseDto createSaleItem(@RequestBody SaleItemRequestDto request) {
+        return saleItemService.saveSaleItem(request);
     }
 
     @GetMapping
-    public List<SaleItem> getAllSaleItems() {
+    public List<SaleItemResponseDto> getAllSaleItems() {
         return saleItemService.getAllSaleItems();
     }
 
     @GetMapping("/{id}")
-    public SaleItem getSaleItemById(@PathVariable Long id) {
+    public SaleItemResponseDto getSaleItemById(@PathVariable Long id) {
         return saleItemService.getSaleItemById(id);
     }
 
     @PutMapping("/{id}")
-    public SaleItem updateSaleItem(@PathVariable Long id, @RequestBody SaleItem saleItem) {
-        return saleItemService.updateSaleItem(id, saleItem);
+    public SaleItemResponseDto updateSaleItem(@PathVariable Long id,
+                                              @RequestBody SaleItemRequestDto request) {
+        return saleItemService.updateSaleItem(id, request);
     }
 
     @DeleteMapping("/{id}")

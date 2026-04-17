@@ -1,12 +1,13 @@
 package com.smartbiz.service;
 
-import com.smartbiz.entity.Supplier;
+import com.smartbiz.dto.SupplierRequestDto;
+import com.smartbiz.dto.SupplierResponseDto;
 import java.util.List;
 
 public interface SupplierService {
-    Supplier saveSupplier(Supplier supplier);
-    List<Supplier> getAllSuppliers();
-    Supplier getSupplierById(Long id);
-    Supplier updateSupplier(Long id, Supplier supplier);
+    SupplierResponseDto saveSupplier(SupplierRequestDto supplier);
+    List<SupplierResponseDto> getAllSuppliers();
+    SupplierResponseDto getSupplierById(Long id);
+    SupplierResponseDto updateSupplier(Long id, SupplierRequestDto supplier);
     void deleteSupplier(Long id);
 }
