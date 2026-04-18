@@ -4,8 +4,10 @@ import com.smartbiz.dto.CustomerRequestDto;
 import com.smartbiz.dto.CustomerResponseDto;
 import com.smartbiz.entity.Business;
 import com.smartbiz.entity.Customer;
-import com.smartbiz.repository.BusinessRepository;
+import com.smartbiz.entity.User;
 import com.smartbiz.repository.CustomerRepository;
+import com.smartbiz.repository.UserRepository;
+import com.smartbiz.security.SecurityUtils;
 import com.smartbiz.service.CustomerService;
 import org.springframework.stereotype.Service;
 
@@ -15,18 +17,18 @@ import java.util.List;
 public class CustomerServiceImpl implements CustomerService {
 
     private final CustomerRepository customerRepository;
-    private final BusinessRepository businessRepository;
+    private final UserRepository userRepository;
 
     public CustomerServiceImpl(CustomerRepository customerRepository,
-                               BusinessRepository businessRepository) {
+                               UserRepository userRepository) {
         this.customerRepository = customerRepository;
-        this.businessRepository = businessRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
     public CustomerResponseDto saveCustomer(CustomerRequestDto request) {
-        Business business = businessRepository.findById(request.getBusinessId())
-                .orElseThrow(() -> new RuntimeException("Business not found"));
+        User loggedInUser = getLoggedInUser();
+        Business business = loggedInUser.getBusiness();
 
         Customer customer = Customer.builder()
                 .fullName(request.getFullName())
@@ -42,30 +44,47 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public List<CustomerResponseDto> getAllCustomers() {
-        return customerRepository.findAll().stream()
+        User loggedInUser = getLoggedInUser();
+        Long businessId = loggedInUser.getBusiness().getId();
+
+        return customerRepository.findAll()
+                .stream()
+                .filter(customer -> customer.getBusiness().getId().equals(businessId))
                 .map(this::mapToDto)
                 .toList();
     }
 
     @Override
     public CustomerResponseDto getCustomerById(Long id) {
-        Customer customer = customerRepository.findById(id).orElse(null);
-        return customer == null ? null : mapToDto(customer);
+        User loggedInUser = getLoggedInUser();
+        Long businessId = loggedInUser.getBusiness().getId();
+
+        Customer customer = customerRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Customer not found"));
+
+        if (!customer.getBusiness().getId().equals(businessId)) {
+            throw new RuntimeException("Access denied");
+        }
+
+        return mapToDto(customer);
     }
 
     @Override
     public CustomerResponseDto updateCustomer(Long id, CustomerRequestDto request) {
-        Customer existing = customerRepository.findById(id).orElse(null);
-        if (existing == null) return null;
+        User loggedInUser = getLoggedInUser();
+        Long businessId = loggedInUser.getBusiness().getId();
 
-        Business business = businessRepository.findById(request.getBusinessId())
-                .orElseThrow(() -> new RuntimeException("Business not found"));
+        Customer existing = customerRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Customer not found"));
+
+        if (!existing.getBusiness().getId().equals(businessId)) {
+            throw new RuntimeException("Access denied");
+        }
 
         existing.setFullName(request.getFullName());
         existing.setEmail(request.getEmail());
         existing.setPhone(request.getPhone());
         existing.setAddress(request.getAddress());
-        existing.setBusiness(business);
 
         Customer updated = customerRepository.save(existing);
         return mapToDto(updated);
@@ -73,7 +92,28 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public void deleteCustomer(Long id) {
+        User loggedInUser = getLoggedInUser();
+        Long businessId = loggedInUser.getBusiness().getId();
+
+        Customer customer = customerRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Customer not found"));
+
+        if (!customer.getBusiness().getId().equals(businessId)) {
+            throw new RuntimeException("Access denied");
+        }
+
         customerRepository.deleteById(id);
+    }
+
+    private User getLoggedInUser() {
+        String email = SecurityUtils.getCurrentUserEmail();
+
+        if (email == null) {
+            throw new RuntimeException("No authenticated user found");
+        }
+
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Logged-in user not found"));
     }
 
     private CustomerResponseDto mapToDto(Customer customer) {
