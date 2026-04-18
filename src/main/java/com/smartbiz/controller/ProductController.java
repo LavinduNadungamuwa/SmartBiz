@@ -43,4 +43,6 @@ public class ProductController {
     public void deleteProduct(@PathVariable Long id) {
         productService.deleteProduct(id);
     }
+
+    //delete may not work, as this is a parent row, with foreign keys
 }

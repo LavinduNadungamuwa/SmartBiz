@@ -43,4 +43,6 @@ public class SaleController {
     public void deleteSale(@PathVariable Long id) {
         saleService.deleteSale(id);
     }
+
+    //delete may not work, as this is a parent row, with foreign keys
 }

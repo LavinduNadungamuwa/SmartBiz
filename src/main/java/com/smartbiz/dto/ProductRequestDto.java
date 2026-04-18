@@ -11,6 +11,5 @@ public class ProductRequestDto {
     private String description;
     private BigDecimal unitPrice;
     private Integer stockQuantity;
-    private Long businessId;
     private Long supplierId;
 }

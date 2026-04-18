@@ -12,6 +12,4 @@ public class ExpenseRequestDto {
     private BigDecimal amount;
     private LocalDateTime expenseDate;
     private String notes;
-    private Long businessId;
-    private Long userId;
 }

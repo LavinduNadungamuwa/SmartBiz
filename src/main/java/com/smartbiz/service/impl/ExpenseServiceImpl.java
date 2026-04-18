@@ -5,9 +5,9 @@ import com.smartbiz.dto.ExpenseResponseDto;
 import com.smartbiz.entity.Business;
 import com.smartbiz.entity.Expense;
 import com.smartbiz.entity.User;
-import com.smartbiz.repository.BusinessRepository;
 import com.smartbiz.repository.ExpenseRepository;
 import com.smartbiz.repository.UserRepository;
+import com.smartbiz.security.SecurityUtils;
 import com.smartbiz.service.ExpenseService;
 import org.springframework.stereotype.Service;
 
@@ -17,24 +17,18 @@ import java.util.List;
 public class ExpenseServiceImpl implements ExpenseService {
 
     private final ExpenseRepository expenseRepository;
-    private final BusinessRepository businessRepository;
     private final UserRepository userRepository;
 
     public ExpenseServiceImpl(ExpenseRepository expenseRepository,
-                              BusinessRepository businessRepository,
                               UserRepository userRepository) {
         this.expenseRepository = expenseRepository;
-        this.businessRepository = businessRepository;
         this.userRepository = userRepository;
     }
 
     @Override
     public ExpenseResponseDto saveExpense(ExpenseRequestDto request) {
-        Business business = businessRepository.findById(request.getBusinessId())
-                .orElseThrow(() -> new RuntimeException("Business not found"));
-
-        User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        User loggedInUser = getLoggedInUser();
+        Business business = loggedInUser.getBusiness();
 
         Expense expense = Expense.builder()
                 .title(request.getTitle())
@@ -43,7 +37,7 @@ public class ExpenseServiceImpl implements ExpenseService {
                 .expenseDate(request.getExpenseDate())
                 .notes(request.getNotes())
                 .business(business)
-                .user(user)
+                .user(loggedInUser)
                 .build();
 
         Expense saved = expenseRepository.save(expense);
@@ -52,7 +46,10 @@ public class ExpenseServiceImpl implements ExpenseService {
 
     @Override
     public List<ExpenseResponseDto> getAllExpenses() {
-        return expenseRepository.findAll()
+        User loggedInUser = getLoggedInUser();
+        Long businessId = loggedInUser.getBusiness().getId();
+
+        return expenseRepository.findByBusinessId(businessId)
                 .stream()
                 .map(this::mapToDto)
                 .toList();
@@ -60,23 +57,31 @@ public class ExpenseServiceImpl implements ExpenseService {
 
     @Override
     public ExpenseResponseDto getExpenseById(Long id) {
-        Expense expense = expenseRepository.findById(id).orElse(null);
-        return expense == null ? null : mapToDto(expense);
+        User loggedInUser = getLoggedInUser();
+        Long businessId = loggedInUser.getBusiness().getId();
+
+        Expense expense = expenseRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Expense not found"));
+
+        if (!expense.getBusiness().getId().equals(businessId)) {
+            throw new RuntimeException("Access denied");
+        }
+
+        return mapToDto(expense);
     }
 
     @Override
     public ExpenseResponseDto updateExpense(Long id, ExpenseRequestDto request) {
-        Expense existing = expenseRepository.findById(id).orElse(null);
+        User loggedInUser = getLoggedInUser();
+        Business business = loggedInUser.getBusiness();
+        Long businessId = business.getId();
 
-        if (existing == null) {
-            return null;
+        Expense existing = expenseRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Expense not found"));
+
+        if (!existing.getBusiness().getId().equals(businessId)) {
+            throw new RuntimeException("Access denied");
         }
-
-        Business business = businessRepository.findById(request.getBusinessId())
-                .orElseThrow(() -> new RuntimeException("Business not found"));
-
-        User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
 
         existing.setTitle(request.getTitle());
         existing.setCategory(request.getCategory());
@@ -84,7 +89,7 @@ public class ExpenseServiceImpl implements ExpenseService {
         existing.setExpenseDate(request.getExpenseDate());
         existing.setNotes(request.getNotes());
         existing.setBusiness(business);
-        existing.setUser(user);
+        existing.setUser(loggedInUser);
 
         Expense updated = expenseRepository.save(existing);
         return mapToDto(updated);
@@ -92,7 +97,28 @@ public class ExpenseServiceImpl implements ExpenseService {
 
     @Override
     public void deleteExpense(Long id) {
+        User loggedInUser = getLoggedInUser();
+        Long businessId = loggedInUser.getBusiness().getId();
+
+        Expense expense = expenseRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Expense not found"));
+
+        if (!expense.getBusiness().getId().equals(businessId)) {
+            throw new RuntimeException("Access denied");
+        }
+
         expenseRepository.deleteById(id);
+    }
+
+    private User getLoggedInUser() {
+        String email = SecurityUtils.getCurrentUserEmail();
+
+        if (email == null) {
+            throw new RuntimeException("No authenticated user found");
+        }
+
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Logged-in user not found"));
     }
 
     private ExpenseResponseDto mapToDto(Expense expense) {
