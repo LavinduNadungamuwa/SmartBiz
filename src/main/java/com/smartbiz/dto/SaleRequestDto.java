@@ -11,7 +11,5 @@ public class SaleRequestDto {
     private BigDecimal totalAmount;
     private PaymentMethod paymentMethod;
     private SaleStatus status;
-    private Long businessId;
     private Long customerId;
-    private Long userId;
 }

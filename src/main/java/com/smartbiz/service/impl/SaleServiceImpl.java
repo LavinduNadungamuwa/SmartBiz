@@ -6,10 +6,10 @@ import com.smartbiz.entity.Business;
 import com.smartbiz.entity.Customer;
 import com.smartbiz.entity.Sale;
 import com.smartbiz.entity.User;
-import com.smartbiz.repository.BusinessRepository;
 import com.smartbiz.repository.CustomerRepository;
 import com.smartbiz.repository.SaleRepository;
 import com.smartbiz.repository.UserRepository;
+import com.smartbiz.security.SecurityUtils;
 import com.smartbiz.service.SaleService;
 import org.springframework.stereotype.Service;
 
@@ -19,30 +19,28 @@ import java.util.List;
 public class SaleServiceImpl implements SaleService {
 
     private final SaleRepository saleRepository;
-    private final BusinessRepository businessRepository;
     private final CustomerRepository customerRepository;
     private final UserRepository userRepository;
 
     public SaleServiceImpl(SaleRepository saleRepository,
-                           BusinessRepository businessRepository,
                            CustomerRepository customerRepository,
                            UserRepository userRepository) {
         this.saleRepository = saleRepository;
-        this.businessRepository = businessRepository;
         this.customerRepository = customerRepository;
         this.userRepository = userRepository;
     }
 
     @Override
     public SaleResponseDto saveSale(SaleRequestDto request) {
-        Business business = businessRepository.findById(request.getBusinessId())
-                .orElseThrow(() -> new RuntimeException("Business not found"));
+        User loggedInUser = getLoggedInUser();
+        Business business = loggedInUser.getBusiness();
 
         Customer customer = customerRepository.findById(request.getCustomerId())
                 .orElseThrow(() -> new RuntimeException("Customer not found"));
 
-        User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        if (!customer.getBusiness().getId().equals(business.getId())) {
+            throw new RuntimeException("Access denied");
+        }
 
         Sale sale = Sale.builder()
                 .totalAmount(request.getTotalAmount())
@@ -50,7 +48,7 @@ public class SaleServiceImpl implements SaleService {
                 .status(request.getStatus())
                 .business(business)
                 .customer(customer)
-                .user(user)
+                .user(loggedInUser)
                 .build();
 
         Sale saved = saleRepository.save(sale);
@@ -59,7 +57,10 @@ public class SaleServiceImpl implements SaleService {
 
     @Override
     public List<SaleResponseDto> getAllSales() {
-        return saleRepository.findAll()
+        User loggedInUser = getLoggedInUser();
+        Long businessId = loggedInUser.getBusiness().getId();
+
+        return saleRepository.findByBusinessId(businessId)
                 .stream()
                 .map(this::mapToDto)
                 .toList();
@@ -67,33 +68,45 @@ public class SaleServiceImpl implements SaleService {
 
     @Override
     public SaleResponseDto getSaleById(Long id) {
-        Sale sale = saleRepository.findById(id).orElse(null);
-        return sale == null ? null : mapToDto(sale);
+        User loggedInUser = getLoggedInUser();
+        Long businessId = loggedInUser.getBusiness().getId();
+
+        Sale sale = saleRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Sale not found"));
+
+        if (!sale.getBusiness().getId().equals(businessId)) {
+            throw new RuntimeException("Access denied");
+        }
+
+        return mapToDto(sale);
     }
 
     @Override
     public SaleResponseDto updateSale(Long id, SaleRequestDto request) {
-        Sale existing = saleRepository.findById(id).orElse(null);
+        User loggedInUser = getLoggedInUser();
+        Business business = loggedInUser.getBusiness();
+        Long businessId = business.getId();
 
-        if (existing == null) {
-            return null;
+        Sale existing = saleRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Sale not found"));
+
+        if (!existing.getBusiness().getId().equals(businessId)) {
+            throw new RuntimeException("Access denied");
         }
-
-        Business business = businessRepository.findById(request.getBusinessId())
-                .orElseThrow(() -> new RuntimeException("Business not found"));
 
         Customer customer = customerRepository.findById(request.getCustomerId())
                 .orElseThrow(() -> new RuntimeException("Customer not found"));
 
-        User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        if (!customer.getBusiness().getId().equals(businessId)) {
+            throw new RuntimeException("Access denied");
+        }
 
         existing.setTotalAmount(request.getTotalAmount());
         existing.setPaymentMethod(request.getPaymentMethod());
         existing.setStatus(request.getStatus());
-        existing.setBusiness(business);
         existing.setCustomer(customer);
-        existing.setUser(user);
+        existing.setUser(loggedInUser);
+        existing.setBusiness(business);
 
         Sale updated = saleRepository.save(existing);
         return mapToDto(updated);
@@ -101,7 +114,28 @@ public class SaleServiceImpl implements SaleService {
 
     @Override
     public void deleteSale(Long id) {
+        User loggedInUser = getLoggedInUser();
+        Long businessId = loggedInUser.getBusiness().getId();
+
+        Sale sale = saleRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Sale not found"));
+
+        if (!sale.getBusiness().getId().equals(businessId)) {
+            throw new RuntimeException("Access denied");
+        }
+
         saleRepository.deleteById(id);
+    }
+
+    private User getLoggedInUser() {
+        String email = SecurityUtils.getCurrentUserEmail();
+
+        if (email == null) {
+            throw new RuntimeException("No authenticated user found");
+        }
+
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Logged-in user not found"));
     }
 
     private SaleResponseDto mapToDto(Sale sale) {
