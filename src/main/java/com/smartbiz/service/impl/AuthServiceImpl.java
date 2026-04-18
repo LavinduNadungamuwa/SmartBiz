@@ -34,7 +34,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthResponseDto register(RegisterRequestDto request) {
-        if (userRepository.existsByEmail(request.getEmail())) {
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
             return new AuthResponseDto(null, "Email already exists");
         }
 
@@ -48,18 +48,20 @@ public class AuthServiceImpl implements AuthService {
 
         businessRepository.save(business);
 
-        User owner = User.builder()
+        UserRole assignedRole = UserRole.ADMIN;
+
+        User user = User.builder()
                 .fullName(request.getOwnerName())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .phone(request.getPhone())
-                .role(UserRole.OWNER)
+                .role(assignedRole)
                 .business(business)
                 .build();
 
-        userRepository.save(owner);
+        userRepository.save(user);
 
-        String token = jwtService.generateToken(owner.getEmail());
+        String token = jwtService.generateToken(user.getEmail());
         return new AuthResponseDto(token, "Registration successful");
     }
 
