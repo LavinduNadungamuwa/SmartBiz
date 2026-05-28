@@ -5,8 +5,13 @@ import ProtectedRoute from './ProtectedRoute';
 import Login from '../pages/auth/Login';
 import Register from '../pages/auth/Register';
 
-// Pages added progressively — stubbed until built
-const Dashboard = () => <div style={{color:'#fff',padding:32}}>Dashboard — coming next</div>;
+// simple route placeholder used across the router
+const Placeholder = ({ name }) => (
+  <div style={{ padding: 24 }}>
+    <h2>{name}</h2>
+    <p className="td-muted">This page is not implemented yet.</p>
+  </div>
+);
 
 export default function AppRouter() {
   return (
@@ -14,16 +19,13 @@ export default function AppRouter() {
       <BrowserRouter>
         <Routes>
           {/* Public */}
-          <Route path="/login" element={<Login />} />
+          <Route path="/login"    element={<Login />} />
           <Route path="/register" element={<Register />} />
 
-          {/* Protected */}
           <Route element={<ProtectedRoute />}>
-            <Route path="/dashboard" element={<Dashboard />} />
-            {/* More routes added here as pages are built */}
+            <Route path="/dashboard" element={<Placeholder name="Dashboard" />} />
           </Route>
 
-          {/* Default redirect */}
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </BrowserRouter>
