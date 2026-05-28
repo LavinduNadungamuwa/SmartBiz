@@ -45,29 +45,40 @@ export default function Register() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    const errs = validate();
-    if (Object.keys(errs).length) {
-      setErrors(errs);
+
+  e.preventDefault();
+
+  setError('');
+
+  try {
+
+    const res = await register(form);
+
+    // REGISTRATION FAILED
+    if (!res.data.token) {
+      setError(res.data.message || 'Registration failed');
       return;
     }
-    setLoading(true);
-    try {
-      // eslint-disable-next-line no-unused-vars
-      const { confirmPassword, ...payload } = form;
-      const res = await register(payload);
-      saveAuth(res.data.token);
-      navigate('/dashboard');
-    } catch (err) {
-      setApiError(
-        err.response?.data?.message ||
-          err.response?.data ||
-          'Registration failed. Please try again.'
-      );
-    } finally {
-      setLoading(false);
+
+    // Save auth
+    const success = saveAuth(res.data.token);
+
+    if (!success) {
+      setError('Authentication failed');
+      return;
     }
-  };
+
+    // SUCCESS
+    navigate('/login');
+
+  } catch (err) {
+
+    setError(
+      err.response?.data?.message ||
+      'Registration failed'
+    );
+  }
+};
 
   const field = (name, label, type = 'text', placeholder = '', half = false) => (
     <div className={`field${half ? ' field--half' : ''}`}>

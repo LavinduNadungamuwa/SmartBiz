@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { login } from '../../api/auth';
 import { useAuth } from '../../store/AuthContext';
@@ -19,26 +19,46 @@ export default function Login() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!form.email || !form.password) {
-      setError('Please fill in all fields.');
+
+  e.preventDefault();
+
+  setError('');
+
+  if (!form.email || !form.password) {
+    setError('Please fill all fields');
+    return;
+  }
+
+  try {
+
+    const res = await login(form);
+
+    // LOGIN FAILED
+    if (!res.data.token) {
+      setError(res.data.message || 'Invalid credentials');
       return;
     }
-    setLoading(true);
-    try {
-      const res = await login(form);
-      saveAuth(res.data.token);
-      navigate('/dashboard');
-    } catch (err) {
-      setError(
-        err.response?.data?.message ||
-          err.response?.data ||
-          'Invalid email or password.'
-      );
-    } finally {
-      setLoading(false);
+
+    // Save auth
+    const success = saveAuth(res.data.token);
+
+    // Invalid token
+    if (!success) {
+      setError('Authentication failed');
+      return;
     }
-  };
+
+    // SUCCESS
+    navigate('/dashboard');
+
+  } catch (err) {
+
+    setError(
+      err.response?.data?.message ||
+      'Login failed'
+    );
+  }
+};
 
   return (
     <div className="auth-root">
