@@ -2,7 +2,7 @@
 
 /* Theme variables — green / black */
 :root {
-  --bg-900: #030404;
+  --bg-900: #434a4a;
   --bg-800: #061010;
   --panel: rgba(12, 14, 12, 0.7);
   --glass-border: rgba(255,255,255,0.04);
@@ -89,7 +89,7 @@ html, body, #root {
 .feat-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--neon); flex-shrink: 0; }
 
 /* subtle grid overlay */
-.brand-grid { position: absolute; inset: 0; z-index: 1; opacity: 0.04; background-image: linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(180deg, rgba(255,255,255,0.02) 1px, transparent 1px); background-size: 28px 28px, 28px 28px; }
+.brand-grid { position: absolute; inset: 0; z-index: 1; opacity: 0.05; background-image: linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(180deg, rgba(255,255,255,0.02) 1px, transparent 1px); background-size: 28px 28px, 28px 28px; }
 
 /* ── Form panel (right) ──────────────────────────────────── */
 .auth-panel--form {
@@ -100,20 +100,28 @@ html, body, #root {
   justify-content: center;
   padding: 48px 40px;
   background: transparent;
-  overflow-y: auto;
+  overflow: hidden; /* prevent panel from scrolling */
 }
 
 .form-card {
   width: 100%;
-  max-width: 420px;
+  max-width: 550px;
   background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
   border: 1px solid var(--glass-border);
-  border-radius: 12px;
+  border-radius: 20px;
   padding: 28px 28px;
   box-shadow: 0 10px 50px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.01);
   backdrop-filter: blur(6px) saturate(120%);
+  /* ensure the card never exceeds the viewport height; internal scroll if needed */
+  max-height: calc(100vh - 96px);
+  overflow-y: auto;
+  position: relative;
 }
-.form-card--wide { max-width: 640px; }
+
+/* Small screens: make card fit comfortably and avoid scrolling where possible */
+@media (max-height: 700px) {
+  .form-card { max-height: calc(100vh - 48px); }
+}
 
 .form-header { margin-bottom: 24px; }
 .form-title { font-family: 'DM Serif Display', serif; font-size: 30px; color: var(--neon); margin-bottom: 8px; }
@@ -133,7 +141,8 @@ html, body, #root {
   padding: 11px 14px;
   font-family: 'DM Sans', sans-serif;
   font-size: 14px;
-  color: #e8fef0;
+  color: #ffffff; /* typing text color */
+  caret-color: #ffffff;
   outline: none;
   transition: border-color 0.14s, box-shadow 0.14s, transform 0.12s;
   width: 100%;
@@ -141,6 +150,42 @@ html, body, #root {
 .field__input::placeholder { color: rgba(200,240,200,0.26); }
 .field__input:focus { border-color: var(--neon); box-shadow: 0 10px 30px rgba(46,240,138,0.06); transform: translateY(-1px); }
 .field__input--error { border-color: rgba(255,80,80,0.4); }
+
+/* Add subtle green tint to inputs that have content (typed or valid) */
+.field__input:not(:placeholder-shown),
+.field__input:valid {
+  /* inset overlay keeps original dark background while tinting */
+  box-shadow: inset 0 0 0 1000px rgba(76,164,85,0.05);
+}
+
+/* Ensure focused + filled keeps tint but shows neon border */
+.field__input:not(:placeholder-shown):focus,
+.field__input:valid:focus {
+  border-color: var(--neon);
+  box-shadow: inset 0 0 0 1000px rgba(76,164,85,0.18), 0 10px 30px rgba(46,240,138,0.06);
+}
+
+/* Keep inputs dark when browser autofills (Chrome/Blink) and preserve tint using background-image overlay */
+input.field__input:-webkit-autofill,
+input.field__input:-webkit-autofill:focus,
+input.field__input:-webkit-autofill:hover {
+  -webkit-text-fill-color: #ffffff !important;
+  caret-color: #ffffff !important;
+  background-color: rgba(5,8,6,0.6) !important;
+  -webkit-box-shadow: 0 0 0 30px rgba(5,8,6,0.6) inset !important;
+  /* subtle green overlay using background-image so tint shows without breaking autofill box-shadow hacks */
+  background-image: linear-gradient(rgba(76,164,85,0.05), rgba(76,164,85,0.05)) !important;
+  background-blend-mode: overlay !important;
+}
+
+/* Firefox autofill tint */
+input.field__input:-moz-autofill,
+input.field__input:-moz-autofill:focus {
+  box-shadow: 0 0 0 30px rgba(5,8,6,0.6) inset !important;
+  -moz-text-fill-color: #ffffff !important;
+  background-image: linear-gradient(rgba(76,164,85,0.05), rgba(76,164,85,0.05)) !important;
+  background-blend-mode: overlay !important;
+}
 
 .field__password-wrap { position: relative; }
 .field__password-wrap .field__input { padding-right: 44px; }
@@ -151,7 +196,7 @@ html, body, #root {
 
 /* ── Divider ─────────────────────────────────────────────── */
 .field-divider { display: flex; align-items: center; gap: 12px; margin: 4px 0 18px; }
-.field-divider::before, .field-divider::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.02); }
+.field-divider::before, .field-divider::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.1); }
 .field-divider span { font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--muted); }
 
 /* ── Password strength ───────────────────────────────────── */
@@ -164,7 +209,7 @@ html, body, #root {
 .btn-primary {
   width: 100%;
   padding: 13px 24px;
-  background: linear-gradient(90deg, rgba(85, 212, 80, 0.735), rgba(117, 219, 119, 0.778));
+  background: linear-gradient(90deg, rgba(85, 212, 80, 0.535), rgba(105, 215, 108, 0.678));
   color: #02120a;
   font-family: 'DM Sans', sans-serif;
   font-size: 14px;
@@ -192,4 +237,21 @@ html, body, #root {
   .auth-panel--brand { display: none; }
   .auth-panel--form { padding: 32px 20px; }
   .field-row { flex-direction: column; gap: 0; }
+}
+
+/* layout helpers for form rows */
+.field-row {
+  display: flex;
+  gap: 16px;
+  align-items: stretch;
+}
+
+.field--half {
+  flex: 1;
+  min-width: 0; /* prevents overflow of long content */
+}
+
+/* keep stacking on small screens (already present) */
+@media (max-width: 768px) {
+  .field-row { flex-direction: column; gap: 12px; }
 }

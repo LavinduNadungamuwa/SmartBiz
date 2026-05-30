@@ -90,7 +90,7 @@ export default function Login() {
       <div className="auth-panel auth-panel--form">
         <div className="form-card">
           <div className="form-header">
-            <h2 className="form-title">Welcome back</h2>
+            <h2 className="form-title">Welcome back!</h2>
             <p className="form-subtitle">Sign in to your SmartBiz account</p>
           </div>
 
