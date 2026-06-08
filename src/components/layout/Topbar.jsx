@@ -41,7 +41,6 @@ export default function Topbar({ onMenuClick }) {
           <span>v</span>
         </button>
         <Toggle
-          label={theme === 'dark' ? 'Dark mode' : 'Light mode'}
           checked={theme === 'dark'}
           onChange={() => setTheme(t => (t === 'dark' ? 'light' : 'dark'))}
           ariaLabel="Toggle dark mode"
