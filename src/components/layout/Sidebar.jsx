@@ -1,5 +1,8 @@
-import { NavLink } from 'react-router-dom';
+import { useState } from 'react';
+import { NavLink, useNavigate } from 'react-router-dom';
 import Icon from '../ui/Icon';
+import Button from '../ui/Button';
+import useAuth from '../../store/useAuth';
 
 const navItems = [
   ['Dashboard', '/dashboard', 'dashboard'],
@@ -15,6 +18,16 @@ const navItems = [
 ];
 
 export default function Sidebar({ collapsed, onToggle }) {
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogoutConfirm = () => {
+    logout();
+    setShowLogoutModal(false);
+    navigate('/login');
+  };
+
   return (
     <aside className={`app-sidebar${collapsed ? ' is-collapsed' : ''}`}>
       <div className="sidebar-brand">
@@ -37,10 +50,33 @@ export default function Sidebar({ collapsed, onToggle }) {
         ))}
       </nav>
 
-      <button className="nav-item logout-button" type="button">
+      <button className="nav-item logout-button" type="button" onClick={() => setShowLogoutModal(true)}>
         <Icon name="logout" />
         <span>Logout</span>
       </button>
+
+      {showLogoutModal && (
+        <div className="modal-overlay" onClick={() => setShowLogoutModal(false)}>
+          <div className="modal-container" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Confirm logout</h3>
+              <button className="modal-close" onClick={() => setShowLogoutModal(false)} aria-label="Close">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+            <div className="modal-body">
+              Are you sure you want to logout? You will be redirected to the login page.
+            </div>
+            <div className="modal-footer">
+              <Button variant="ghost" onClick={() => setShowLogoutModal(false)}>Cancel</Button>
+              <Button onClick={handleLogoutConfirm}>Logout</Button>
+            </div>
+          </div>
+        </div>
+      )}
     </aside>
   );
 }
