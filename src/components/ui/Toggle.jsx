@@ -1,8 +1,13 @@
-export default function Toggle({ label, checked = true }) {
+export default function Toggle({ label = '', checked = false, onChange = () => {}, ariaLabel }) {
   return (
     <label className="toggle-row">
       <span>{label}</span>
-      <input type="checkbox" defaultChecked={checked} />
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={onChange}
+        aria-label={ariaLabel}
+      />
       <i />
     </label>
   );

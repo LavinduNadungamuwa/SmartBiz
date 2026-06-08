@@ -1,6 +1,19 @@
 import Icon from '../ui/Icon';
+import Toggle from '../ui/Toggle';
+import { useEffect, useState } from 'react';
 
 export default function Topbar({ onMenuClick }) {
+  const [theme, setTheme] = useState(() => localStorage.getItem('sb_theme') || 'light');
+
+  useEffect(() => {
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    localStorage.setItem('sb_theme', theme);
+  }, [theme]);
+
   const user = readSavedUser();
   const email = user.sub || user.email || 'smartbiz@account.com';
   const initials = email.slice(0, 2).toUpperCase();
@@ -27,6 +40,12 @@ export default function Topbar({ onMenuClick }) {
           {user.businessId ? `Business #${user.businessId}` : 'SmartBiz Business'}
           <span>v</span>
         </button>
+        <Toggle
+          label={theme === 'dark' ? 'Dark mode' : 'Light mode'}
+          checked={theme === 'dark'}
+          onChange={() => setTheme(t => (t === 'dark' ? 'light' : 'dark'))}
+          ariaLabel="Toggle dark mode"
+        />
         <div className="avatar" aria-label="User profile">
           {initials}
         </div>

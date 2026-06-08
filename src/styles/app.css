@@ -19,6 +19,25 @@
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
+.dark {
+  --app-bg: #0b1220;
+  --surface: #0f1724;
+  --surface-soft: #0b1226;
+  --border: #172033;
+  --text: #e6eef8;
+  --muted: #9aa9bf;
+  --blue: #60a5fa;
+  --blue-600: #3b82f6;
+  --blue-soft: rgba(96, 165, 250, 0.08);
+  --green: #34d399;
+  --green-soft: rgba(52, 211, 153, 0.06);
+  --orange: #fcd34d;
+  --orange-soft: rgba(252, 211, 77, 0.06);
+  --red: #fb7185;
+  --red-soft: rgba(251, 113, 133, 0.04);
+  --shadow: 0 10px 30px rgba(2, 6, 23, 0.6);
+}
+
 body {
   background: var(--app-bg);
   color: var(--text);
@@ -46,7 +65,7 @@ input {
   gap: 22px;
   height: 100vh;
   padding: 18px 16px;
-  background: #ffffff;
+  background: var(--surface);
   border-right: 1px solid var(--border);
 }
 
@@ -166,6 +185,7 @@ input {
   gap: 18px;
   padding: 0 28px;
   background: rgba(255, 255, 255, 0.9);
+  background: var(--surface);
   border-bottom: 1px solid var(--border);
   backdrop-filter: blur(12px);
   flex: 0 0 auto;
@@ -183,7 +203,7 @@ input {
   align-items: center;
   gap: 10px;
   color: var(--muted);
-  background: #f8fafc;
+  background: var(--surface-soft);
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 0 14px;
@@ -217,11 +237,24 @@ input {
   justify-content: center;
   width: 38px;
   height: 38px;
-  color: #475467;
+  color: var(--text);
   border: 1px solid var(--border);
-  background: #ffffff;
+  background: var(--surface);
   border-radius: 10px;
   cursor: pointer;
+}
+
+.icon-button.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 38px;
+  font-size: 16px;
+  line-height: 1;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
 }
 
 .notification-dot {
@@ -232,7 +265,7 @@ input {
   height: 8px;
   border-radius: 999px;
   background: var(--red);
-  border: 2px solid #ffffff;
+  border: 2px solid var(--surface);
 }
 
 .business-switcher {
@@ -242,8 +275,8 @@ input {
   height: 38px;
   border: 1px solid var(--border);
   border-radius: 10px;
-  color: #344054;
-  background: #ffffff;
+  color: var(--text);
+  background: var(--surface);
   padding: 0 12px;
   font-weight: 600;
   cursor: pointer;
@@ -256,8 +289,8 @@ input {
   width: 38px;
   height: 38px;
   border-radius: 999px;
-  background: #111827;
-  color: #ffffff;
+  background: var(--text);
+  color: var(--surface);
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
@@ -1143,7 +1176,7 @@ input {
   width: 46px;
   height: 26px;
   border-radius: 999px;
-  background: #cbd5e1;
+  background: var(--border);
   position: relative;
   cursor: pointer;
 }
