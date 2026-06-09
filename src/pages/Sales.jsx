@@ -45,6 +45,8 @@ export default function Sales() {
   if (loading) return <LoadingState message="Loading sales..." />;
   if (error) return <ErrorState message={error} onRetry={reload} />;
 
+  console.log("Sales Data:", data.sales);
+
   const customerById = indexById(data.customers || []);
   const productById = indexById(data.products || []);
 
@@ -52,10 +54,7 @@ export default function Sales() {
   const filteredSales = (data.sales || []).filter((sale) => {
     const customer = customerById[sale.customerId];
     const customerName = customer?.fullName || '';
-    const saleItems = sale.items || sale.saleItems || [];
-    const productNames = saleItems
-      .map((item) => item.productName || productById[item.productId]?.productName || '')
-      .join(' ');
+    const productNames = sale.products || '';
 
     // Search matching
     const query = searchValue.toLowerCase().trim();
@@ -307,21 +306,15 @@ export default function Sales() {
   const totalSales = (data.sales || []).reduce((sum, sale) => sum + Number(sale.totalAmount || 0), 0);
 
   const rows = paginatedSales.map((sale) => {
-    const saleItems = sale.items || sale.saleItems || [];
-    const productNames = saleItems
-      .map((item) => item.productName || productById[item.productId]?.productName)
-      .filter(Boolean)
-      .join(', ') || '-';
-
-    return [
-      sale.invoiceNumber || `SALE-${sale.id}`,
-      customerById[sale.customerId]?.fullName || `Customer #${sale.customerId || '-'}`,
-      productNames,
-      currency(sale.totalAmount),
-      date(sale.saleDate),
-      status(sale.status),
-    ];
-  });
+  return [
+    sale.invoiceNumber || `SALE-${sale.id}`,
+    customerById[sale.customerId]?.fullName || `Customer #${sale.customerId || '-'}`,
+    sale.products || '-',
+    currency(sale.totalAmount),
+    date(sale.saleDate),
+    status(sale.status),
+  ];
+});
 
   // Normalize items for the view modal so the table always has usable fields and totals
   const viewItems = selectedSale
