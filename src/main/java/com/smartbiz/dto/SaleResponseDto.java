@@ -19,4 +19,5 @@ public class SaleResponseDto {
     private Long businessId;
     private Long customerId;
     private Long userId;
+    private String products;
 }

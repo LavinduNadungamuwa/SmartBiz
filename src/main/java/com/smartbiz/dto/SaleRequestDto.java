@@ -5,6 +5,7 @@ import com.smartbiz.enums.SaleStatus;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Data
 public class SaleRequestDto {
@@ -12,4 +13,6 @@ public class SaleRequestDto {
     private PaymentMethod paymentMethod;
     private SaleStatus status;
     private Long customerId;
+
+    private List<SaleItemRequestDto> items;
 }

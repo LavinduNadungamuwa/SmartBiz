@@ -1,21 +1,19 @@
 package com.smartbiz.service.impl;
 
+import com.smartbiz.dto.SaleItemRequestDto;
 import com.smartbiz.dto.SaleRequestDto;
 import com.smartbiz.dto.SaleResponseDto;
-import com.smartbiz.entity.Business;
-import com.smartbiz.entity.Customer;
-import com.smartbiz.entity.Sale;
-import com.smartbiz.entity.User;
+import com.smartbiz.entity.*;
 import com.smartbiz.exception.AccessDeniedException;
 import com.smartbiz.exception.ResourceNotFoundException;
-import com.smartbiz.repository.CustomerRepository;
-import com.smartbiz.repository.SaleRepository;
-import com.smartbiz.repository.UserRepository;
+import com.smartbiz.repository.*;
 import com.smartbiz.service.SaleService;
 import com.smartbiz.util.SecurityHelper;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class SaleServiceImpl implements SaleService {
@@ -23,13 +21,19 @@ public class SaleServiceImpl implements SaleService {
     private final SaleRepository saleRepository;
     private final CustomerRepository customerRepository;
     private final UserRepository userRepository;
+    private final SaleItemRepository saleItemRepository;
+    private final ProductRepository productRepository;
 
     public SaleServiceImpl(SaleRepository saleRepository,
                            CustomerRepository customerRepository,
-                           UserRepository userRepository) {
+                           UserRepository userRepository,
+                           SaleItemRepository saleItemRepository,
+                           ProductRepository productRepository) {
         this.saleRepository = saleRepository;
         this.customerRepository = customerRepository;
         this.userRepository = userRepository;
+        this.saleItemRepository = saleItemRepository;
+        this.productRepository = productRepository;
     }
 
     @Override
@@ -54,6 +58,33 @@ public class SaleServiceImpl implements SaleService {
                 .build();
 
         Sale saved = saleRepository.save(sale);
+
+        if (request.getItems() != null) {
+
+            for (SaleItemRequestDto itemDto : request.getItems()) {
+
+                Product product = productRepository.findById(itemDto.getProductId())
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException("Product not found"));
+
+                SaleItem saleItem = SaleItem.builder()
+                        .sale(saved)
+                        .product(product)
+                        .quantity(itemDto.getQuantity())
+                        .unitPrice(product.getUnitPrice())
+                        .subtotal(
+                                product.getUnitPrice()
+                                        .multiply(BigDecimal.valueOf(itemDto.getQuantity()))
+                        )
+                        .build();
+
+                saleItemRepository.save(saleItem);
+            }
+        }
+
+        saved = saleRepository.findById(saved.getId())
+                .orElseThrow();
+
         return mapToDto(saved);
     }
 
@@ -62,7 +93,7 @@ public class SaleServiceImpl implements SaleService {
         User loggedInUser = SecurityHelper.getLoggedInUser(userRepository);
         Long businessId = loggedInUser.getBusiness().getId();
 
-        return saleRepository.findByBusinessId(businessId)
+        return saleRepository.findByBusinessIdWithItems(businessId)
                 .stream()
                 .map(this::mapToDto)
                 .toList();
@@ -130,8 +161,21 @@ public class SaleServiceImpl implements SaleService {
     }
 
     private SaleResponseDto mapToDto(Sale sale) {
+
+        String products = sale.getSaleItems()
+                .stream()
+                .map(item -> item.getProduct().getProductName())
+                .collect(Collectors.joining(", "));
+
+        System.out.println(
+                "Sale " + sale.getId() +
+                        " items count = " +
+                        sale.getSaleItems().size()
+        );
+
         return SaleResponseDto.builder()
                 .id(sale.getId())
+                .products(products)
                 .saleDate(sale.getSaleDate())
                 .totalAmount(sale.getTotalAmount())
                 .paymentMethod(sale.getPaymentMethod())
