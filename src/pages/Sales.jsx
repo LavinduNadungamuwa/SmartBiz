@@ -8,7 +8,7 @@ import PageHeader from '../components/ui/PageHeader';
 import StatCard from '../components/ui/StatCard';
 import Toolbar from '../components/ui/Toolbar';
 import { useBusinessData } from '../api/resources';
-import { createSale, updateSale, deleteSale } from '../api/useSales';
+import { createSale, updateSale, deleteSale, getSaleById, getSaleItems } from '../api/useSales';
 import { currency, date, indexById, lastMonthsSeries, number, status } from '../utils/formatters';
 import useAuth from '../store/useAuth';
 
@@ -33,7 +33,6 @@ export default function Sales() {
     saleDate: '',
     status: 'COMPLETED',
     paymentMethod: 'CASH',
-    tax: '0',
     discount: '0',
     notes: '',
     items: [],
@@ -41,6 +40,8 @@ export default function Sales() {
   const [formErrors, setFormErrors] = useState({});
   const [submitLoading, setSubmitLoading] = useState(false);
   const [submitError, setSubmitError] = useState('');
+  const [viewLoading, setViewLoading] = useState(false);
+  const [viewSaleItems, setViewSaleItems] = useState([]);
 
   if (loading) return <LoadingState message="Loading sales..." />;
   if (error) return <ErrorState message={error} onRetry={reload} />;
@@ -101,7 +102,6 @@ export default function Sales() {
       saleDate: new Date().toISOString().split('T')[0],
       status: 'COMPLETED',
       paymentMethod: 'CASH',
-      tax: '0',
       discount: '0',
       notes: '',
       items: [{ productId: '', quantity: 1, unitPrice: '' }],
@@ -114,6 +114,7 @@ export default function Sales() {
   const closeModal = () => {
     setModalMode(null);
     setSelectedSale(null);
+    setViewSaleItems([]);
   };
 
   const handleEdit = (index) => {
@@ -127,7 +128,6 @@ export default function Sales() {
       saleDate: sale.saleDate ? new Date(sale.saleDate).toISOString().split('T')[0] : '',
       status: sale.status || 'COMPLETED',
       paymentMethod: sale.paymentMethod || 'CASH',
-      tax: sale.tax !== undefined ? String(sale.tax) : '0',
       discount: sale.discount !== undefined ? String(sale.discount) : '0',
       notes: sale.notes || '',
       // Include productName so edit modal can show read-only product labels
@@ -143,11 +143,35 @@ export default function Sales() {
     setModalMode('edit');
   };
 
-  const handleView = (index) => {
+  const handleView = async (index) => {
     const sale = paginatedSales[index];
     if (!sale) return;
     setSelectedSale(sale);
+    setViewSaleItems([]);
     setModalMode('view');
+    setViewLoading(true);
+    try {
+      const [saleRes, itemsRes] = await Promise.all([
+        getSaleById(sale.id),
+        getSaleItems(),
+      ]);
+      setSelectedSale(saleRes.data);
+      console.log('[handleView] saleRes.data:', saleRes.data);
+      console.log('[handleView] initial sale from list:', sale);
+      // Filter items belonging to this sale; field may be saleId or sale.id
+      const allItems = Array.isArray(itemsRes.data) ? itemsRes.data : [];
+      const filtered = allItems.filter(
+        (item) =>
+          item.saleId === sale.id ||
+          item.sale?.id === sale.id ||
+          item.sale_id === sale.id
+      );
+      setViewSaleItems(filtered);
+    } catch {
+      // fall back gracefully — modal stays open with basic sale info
+    } finally {
+      setViewLoading(false);
+    }
   };
 
   const handleDelete = async (index) => {
@@ -205,7 +229,7 @@ export default function Sales() {
     return sum + qty * price;
   }, 0);
 
-  const calculatedTotal = calculatedSubtotal + Number(formData.tax || 0) - Number(formData.discount || 0);
+  const calculatedTotal = calculatedSubtotal - Number(formData.discount || 0);
 
   // Form Validation
   const validateForm = () => {
@@ -242,9 +266,6 @@ export default function Sales() {
       }
     }
 
-    if (formData.tax === '' || isNaN(Number(formData.tax)) || Number(formData.tax) < 0) {
-      errors.tax = 'Tax must be a non-negative number';
-    }
     if (formData.discount === '' || isNaN(Number(formData.discount)) || Number(formData.discount) < 0) {
       errors.discount = 'Discount must be a non-negative number';
     }
@@ -277,7 +298,7 @@ export default function Sales() {
       status: formData.status.toUpperCase(),
       paymentMethod: formData.paymentMethod,
       subtotal: calculatedSubtotal,
-      tax: parseFloat(formData.tax),
+      tax: 0,
       discount: parseFloat(formData.discount),
       totalAmount: calculatedTotal,
       notes: formData.notes.trim(),
@@ -306,38 +327,31 @@ export default function Sales() {
   const totalSales = (data.sales || []).reduce((sum, sale) => sum + Number(sale.totalAmount || 0), 0);
 
   const rows = paginatedSales.map((sale) => {
-  return [
-    sale.invoiceNumber || `SALE-${sale.id}`,
-    customerById[sale.customerId]?.fullName || `Customer #${sale.customerId || '-'}`,
-    sale.products || '-',
-    currency(sale.totalAmount),
-    date(sale.saleDate),
-    status(sale.status),
-  ];
-});
+    return [
+      sale.invoiceNumber || `SALE-${sale.id}`,
+      customerById[sale.customerId]?.fullName || `Customer #${sale.customerId || '-'}`,
+      sale.products || '-',
+      currency(sale.totalAmount),
+      date(sale.saleDate),
+      status(sale.status),
+    ];
+  });
 
-  // Normalize items for the view modal so the table always has usable fields and totals
-  const viewItems = selectedSale
-    ? (() => {
-        const itemsRaw = selectedSale.items || selectedSale.saleItems || selectedSale.sale_items || [];
-        if (!Array.isArray(itemsRaw)) return [];
-        return itemsRaw.map((item) => {
-          const productId = item.productId ?? item.product_id ?? item.product?.id ?? item.product?.productId;
-          const productName =
-            item.productName || item.product?.productName || item.product?.name || productById[productId]?.productName || `Product #${productId}`;
-          const quantity = Number(item.quantity ?? item.qty ?? 0);
-          const unitPrice = Number(item.unitPrice ?? item.unit_price ?? item.price ?? item.unit?.price ?? 0);
-          const totalPrice = Number(item.totalPrice ?? item.total_price ?? item.total ?? (quantity * unitPrice) ?? 0);
-          return {
-            productId,
-            productName,
-            quantity: isNaN(quantity) ? 0 : quantity,
-            unitPrice: isNaN(unitPrice) ? 0 : unitPrice,
-            totalPrice: isNaN(totalPrice) ? 0 : totalPrice,
-          };
-        });
-      })()
-    : [];
+  // Normalize viewSaleItems for display in the view modal
+  const viewItems = viewSaleItems.map((item) => {
+    const productId = item.productId ?? item.product_id ?? item.product?.id ?? item.product?.productId;
+    const productName =
+      item.productName || item.product?.productName || item.product?.name || productById[productId]?.productName || `Product #${productId}`;
+    const quantity = Number(item.quantity ?? item.qty ?? 0);
+    const unitPrice = Number(item.unitPrice ?? item.unit_price ?? item.price ?? 0);
+    const totalPrice = Number(item.totalPrice ?? item.total_price ?? item.total ?? quantity * unitPrice);
+    return {
+      productName,
+      quantity: isNaN(quantity) ? 0 : quantity,
+      unitPrice: isNaN(unitPrice) ? 0 : unitPrice,
+      totalPrice: isNaN(totalPrice) ? 0 : totalPrice,
+    };
+  });
 
   return (
     <div className="page">
@@ -414,14 +428,14 @@ export default function Sales() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="modal-header">
-               <h3>{modalMode === 'create' ? 'Record New Sale' : 'Edit Sale Record'}</h3>
-               <button className="modal-close" onClick={closeModal} aria-label="Close">
-                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                   <line x1="18" y1="6" x2="6" y2="18"></line>
-                   <line x1="6" y1="6" x2="18" y2="18"></line>
-                 </svg>
-               </button>
-             </div>
+              <h3>{modalMode === 'create' ? 'Record New Sale' : 'Edit Sale Record'}</h3>
+              <button className="modal-close" onClick={closeModal} aria-label="Close">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
             <form onSubmit={handleSubmit}>
               <div
                 className="modal-body"
@@ -430,11 +444,11 @@ export default function Sales() {
                   maxHeight: 'calc(90vh - 180px)', // leaves room for header/footer
                 }}
               >
-                 {submitError && (
-                   <div style={{ color: 'var(--red)', background: 'var(--red-soft)', padding: '10px 14px', borderRadius: '8px', marginBottom: '16px', fontSize: '14px' }}>
-                     {submitError}
-                   </div>
-                 )}
+                {submitError && (
+                  <div style={{ color: 'var(--red)', background: 'var(--red-soft)', padding: '10px 14px', borderRadius: '8px', marginBottom: '16px', fontSize: '14px' }}>
+                    {submitError}
+                  </div>
+                )}
                 <div className="form-grid">
                   <div className="form-row-2">
                     <div className="form-field">
@@ -544,7 +558,7 @@ export default function Sales() {
                     {formErrors.itemsGlobal && (
                       <div className="error-msg" style={{ marginBottom: '12px', display: 'block' }}>{formErrors.itemsGlobal}</div>
                     )}
-                    
+
                     <div style={{ display: 'grid', gap: '12px' }}>
                       {formData.items.map((item, idx) => {
                         const itemErr = formErrors.items?.[idx] || {};
@@ -645,40 +659,21 @@ export default function Sales() {
                       <strong>{currency(calculatedSubtotal)}</strong>
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-                      <div className="form-field">
-                        <label htmlFor="tax" style={{ fontSize: '12px' }}>Tax ($)</label>
-                        <input
-                          type="number"
-                          id="tax"
-                          min="0"
-                          step="0.01"
-                          className={formErrors.tax ? 'error' : ''}
-                          value={formData.tax}
-                          onChange={(e) => {
-                            setFormData({ ...formData, tax: e.target.value });
-                            setFormErrors({ ...formErrors, tax: '' });
-                          }}
-                        />
-                        {formErrors.tax && <span className="error-msg">{formErrors.tax}</span>}
-                      </div>
-
-                      <div className="form-field">
-                        <label htmlFor="discount" style={{ fontSize: '12px' }}>Discount ($)</label>
-                        <input
-                          type="number"
-                          id="discount"
-                          min="0"
-                          step="0.01"
-                          className={formErrors.discount ? 'error' : ''}
-                          value={formData.discount}
-                          onChange={(e) => {
-                            setFormData({ ...formData, discount: e.target.value });
-                            setFormErrors({ ...formErrors, discount: '' });
-                          }}
-                        />
-                        {formErrors.discount && <span className="error-msg">{formErrors.discount}</span>}
-                      </div>
+                    <div className="form-field">
+                      <label htmlFor="discount" style={{ fontSize: '12px' }}>Discount ($)</label>
+                      <input
+                        type="number"
+                        id="discount"
+                        min="0"
+                        step="0.01"
+                        className={formErrors.discount ? 'error' : ''}
+                        value={formData.discount}
+                        onChange={(e) => {
+                          setFormData({ ...formData, discount: e.target.value });
+                          setFormErrors({ ...formErrors, discount: '' });
+                        }}
+                      />
+                      {formErrors.discount && <span className="error-msg">{formErrors.discount}</span>}
                     </div>
 
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '16px', fontWeight: 800, borderTop: '1px solid var(--border)', paddingTop: '12px', marginTop: '4px' }}>
@@ -723,15 +718,15 @@ export default function Sales() {
             }}
             onClick={(e) => e.stopPropagation()}
           >
-             <div className="modal-header">
-               <h3>Sale Invoice Details</h3>
-               <button className="modal-close" onClick={closeModal} aria-label="Close">
-                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                   <line x1="18" y1="6" x2="6" y2="18"></line>
-                   <line x1="6" y1="6" x2="18" y2="18"></line>
-                 </svg>
-               </button>
-             </div>
+            <div className="modal-header">
+              <h3>Sale Invoice Details</h3>
+              <button className="modal-close" onClick={closeModal} aria-label="Close">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
             <div
               className="modal-body"
               style={{
@@ -742,86 +737,82 @@ export default function Sales() {
                 paddingRight: '8px',
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--border)', paddingBottom: '16px' }}>
-                <div>
-                  <h4 style={{ margin: 0, fontSize: '18px', fontWeight: '700' }}>
-                    {selectedSale.invoiceNumber || `SALE-${selectedSale.id}`}
-                  </h4>
-                  <span style={{ color: 'var(--muted)', fontSize: '13px' }}>Date: {date(selectedSale.saleDate)}</span>
+              {viewLoading ? (
+                <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--muted)' }}>Loading sale details…</div>
+              ) : (<>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--border)', paddingBottom: '16px' }}>
+                  <div>
+                    <h4 style={{ margin: 0, fontSize: '18px', fontWeight: '700' }}>
+                      {selectedSale.invoiceNumber || `SALE-${selectedSale.id}`}
+                    </h4>
+                    <span style={{ color: 'var(--muted)', fontSize: '13px' }}>Date: {date(selectedSale.saleDate)}</span>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <span style={{ display: 'inline-block', padding: '6px 12px', borderRadius: '12px', fontSize: '13px', fontWeight: 700, background: selectedSale.status === 'COMPLETED' ? 'var(--blue-soft)' : 'var(--orange-soft)', color: selectedSale.status === 'COMPLETED' ? 'var(--blue)' : 'var(--orange)' }}>
+                      {status(selectedSale.status)}
+                    </span>
+                  </div>
                 </div>
-                <div style={{ textAlign: 'right' }}>
-                  <span style={{ display: 'inline-block', padding: '6px 12px', borderRadius: '12px', fontSize: '13px', fontWeight: 700, background: selectedSale.status === 'COMPLETED' ? 'var(--blue-soft)' : 'var(--orange-soft)', color: selectedSale.status === 'COMPLETED' ? 'var(--blue)' : 'var(--orange)' }}>
-                    {status(selectedSale.status)}
-                  </span>
-                </div>
-              </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-                <div>
-                  <label style={{ display: 'block', fontSize: '11px', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '4px' }}>Customer Name</label>
-                  <strong>{customerById[selectedSale.customerId]?.fullName || `Customer #${selectedSale.customerId || '-'}`}</strong>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '11px', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '4px' }}>Customer Name</label>
+                    <strong>{customerById[selectedSale.customerId]?.fullName || `Customer #${selectedSale.customerId || '-'}`}</strong>
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '11px', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '4px' }}>Payment Method</label>
+                    <strong>{status(selectedSale.paymentMethod)}</strong>
+                  </div>
                 </div>
-                 <div>
-                  <label style={{ display: 'block', fontSize: '11px', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '4px' }}>Payment Method</label>
-                  <strong>{status(selectedSale.paymentMethod)}</strong>
-                </div>
-              </div>
 
-              {/* Items Table */}
-              <div style={{ borderTop: '1px solid var(--border)', paddingTop: '16px', marginTop: '8px' }}>
-                <label style={{ display: 'block', fontSize: '11px', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '8px' }}>Purchased Items</label>
-                <div style={{ overflowX: 'auto' }}>
-                  <table className="data-table" style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'auto', minWidth: 0 }}>
-                    <thead>
-                      <tr>
-                        <th style={{ textAlign: 'left', padding: '10px' }}>Product</th>
-                        <th style={{ textAlign: 'center', padding: '10px' }}>Qty</th>
-                        <th style={{ textAlign: 'right', padding: '10px' }}>Unit Price</th>
-                        <th style={{ textAlign: 'right', padding: '10px' }}>Total Price</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {viewItems.map((item, idx) => (
-                        <tr key={idx} style={{ borderBottom: '1px solid var(--border)' }}>
-                          <td style={{ padding: '10px', whiteSpace: 'normal', overflow: 'hidden', textOverflow: 'ellipsis', wordBreak: 'break-word' }}>
-                            {item.productName}
-                          </td>
-                          <td style={{ textAlign: 'center', padding: '10px' }}>{item.quantity}</td>
-                          <td style={{ textAlign: 'right', padding: '10px' }}>{currency(item.unitPrice)}</td>
-                          <td style={{ textAlign: 'right', padding: '10px' }}>{currency(item.totalPrice)}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-
-              {/* Totals Summary */}
-              <div style={{ background: 'var(--app-bg)', padding: '16px', borderRadius: '12px', display: 'grid', gap: '8px', marginLeft: 'auto', width: 'min(280px, 100%)', boxSizing: 'border-box' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
-                  <span>Subtotal:</span>
-                  <strong>{currency(selectedSale.subtotal || (viewItems || []).reduce((s, i) => s + (i.quantity * i.unitPrice), 0))}</strong>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
-                  <span>Tax:</span>
-                  <strong>{currency(selectedSale.tax)}</strong>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
-                  <span>Discount:</span>
-                  <strong>-{currency(selectedSale.discount)}</strong>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '16px', fontWeight: 800, borderTop: '1px solid var(--border)', paddingTop: '8px', marginTop: '4px' }}>
-                  <span>Total Paid:</span>
-                  <span style={{ color: 'var(--blue)' }}>{currency(selectedSale.totalAmount)}</span>
-                </div>
-              </div>
-
-              {selectedSale.notes && (
+                {/* Items Table */}
                 <div style={{ borderTop: '1px solid var(--border)', paddingTop: '16px' }}>
-                  <label style={{ display: 'block', fontSize: '11px', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '4px' }}>Notes</label>
-                  <p style={{ margin: 0, fontSize: '14px', whiteSpace: 'pre-line' }}>{selectedSale.notes}</p>
+                  <label style={{ display: 'block', fontSize: '11px', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '12px' }}>Items Ordered</label>
+                  {viewItems.length > 0 ? (
+                    <div style={{ overflowX: 'auto' }}>
+                      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
+                        <thead>
+                          <tr style={{ borderBottom: '2px solid var(--border)' }}>
+                            <th style={{ textAlign: 'left', padding: '8px 10px', fontSize: '11px', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase' }}>Product</th>
+                            <th style={{ textAlign: 'center', padding: '8px 10px', fontSize: '11px', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase' }}>Qty</th>
+                            <th style={{ textAlign: 'right', padding: '8px 10px', fontSize: '11px', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase' }}>Unit Price</th>
+                            <th style={{ textAlign: 'right', padding: '8px 10px', fontSize: '11px', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase' }}>Total</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {viewItems.map((item, idx) => (
+                            <tr key={idx} style={{ borderBottom: '1px solid var(--border)' }}>
+                              <td style={{ padding: '10px', fontWeight: 500 }}>{item.productName}</td>
+                              <td style={{ padding: '10px', textAlign: 'center' }}>{item.quantity}</td>
+                              <td style={{ padding: '10px', textAlign: 'right' }}>{currency(item.unitPrice)}</td>
+                              <td style={{ padding: '10px', textAlign: 'right', fontWeight: 700 }}>{currency(item.totalPrice)}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                        <tfoot>
+                          <tr style={{ borderTop: '1px solid var(--border)' }}>
+                            <td colSpan={3} style={{ padding: '8px 10px', textAlign: 'right', fontSize: '14px', color: 'var(--muted)' }}>Discount:</td>
+                            <td style={{ padding: '8px 10px', textAlign: 'right', fontSize: '14px', color: 'var(--orange)' }}>− {currency(selectedSale.discount ?? 0)}</td>
+                          </tr>
+                          <tr style={{ borderTop: '2px solid var(--border)' }}>
+                            <td colSpan={3} style={{ padding: '10px', textAlign: 'right', fontWeight: 700, fontSize: '15px' }}>Total Amount:</td>
+                            <td style={{ padding: '10px', textAlign: 'right', fontWeight: 800, fontSize: '15px', color: 'var(--blue)' }}>{currency(selectedSale.totalAmount)}</td>
+                          </tr>
+                        </tfoot>
+                      </table>
+                    </div>
+                  ) : (
+                    <p style={{ margin: 0, fontSize: '14px', color: 'var(--muted)' }}>No item details available.</p>
+                  )}
                 </div>
-              )}
+
+                {selectedSale.notes && (
+                  <div style={{ borderTop: '1px solid var(--border)', paddingTop: '16px' }}>
+                    <label style={{ display: 'block', fontSize: '11px', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '4px' }}>Notes</label>
+                    <p style={{ margin: 0, fontSize: '14px', whiteSpace: 'pre-line' }}>{selectedSale.notes}</p>
+                  </div>
+                )}
+              </>)}
             </div>
             <div className="modal-footer">
               <Button variant="ghost" onClick={closeModal}>Close</Button>
