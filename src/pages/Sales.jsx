@@ -488,6 +488,7 @@ export default function Sales() {
                 className="modal-body"
                 style={{
                   overflowY: 'auto',
+                  overflowX: 'hidden',
                   maxHeight: 'calc(90vh - 180px)', // leaves room for header/footer
                 }}
               >
@@ -607,12 +608,10 @@ export default function Sales() {
                       {formData.items.map((item, idx) => {
                         const itemErr = formErrors.items?.[idx] || {};
                         return (
-                          <div key={idx} style={{ display: 'flex', gap: '12px', alignItems: 'flex-start', background: 'var(--app-bg)', padding: '12px', borderRadius: '10px' }}>
-                            <div style={{ flex: 3 }} className="form-field">
-                              <label style={{ fontSize: '11px', color: 'var(--muted)' }}>
-                                Product
-                              </label>
-
+                          <div key={idx} style={{ background: 'var(--app-bg)', padding: '12px', borderRadius: '10px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                            {/* Product selector — full width */}
+                            <div style={{ gridColumn: '1 / -1' }} className="form-field">
+                              <label style={{ fontSize: '11px', color: 'var(--muted)' }}>Product</label>
                               <select
                                 className={itemErr.productId ? 'error' : ''}
                                 value={item.productId || ''}
@@ -622,22 +621,19 @@ export default function Sales() {
                                 required
                               >
                                 <option value="">Select Product</option>
-
                                 {(data.products || []).map((product) => (
                                   <option key={product.id} value={product.id}>
                                     {product.productName} ({currency(product.unitPrice)})
                                   </option>
                                 ))}
                               </select>
-
                               {itemErr.productId && (
-                                <span className="error-msg">
-                                  {itemErr.productId}
-                                </span>
+                                <span className="error-msg">{itemErr.productId}</span>
                               )}
                             </div>
 
-                            <div style={{ flex: 1 }} className="form-field">
+                            {/* Qty */}
+                            <div className="form-field">
                               <label style={{ fontSize: '11px', color: 'var(--muted)' }}>Qty</label>
                               <input
                                 type="number"
@@ -651,7 +647,8 @@ export default function Sales() {
                               {itemErr.quantity && <span className="error-msg">{itemErr.quantity}</span>}
                             </div>
 
-                            <div style={{ flex: 1.5 }} className="form-field">
+                            {/* Unit Price */}
+                            <div className="form-field">
                               <label style={{ fontSize: '11px', color: 'var(--muted)' }}>Price ($)</label>
                               <input
                                 type="number"
@@ -665,34 +662,35 @@ export default function Sales() {
                               {itemErr.unitPrice && <span className="error-msg">{itemErr.unitPrice}</span>}
                             </div>
 
-                            <div style={{ flex: 1.2, alignSelf: 'center', textAlign: 'right', paddingRight: '8px' }}>
-                              <span style={{ fontSize: '11px', color: 'var(--muted)', display: 'block', marginBottom: '4px' }}>Total</span>
-                              <strong style={{ fontSize: '14px' }}>
-                                {currency(Number(item.quantity || 0) * Number(item.unitPrice || 0))}
-                              </strong>
+                            {/* Row total + remove button */}
+                            <div style={{ gridColumn: '1 / -1', display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '4px' }}>
+                              <span style={{ fontSize: '13px', color: 'var(--muted)' }}>
+                                Total:&nbsp;
+                                <strong style={{ color: 'var(--text)', fontSize: '14px' }}>
+                                  {currency(Number(item.quantity || 0) * Number(item.unitPrice || 0))}
+                                </strong>
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => removeItemRow(idx)}
+                                style={{
+                                  background: 'transparent',
+                                  border: 'none',
+                                  color: 'var(--red)',
+                                  cursor: 'pointer',
+                                  padding: '6px',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center'
+                                }}
+                                title="Remove item"
+                              >
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                  <polyline points="3 6 5 6 21 6"></polyline>
+                                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                </svg>
+                              </button>
                             </div>
-
-                            <button
-                              type="button"
-                              onClick={() => removeItemRow(idx)}
-                              style={{
-                                background: 'transparent',
-                                border: 'none',
-                                color: 'var(--red)',
-                                cursor: 'pointer',
-                                padding: '8px',
-                                marginTop: '16px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center'
-                              }}
-                              title="Remove item"
-                            >
-                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <polyline points="3 6 5 6 21 6"></polyline>
-                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                              </svg>
-                            </button>
                           </div>
                         );
                       })}

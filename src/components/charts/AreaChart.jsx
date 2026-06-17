@@ -86,13 +86,34 @@ export default function AreaChart({ labels = [], values = [], data = [] }) {
         })}
       </svg>
 
-      {/* X labels rendered below SVG for readability */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', gap: '4px', marginTop: '6px', fontSize: '11px', color: 'var(--muted)' }}>
-        {labels.map((lab, i) => (
-          <div key={i} style={{ flex: 1, textAlign: i === 0 ? 'left' : i === labels.length - 1 ? 'right' : 'center', minWidth: 0, paddingLeft: i === 0 ? '4px' : 0, paddingRight: i === labels.length - 1 ? '4px' : 0 }}>
-            {lab}
-          </div>
-        ))}
+      {/* X labels rendered below SVG for readability, aligned precisely with ticks */}
+      <div style={{ position: 'relative', height: '20px', marginTop: '6px' }}>
+        {labels.map((lab, i) => {
+          const percent = n === 1 ? 50 : (i / (n - 1)) * 100;
+          let transform = 'translateX(-50%)';
+          
+          if (i === 0) {
+            transform = 'none';
+          } else if (i === labels.length - 1) {
+            transform = 'translateX(-100%)';
+          }
+          
+          return (
+            <div
+              key={i}
+              style={{
+                position: 'absolute',
+                left: `${percent}%`,
+                transform: transform,
+                fontSize: '11px',
+                color: 'var(--muted)',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {lab}
+            </div>
+          );
+        })}
       </div>
 
       {/* Axis titles */}
