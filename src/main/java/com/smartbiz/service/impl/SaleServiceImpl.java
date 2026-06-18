@@ -4,10 +4,12 @@ import com.smartbiz.dto.SaleItemRequestDto;
 import com.smartbiz.dto.SaleRequestDto;
 import com.smartbiz.dto.SaleResponseDto;
 import com.smartbiz.entity.*;
+import com.smartbiz.enums.InvoiceStatus;
 import com.smartbiz.exception.AccessDeniedException;
 import com.smartbiz.exception.ResourceNotFoundException;
 import com.smartbiz.repository.*;
 import com.smartbiz.service.SaleService;
+import com.smartbiz.util.InvoiceNumberGenerator;
 import com.smartbiz.util.SecurityHelper;
 import org.springframework.stereotype.Service;
 
@@ -23,17 +25,19 @@ public class SaleServiceImpl implements SaleService {
     private final UserRepository userRepository;
     private final SaleItemRepository saleItemRepository;
     private final ProductRepository productRepository;
+    private final InvoiceRepository invoiceRepository;
 
     public SaleServiceImpl(SaleRepository saleRepository,
-            CustomerRepository customerRepository,
-            UserRepository userRepository,
-            SaleItemRepository saleItemRepository,
-            ProductRepository productRepository) {
+                           CustomerRepository customerRepository,
+                           UserRepository userRepository,
+                           SaleItemRepository saleItemRepository,
+                           ProductRepository productRepository, InvoiceRepository invoiceRepository) {
         this.saleRepository = saleRepository;
         this.customerRepository = customerRepository;
         this.userRepository = userRepository;
         this.saleItemRepository = saleItemRepository;
         this.productRepository = productRepository;
+        this.invoiceRepository = invoiceRepository;
     }
 
     @Override
@@ -83,6 +87,19 @@ public class SaleServiceImpl implements SaleService {
 
         saved = saleRepository.findById(saved.getId())
                 .orElseThrow();
+
+        if (invoiceRepository.findBySaleId(saved.getId()).isEmpty()) {
+
+            Invoice invoice = Invoice.builder()
+                    .invoiceNumber(
+                            InvoiceNumberGenerator.generateInvoiceNumber())
+                    .sale(saved)
+                    .totalAmount(saved.getTotalAmount())
+                    .status(InvoiceStatus.PAID)
+                    .build();
+
+            invoiceRepository.save(invoice);
+        }
 
         return mapToDto(saved);
     }
@@ -171,6 +188,14 @@ public class SaleServiceImpl implements SaleService {
         }
 
         Sale updated = saleRepository.save(existing);
+
+        Invoice invoice = invoiceRepository.findBySaleId(updated.getId())
+                .orElse(null);
+
+        if (invoice != null) {
+            invoice.setTotalAmount(updated.getTotalAmount());
+            invoiceRepository.save(invoice);
+        }
 
         updated = saleRepository.findById(updated.getId())
                 .orElseThrow();

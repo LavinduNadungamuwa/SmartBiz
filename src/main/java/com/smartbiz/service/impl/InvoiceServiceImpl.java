@@ -92,6 +92,23 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
+    public InvoiceResponseDto getInvoiceBySaleId(Long saleId) {
+
+        User loggedInUser = SecurityHelper.getLoggedInUser(userRepository);
+        Long businessId = loggedInUser.getBusiness().getId();
+
+        Invoice invoice = invoiceRepository.findBySaleId(saleId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Invoice not found"));
+
+        if (!invoice.getSale().getBusiness().getId().equals(businessId)) {
+            throw new AccessDeniedException("Access denied");
+        }
+
+        return mapToDto(invoice);
+    }
+
+    @Override
     public InvoiceResponseDto updateInvoice(Long id, InvoiceRequestDto request) {
         User loggedInUser = SecurityHelper.getLoggedInUser(userRepository);
         Long businessId = loggedInUser.getBusiness().getId();

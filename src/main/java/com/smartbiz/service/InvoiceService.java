@@ -10,5 +10,6 @@ public interface InvoiceService {
     List<InvoiceResponseDto> getAllInvoices();
     InvoiceResponseDto getInvoiceById(Long id);
     InvoiceResponseDto updateInvoice(Long id, InvoiceRequestDto request);
+    InvoiceResponseDto getInvoiceBySaleId(Long saleId);
     void deleteInvoice(Long id);
 }

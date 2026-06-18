@@ -38,6 +38,13 @@ public class InvoiceController {
         return invoiceService.getInvoiceById(id);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
+    @GetMapping("/sale/{saleId}")
+    public InvoiceResponseDto getInvoiceBySaleId(
+            @PathVariable Long saleId){
+        return invoiceService.getInvoiceBySaleId(saleId);
+    }
+
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public InvoiceResponseDto updateInvoice(@PathVariable Long id,
