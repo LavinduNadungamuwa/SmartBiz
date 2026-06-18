@@ -10,7 +10,7 @@ export default function EmptyState({ title, description, action, onAction }) {
       </div>
       <h3>{title}</h3>
       <p>{description}</p>
-      <Button icon="plus" onClick={onAction}>{action}</Button>
+      {action ? <Button icon="plus" onClick={onAction}>{action}</Button> : null}
     </div>
   );
 }
