@@ -111,7 +111,7 @@ export default function Reports() {
   const handlePrintExpenses = () => {
     const rows = filteredExpenses.map(e => `
       <tr>
-        <td>${e.description ?? '—'}</td>
+        <td>${e.notes ?? '—'}</td>
         <td>${e.category ?? '—'}</td>
         <td>${date(e.expenseDate)}</td>
         <td style="text-align:right">${currency(e.amount)}</td>
@@ -392,7 +392,7 @@ export default function Reports() {
                   <tbody>
                     {filteredExpenses.map((exp) => (
                       <tr key={exp.id}>
-                        <td>{exp.description ?? '—'}</td>
+                        <td>{exp.notes ?? '—'}</td>
                         <td>{exp.category ?? '—'}</td>
                         <td>{date(exp.expenseDate)}</td>
                         <td style={{ textAlign: 'right', fontWeight: 700 }}>{currency(exp.amount)}</td>
