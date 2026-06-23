@@ -22,6 +22,7 @@ const paths = {
   view: 'M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12Zm11 4a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z',
   revenue: 'M4 19h16v2H4v-2Zm2-3 4-6 4 3 4-8 2 1-5 11-4-3-3 4-2-2Z',
   profit: 'M12 3a9 9 0 1 0 9 9h-2a7 7 0 1 1-7-7V3Zm1 1v9h8a9 9 0 0 0-8-9Z',
+  send: 'M2 21 23 12 2 3v7l15 2-15 2v7Z',
 };
 
 export default function Icon({ name, size = 20 }) {
