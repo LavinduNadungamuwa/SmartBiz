@@ -1095,26 +1095,72 @@ input {
 .conversation-card {
   display: grid;
   gap: 12px;
+  grid-template-columns: 1fr; /* ensure full-width single column */
+  align-items: start;
+}
+
+.ai-question {
+  display: grid;
+  gap: 8px;
+}
+
+.ai-question span {
+  color: var(--muted);
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.ai-question textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface); 
+  color: var(--text);
+  resize: vertical;
+  outline: 0;
+  box-shadow: none;
+}
+
+.ai-question textarea:focus {
+  border-color: var(--blue);
+  box-shadow: 0 8px 30px rgba(37, 99, 235, 0.12);
 }
 
 .chat-row {
-  max-width: 760px;
+  width: 100%; 
   padding: 14px;
   border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+  box-shadow: none;
 }
 
 .chat-row p {
-  margin: 6px 0 0;
-  color: #344054;
+  margin: 0;
+  color: var(--text);
+  line-height: 1.5;
+  white-space: pre-wrap; /* preserve newlines from AI responses */
 }
 
 .chat-row.ai {
   background: var(--blue-soft);
+  color: var(--text);
+  border: 1px solid rgba(37, 99, 235, 0.08);
+}
+
+.chat-row.ai strong {
+  color: var(--blue);
+  font-weight: 800;
 }
 
 .chat-row.user {
   justify-self: end;
-  background: #f3f4f6;
+  background: var(--surface-soft);
+  border: 1px solid var(--border);
 }
 
 .settings-grid {
@@ -1668,4 +1714,54 @@ input {
   background: var(--blue-soft);
   color: var(--blue);
   box-shadow: 0 6px 16px rgba(37, 99, 235, 0.08);
+}
+
+.assistant-info {
+  min-width: 0;
+}
+
+.assistant-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+}
+
+.textarea-with-send {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+}
+
+.textarea-with-send textarea {
+  width: 100%;
+  min-height: 96px;
+  padding-right: 48px; /* leave room for the send button */
+  background: var(--surface);
+  color: var(--text);
+}
+
+.send-icon {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  padding: 6px 8px;
+  height: 36px;
+}
+
+.send-icon .icon { width: 14px; height: 14px; }
+
+/* ensure send-icon ghost style matches other ghost buttons */
+.app-button.send-icon {
+  background: var(--blue);
+  color: #fff;
+  border-color: transparent;
+}
+
+.app-button.ghost.send-icon .icon {
+  color: #fff;
+  fill: currentColor;
+}
+
+.app-button.ghost.send-icon:hover {
+  background: var(--blue-600);
 }
