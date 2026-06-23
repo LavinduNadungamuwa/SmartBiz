@@ -569,8 +569,9 @@ input {
   overflow: visible;
 }
 
-.line-chart svg {
-  background: linear-gradient(#eef4ff 1px, transparent 1px) 0 0 / 100% 25%;
+.line-chart svg,
+.area-chart svg {
+  background: linear-gradient(var(--border) 1px, transparent 1px) 0 0 / 100% 25%;
 }
 
 .line-chart polyline,
