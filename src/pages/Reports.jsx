@@ -9,11 +9,11 @@ import { useBusinessData } from '../api/resources';
 import { currency, date, indexById, lastMonthsSeries, number, status } from '../utils/formatters';
 
 const REPORT_TYPES = [
-  { key: 'Sales Report',     icon: 'sales'     },
-  { key: 'Revenue Report',   icon: 'revenue'   },
-  { key: 'Expense Report',   icon: 'expenses'  },
+  { key: 'Sales Report', icon: 'sales' },
+  { key: 'Revenue Report', icon: 'revenue' },
+  { key: 'Expense Report', icon: 'expenses' },
   { key: 'Inventory Report', icon: 'inventory' },
-  { key: 'Customer Report',  icon: 'customers' },
+  { key: 'Customer Report', icon: 'customers' },
 ];
 
 /** Build a simple print window from an HTML string */
@@ -62,7 +62,7 @@ export default function Reports() {
     return data.sales.filter((sale) => {
       const d = new Date(sale.saleDate);
       if (fromDate && d < new Date(fromDate)) return false;
-      if (toDate   && d > new Date(toDate))   return false;
+      if (toDate && d > new Date(toDate)) return false;
       return true;
     });
   }, [data?.sales, fromDate, toDate]);
@@ -72,26 +72,26 @@ export default function Reports() {
     return data.expenses.filter((exp) => {
       const d = new Date(exp.expenseDate);
       if (fromDate && d < new Date(fromDate)) return false;
-      if (toDate   && d > new Date(toDate))   return false;
+      if (toDate && d > new Date(toDate)) return false;
       return true;
     });
   }, [data?.expenses, fromDate, toDate]);
 
-  const revenue  = useMemo(() => lastMonthsSeries(filteredSales,    'saleDate',    'totalAmount'), [filteredSales]);
-  const expenses = useMemo(() => lastMonthsSeries(filteredExpenses, 'expenseDate', 'amount'),      [filteredExpenses]);
+  const revenue = useMemo(() => lastMonthsSeries(filteredSales, 'saleDate', 'totalAmount'), [filteredSales]);
+  const expenses = useMemo(() => lastMonthsSeries(filteredExpenses, 'expenseDate', 'amount'), [filteredExpenses]);
 
-  const totalSales    = useMemo(() => filteredSales.reduce((s, x)    => s + Number(x.totalAmount || 0), 0), [filteredSales]);
-  const totalExpenses = useMemo(() => filteredExpenses.reduce((s, x) => s + Number(x.amount || 0), 0),     [filteredExpenses]);
-  const profit        = totalSales - totalExpenses;
+  const totalSales = useMemo(() => filteredSales.reduce((s, x) => s + Number(x.totalAmount || 0), 0), [filteredSales]);
+  const totalExpenses = useMemo(() => filteredExpenses.reduce((s, x) => s + Number(x.amount || 0), 0), [filteredExpenses]);
+  const profit = totalSales - totalExpenses;
   const totalProducts = data?.products?.length || 0;
 
   const pendingInvoices = useMemo(() => data?.invoices?.filter(i => i.status === 'PENDING').length || 0, [data?.invoices]);
-  const paidInvoices    = useMemo(() => data?.invoices?.filter(i => i.status === 'PAID').length    || 0, [data?.invoices]);
-  const customerById    = useMemo(() => indexById(data?.customers || []), [data?.customers]);
+  const paidInvoices = useMemo(() => data?.invoices?.filter(i => i.status === 'PAID').length || 0, [data?.invoices]);
+  const customerById = useMemo(() => indexById(data?.customers || []), [data?.customers]);
 
   // ── Early returns AFTER all hooks ─────────────────────────────────────────
   if (loading) return <LoadingState message="Loading reports..." />;
-  if (error)   return <ErrorState  message={error} onRetry={reload} />;
+  if (error) return <ErrorState message={error} onRetry={reload} />;
 
   // ── Print helpers ─────────────────────────────────────────────────────────
 
@@ -209,11 +209,11 @@ export default function Reports() {
   };
 
   const printHandlers = {
-    'Sales Report':     handlePrintSales,
-    'Revenue Report':   handlePrintRevenue,
-    'Expense Report':   handlePrintExpenses,
+    'Sales Report': handlePrintSales,
+    'Revenue Report': handlePrintRevenue,
+    'Expense Report': handlePrintExpenses,
     'Inventory Report': handlePrintInventory,
-    'Customer Report':  handlePrintCustomers,
+    'Customer Report': handlePrintCustomers,
   };
 
   // ── Render ────────────────────────────────────────────────────────────────
@@ -351,12 +351,12 @@ export default function Reports() {
       {selectedReport === 'Revenue Report' && (
         <>
           <section className="summary-grid">
-            <StatCard label="Total Revenue"    value={currency(totalSales)}    growth="Live"       icon="revenue"   />
-            <StatCard label="Total Expenses"   value={currency(totalExpenses)} growth="Live"       icon="expenses"  />
-            <StatCard label="Net Profit"       value={currency(profit)}        growth={profit >= 0 ? 'Profitable' : 'Loss'} icon="revenue" />
-            <StatCard label="Paid Invoices"    value={number(paidInvoices)}    growth="Live"       icon="invoice"   />
-            <StatCard label="Pending Invoices" value={number(pendingInvoices)} growth="Live"       icon="invoice"   />
-            <StatCard label="Products Listed"  value={number(totalProducts)}   growth="Live"       icon="inventory" />
+            <StatCard label="Total Revenue" value={currency(totalSales)} growth="Live" icon="revenue" />
+            <StatCard label="Total Expenses" value={currency(totalExpenses)} growth="Live" icon="expenses" />
+            <StatCard label="Net Profit" value={currency(profit)} growth={profit >= 0 ? 'Profitable' : 'Loss'} icon="revenue" />
+            <StatCard label="Paid Invoices" value={number(paidInvoices)} growth="Live" icon="invoice" />
+            <StatCard label="Pending Invoices" value={number(pendingInvoices)} growth="Live" icon="invoice" />
+            <StatCard label="Products Listed" value={number(totalProducts)} growth="Live" icon="inventory" />
           </section>
 
           <section className="dashboard-grid two">
@@ -406,7 +406,7 @@ export default function Reports() {
       {selectedReport === 'Expense Report' && (
         <>
           <section className="summary-grid">
-            <StatCard label="Total Expenses"  value={currency(totalExpenses)} growth="Live" icon="expenses" />
+            <StatCard label="Total Expenses" value={currency(totalExpenses)} growth="Live" icon="expenses" />
             <StatCard label="No. of Expenses" value={number(filteredExpenses.length)} growth="Live" icon="expenses" />
             <StatCard
               label="Avg. Expense"
@@ -461,7 +461,7 @@ export default function Reports() {
       {selectedReport === 'Inventory Report' && (
         <>
           <section className="summary-grid">
-            <StatCard label="Total Products"  value={number(totalProducts)} growth="Live" icon="inventory" />
+            <StatCard label="Total Products" value={number(totalProducts)} growth="Live" icon="inventory" />
             <StatCard
               label="Low Stock Items"
               value={number(data.products?.filter(p => Number(p.stockQuantity) > 0 && Number(p.stockQuantity) <= 10).length || 0)}
@@ -493,7 +493,7 @@ export default function Reports() {
                   {data.products?.map((product) => {
                     const qty = Number(product.stockQuantity || 0);
                     const stockStatus = qty <= 0 ? 'out-of-stock' : qty <= 10 ? 'low-stock' : 'in-stock';
-                    const stockLabel  = qty <= 0 ? 'Out of Stock' : qty <= 10 ? 'Low Stock'  : 'In Stock';
+                    const stockLabel = qty <= 0 ? 'Out of Stock' : qty <= 10 ? 'Low Stock' : 'In Stock';
                     return (
                       <tr key={product.id}>
                         <td style={{ fontWeight: 500 }}>{product.productName}</td>
@@ -516,8 +516,8 @@ export default function Reports() {
         <>
           <section className="summary-grid">
             <StatCard label="Total Customers" value={number(data.customers?.length || 0)} growth="Live" icon="revenue" />
-            <StatCard label="Paid Invoices"   value={number(paidInvoices)}               growth="Live" icon="invoice" />
-            <StatCard label="Total Revenue"   value={currency(totalSales)}               growth="Live" icon="revenue" />
+            <StatCard label="Paid Invoices" value={number(paidInvoices)} growth="Live" icon="invoice" />
+            <StatCard label="Total Revenue" value={currency(totalSales)} growth="Live" icon="revenue" />
           </section>
 
           <section className="card">

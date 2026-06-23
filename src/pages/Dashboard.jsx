@@ -57,14 +57,14 @@ export default function Dashboard() {
       </section>
 
       <section className="dashboard-grid three">
-        <ChartCard title="Revenue Overview" subtitle="Monthly sales revenue">
-          <LineChart data={revenue.values} labels={revenue.labels} />
+        <ChartCard title="Sales Performance" subtitle="Sales trend over time">
+          <AreaChart data={revenue.values} labels={revenue.labels} />
+        </ChartCard>
+        <ChartCard title="Expense Overview" subtitle="Monthly business expenses">
+          <LineChart data={expenseTrend.values} labels={expenseTrend.labels} />
         </ChartCard>
         <ChartCard title="Revenue vs Expenses" subtitle="Live sales and expense totals">
           <BarChart revenue={revenue.raw} expenses={expenseTrend.raw} labels={revenue.labels} />
-        </ChartCard>
-        <ChartCard title="Sales Performance" subtitle="Sales trend over time">
-          <AreaChart data={revenue.values} />
         </ChartCard>
       </section>
 
