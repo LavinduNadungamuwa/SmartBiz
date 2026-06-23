@@ -42,6 +42,7 @@ export default function Sales() {
   const [submitError, setSubmitError] = useState('');
   const [viewLoading, setViewLoading] = useState(false);
   const [viewSaleItems, setViewSaleItems] = useState([]);
+  const [originalQuantities, setOriginalQuantities] = useState({});
 
   if (loading) return <LoadingState message="Loading sales..." />;
   if (error) return <ErrorState message={error} onRetry={reload} />;
@@ -96,6 +97,7 @@ export default function Sales() {
 
   // Modal actions
   const openCreateModal = () => {
+    setOriginalQuantities({});
     setFormData({
       customerId: '',
       invoiceNumber: `SALE-${Date.now().toString().slice(-6)}`,
@@ -112,6 +114,7 @@ export default function Sales() {
   };
 
   const closeModal = () => {
+    setOriginalQuantities({});
     setModalMode(null);
     setSelectedSale(null);
     setViewSaleItems([]);
@@ -135,6 +138,17 @@ export default function Sales() {
           item.sale?.id === sale.id ||
           item.sale_id === sale.id
       );
+
+      // Save original quantities mapping for stock validations
+      const orgQtyMap = {};
+      saleItems.forEach((item) => {
+        const prodId = item.productId ?? item.product_id ?? item.product?.id ?? item.product?.productId;
+        const qty = item.quantity ?? item.qty ?? 1;
+        if (prodId) {
+          orgQtyMap[prodId] = (orgQtyMap[prodId] || 0) + qty;
+        }
+      });
+      setOriginalQuantities(orgQtyMap);
 
       setSelectedSale(fullSale);
 
@@ -274,6 +288,17 @@ export default function Sales() {
 
     if (!formData.saleDate) errors.saleDate = 'Sale Date is required';
 
+    // Sum requested quantities per product to validate against total available stock
+    const prodQtySums = {};
+    formData.items.forEach((item) => {
+      if (item.productId) {
+        const qty = Number(item.quantity);
+        if (!isNaN(qty) && qty > 0) {
+          prodQtySums[item.productId] = (prodQtySums[item.productId] || 0) + qty;
+        }
+      }
+    });
+
     const itemsErrors = [];
     if (formData.items.length === 0) {
       errors.itemsGlobal = 'At least one product item is required';
@@ -286,6 +311,15 @@ export default function Sales() {
         const qty = Number(item.quantity);
         if (isNaN(qty) || qty <= 0 || !Number.isInteger(qty)) {
           itemErr.quantity = 'Must be positive integer';
+        } else if (item.productId) {
+          const product = productById[item.productId];
+          const orgQty = originalQuantities[item.productId] || 0;
+          const availableStock = (product?.stockQuantity || 0) + orgQty;
+          const totalRequestedQty = prodQtySums[item.productId] || 0;
+          
+          if (totalRequestedQty > availableStock) {
+            itemErr.quantity = `Only ${availableStock} units available (requested ${totalRequestedQty})`;
+          }
         }
 
         const price = Number(item.unitPrice);
@@ -621,11 +655,15 @@ export default function Sales() {
                                 required
                               >
                                 <option value="">Select Product</option>
-                                {(data.products || []).map((product) => (
-                                  <option key={product.id} value={product.id}>
-                                    {product.productName} ({currency(product.unitPrice)})
-                                  </option>
-                                ))}
+                                {(data.products || []).map((product) => {
+                                  const orgQty = originalQuantities[product.id] || 0;
+                                  const availableStock = product.stockQuantity + orgQty;
+                                  return (
+                                    <option key={product.id} value={product.id} disabled={availableStock <= 0}>
+                                      {product.productName} ({currency(product.unitPrice)}) - {availableStock > 0 ? `${availableStock} available` : 'Out of Stock'}
+                                    </option>
+                                  );
+                                })}
                               </select>
                               {itemErr.productId && (
                                 <span className="error-msg">{itemErr.productId}</span>
