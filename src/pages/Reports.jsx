@@ -273,13 +273,12 @@ export default function Reports() {
           />
         </label>
         {(fromDate || toDate) && (
-          <button
-            type="button"
-            className="app-button ghost"
+          <Button
+            variant="ghost"
             onClick={() => { setFromDate(''); setToDate(''); }}
           >
             <Icon name="close" size={15} /> Clear filter
-          </button>
+          </Button>
         )}
       </div>
 

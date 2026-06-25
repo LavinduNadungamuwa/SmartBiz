@@ -181,7 +181,7 @@ export default function Customers() {
   );
 
   return (
-    <div className="page">
+    <div className="page flex flex-col gap-[22px] max-w-[1600px] mx-auto px-[15px]">
       <PageHeader
         eyebrow="CRM"
         title="Customers"
@@ -198,7 +198,7 @@ export default function Customers() {
         onFilterClick={(filter) => { setActiveFilter(filter); setCurrentPage(1); }}
       />
 
-      <section className="card">
+      <section className="card bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius)] shadow-[var(--shadow)] p-5">
         {rows.length ? (
           <>
             <DataTable
@@ -209,10 +209,22 @@ export default function Customers() {
               onView={handleView}
               onDelete={handleDelete}
             />
-            <div className="pagination">
-              <button onClick={handlePrevPage} disabled={currentPage === 1}>Previous</button>
+            <div className="pagination flex items-center justify-end gap-3 pt-4 text-[var(--muted)]">
+              <button
+                onClick={handlePrevPage}
+                disabled={currentPage === 1}
+                className="h-[34px] px-3 border border-[var(--border)] bg-[var(--surface)] text-[var(--text)] rounded-[9px] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Previous
+              </button>
               <span>Page {currentPage} of {totalPages} ({filteredCustomers.length} customers)</span>
-              <button onClick={handleNextPage} disabled={currentPage === totalPages}>Next</button>
+              <button
+                onClick={handleNextPage}
+                disabled={currentPage === totalPages}
+                className="h-[34px] px-3 border border-[var(--border)] bg-[var(--surface)] text-[var(--text)] rounded-[9px] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Next
+              </button>
             </div>
           </>
         ) : (
@@ -227,79 +239,80 @@ export default function Customers() {
 
       {/* ── CREATE / EDIT MODAL ─────────────────────────────────────────── */}
       {modalMode && modalMode !== 'view' && (
-        <div className="modal-overlay" onClick={closeModal}>
-          <div className="modal-container" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>{modalMode === 'create' ? 'Add New Customer' : 'Edit Customer'}</h3>
-              <button className="modal-close" onClick={closeModal} aria-label="Close">
+        <div className="modal-overlay fixed inset-0 bg-[rgba(15,23,42,0.5)] backdrop-blur-[6px] flex items-center justify-center z-[1000] animate-[fadeIn_0.25s_ease-out]" onClick={closeModal}>
+          <div className="modal-container bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius)] shadow-[0_20px_25px_-5px_rgba(0,0,0,0.1),0_10px_10px_-5px_rgba(0,0,0,0.04)] w-[min(540px,94vw)] max-h-[90vh] flex flex-col animate-[slideUp_0.3s_cubic-bezier(0.16,1,0.3,1)] overflow-hidden" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header flex items-center justify-between py-5 px-6 border-b border-[var(--border)]">
+              <h3 className="m-0 text-[18px] font-bold text-[var(--text)]">{modalMode === 'create' ? 'Add New Customer' : 'Edit Customer'}</h3>
+              <button className="modal-close bg-transparent border-0 text-[var(--muted)] cursor-pointer flex items-center justify-center p-1 rounded-[6px] transition-colors duration-200 hover:bg-[var(--app-bg)] hover:text-[var(--text)]" onClick={closeModal} aria-label="Close">
                 <CloseIcon />
               </button>
             </div>
             <form onSubmit={handleSubmit}>
-              <div className="modal-body">
+              <div className="modal-body p-6 overflow-y-auto text-[var(--text)]">
                 {submitError && (
                   <div className="mb-4 px-[14px] py-[10px] rounded-lg text-sm text-[var(--red)] bg-[var(--red-soft)]">
                     {submitError}
                   </div>
                 )}
-                <div className="form-grid">
-                  <div className="form-field">
-                    <label htmlFor="fullName">Full Name *</label>
+                <div className="form-grid grid gap-[18px]">
+                  <div className="form-field flex flex-col gap-1.5">
+                    <label htmlFor="fullName" className="text-[13px] font-semibold text-[var(--text)]">Full Name *</label>
                     <input
                       type="text"
                       id="fullName"
-                      className={formErrors.fullName ? 'error' : ''}
+                      className={`h-[40px] px-3 border rounded-[10px] text-[14px] bg-[var(--surface)] text-[var(--text)] outline-none transition-all duration-200 focus:border-[var(--blue)] focus:shadow-[0_0_0_3px_rgba(37,99,235,0.12)] ${formErrors.fullName ? 'border-[var(--red)]' : 'border-[var(--border)]'}`}
                       value={formData.fullName}
                       onChange={(e) => { setFormData({ ...formData, fullName: e.target.value }); setFormErrors({ ...formErrors, fullName: '' }); }}
                       placeholder="e.g. John Doe"
                       required
                     />
-                    {formErrors.fullName && <span className="error-msg">{formErrors.fullName}</span>}
+                    {formErrors.fullName && <span className="error-msg text-[12px] text-[var(--red)] mt-0.5">{formErrors.fullName}</span>}
                   </div>
 
-                  <div className="form-row-2">
-                    <div className="form-field">
-                      <label htmlFor="email">Email Address *</label>
+                  <div className="form-row-2 grid grid-cols-2 gap-4">
+                    <div className="form-field flex flex-col gap-1.5">
+                      <label htmlFor="email" className="text-[13px] font-semibold text-[var(--text)]">Email Address *</label>
                       <input
                         type="email"
                         id="email"
-                        className={formErrors.email ? 'error' : ''}
+                        className={`h-[40px] px-3 border rounded-[10px] text-[14px] bg-[var(--surface)] text-[var(--text)] outline-none transition-all duration-200 focus:border-[var(--blue)] focus:shadow-[0_0_0_3px_rgba(37,99,235,0.12)] ${formErrors.email ? 'border-[var(--red)]' : 'border-[var(--border)]'}`}
                         value={formData.email}
                         onChange={(e) => { setFormData({ ...formData, email: e.target.value }); setFormErrors({ ...formErrors, email: '' }); }}
                         placeholder="e.g. john@example.com"
                         required
                       />
-                      {formErrors.email && <span className="error-msg">{formErrors.email}</span>}
+                      {formErrors.email && <span className="error-msg text-[12px] text-[var(--red)] mt-0.5">{formErrors.email}</span>}
                     </div>
 
-                    <div className="form-field">
-                      <label htmlFor="phone">Phone Number *</label>
+                    <div className="form-field flex flex-col gap-1.5">
+                      <label htmlFor="phone" className="text-[13px] font-semibold text-[var(--text)]">Phone Number *</label>
                       <input
                         type="text"
                         id="phone"
-                        className={formErrors.phone ? 'error' : ''}
+                        className={`h-[40px] px-3 border rounded-[10px] text-[14px] bg-[var(--surface)] text-[var(--text)] outline-none transition-all duration-200 focus:border-[var(--blue)] focus:shadow-[0_0_0_3px_rgba(37,99,235,0.12)] ${formErrors.phone ? 'border-[var(--red)]' : 'border-[var(--border)]'}`}
                         value={formData.phone}
                         onChange={(e) => { setFormData({ ...formData, phone: e.target.value }); setFormErrors({ ...formErrors, phone: '' }); }}
                         placeholder="e.g. +94 77 123 4567"
                         required
                       />
-                      {formErrors.phone && <span className="error-msg">{formErrors.phone}</span>}
+                      {formErrors.phone && <span className="error-msg text-[12px] text-[var(--red)] mt-0.5">{formErrors.phone}</span>}
                     </div>
                   </div>
 
-                  <div className="form-field">
-                    <label htmlFor="address">Address</label>
+                  <div className="form-field flex flex-col gap-1.5">
+                    <label htmlFor="address" className="text-[13px] font-semibold text-[var(--text)]">Address</label>
                     <textarea
                       id="address"
                       rows="3"
                       value={formData.address}
                       onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                       placeholder="e.g. 123 Main St, Colombo"
+                      className="px-3 py-2 border border-[var(--border)] rounded-[10px] text-[14px] bg-[var(--surface)] text-[var(--text)] outline-none transition-all duration-200 focus:border-[var(--blue)] focus:shadow-[0_0_0_3px_rgba(37,99,235,0.12)] w-full"
                     />
                   </div>
                 </div>
               </div>
-              <div className="modal-footer">
+              <div className="modal-footer flex justify-end gap-3 py-[18px] px-6 bg-[var(--surface-soft)] border-t border-[var(--border)]">
                 <Button variant="ghost" onClick={closeModal}>Cancel</Button>
                 <Button type="submit" variant="primary" disabled={submitLoading}>
                   {submitLoading ? 'Saving...' : 'Save Customer'}
@@ -312,16 +325,16 @@ export default function Customers() {
 
       {/* ── VIEW MODAL ──────────────────────────────────────────────────── */}
       {modalMode === 'view' && selectedCustomer && (
-        <div className="modal-overlay" onClick={closeModal}>
-          <div className="modal-container" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>Customer Profile</h3>
-              <button className="modal-close" onClick={closeModal} aria-label="Close">
+        <div className="modal-overlay fixed inset-0 bg-[rgba(15,23,42,0.5)] backdrop-blur-[6px] flex items-center justify-center z-[1000] animate-[fadeIn_0.25s_ease-out]" onClick={closeModal}>
+          <div className="modal-container bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius)] shadow-[0_20px_25px_-5px_rgba(0,0,0,0.1),0_10px_10px_-5px_rgba(0,0,0,0.04)] w-[min(540px,94vw)] max-h-[90vh] flex flex-col animate-[slideUp_0.3s_cubic-bezier(0.16,1,0.3,1)] overflow-hidden" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header flex items-center justify-between py-5 px-6 border-b border-[var(--border)]">
+              <h3 className="m-0 text-[18px] font-bold text-[var(--text)]">Customer Profile</h3>
+              <button className="modal-close bg-transparent border-0 text-[var(--muted)] cursor-pointer flex items-center justify-center p-1 rounded-[6px] transition-colors duration-200 hover:bg-[var(--app-bg)] hover:text-[var(--text)]" onClick={closeModal} aria-label="Close">
                 <CloseIcon />
               </button>
             </div>
 
-            <div className="modal-body grid gap-5">
+            <div className="modal-body p-6 overflow-y-auto grid gap-5 text-[var(--text)]">
               {/* Avatar + name row */}
               <div className="flex items-center gap-4 pb-4 border-b border-[var(--border)]">
                 <div className="flex items-center justify-center w-14 h-14 rounded-full bg-[var(--blue-soft)] text-[var(--blue)] text-xl font-extrabold shrink-0">
@@ -364,7 +377,7 @@ export default function Customers() {
               </div>
             </div>
 
-            <div className="modal-footer">
+            <div className="modal-footer flex justify-end gap-3 py-[18px] px-6 bg-[var(--surface-soft)] border-t border-[var(--border)]">
               <Button variant="ghost" onClick={closeModal}>Close</Button>
               <Button
                 variant="primary"

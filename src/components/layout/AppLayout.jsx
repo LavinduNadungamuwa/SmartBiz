@@ -42,7 +42,7 @@ export default function AppLayout() {
       {/* Main content column */}
       <div className="min-w-0 h-screen flex flex-col">
         <Topbar onMenuClick={() => setMobileOpen(true)} />
-        <main className="page-scroll">
+        <main className="min-h-0 overflow-auto p-7 max-[860px]:p-5 max-[560px]:p-4">
           <Outlet />
         </main>
       </div>

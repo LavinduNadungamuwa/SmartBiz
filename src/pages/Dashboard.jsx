@@ -45,7 +45,7 @@ export default function Dashboard() {
     .slice(0, 5);
 
   return (
-    <div className="page">
+    <div className="page flex flex-col gap-[22px] max-w-[1600px] mx-auto px-[15px]">
       <PageHeader
         eyebrow="Dashboard"
         title="Business overview"
@@ -92,9 +92,9 @@ export default function Dashboard() {
 
       {/* Recent Sales + Recent Invoices — 2 col */}
       <section className="grid grid-cols-2 gap-4 max-[1180px]:grid-cols-1">
-        <section className="card">
-          <div className="card-header">
-            <h2>Recent Sales</h2>
+        <section className="card bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius)] shadow-[var(--shadow)] p-5">
+          <div className="card-header flex justify-between gap-4 mb-[18px]">
+            <h2 className="m-0 text-[17px] font-bold text-[var(--text)]">Recent Sales</h2>
           </div>
           <DataTable
             columns={['Sale ID', 'Customer', 'Amount', 'Date', 'Status']}
@@ -115,9 +115,9 @@ export default function Dashboard() {
             }
           />
         </section>
-        <section className="card">
-          <div className="card-header">
-            <h2>Recent Invoices</h2>
+        <section className="card bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius)] shadow-[var(--shadow)] p-5">
+          <div className="card-header flex justify-between gap-4 mb-[18px]">
+            <h2 className="m-0 text-[17px] font-bold text-[var(--text)]">Recent Invoices</h2>
           </div>
           <DataTable
             columns={['Invoice Number', 'Sale', 'Total', 'Issue Date', 'Status']}
@@ -143,10 +143,10 @@ export default function Dashboard() {
       {/* Bottom row — 3 col, stretch-aligned */}
       <section className="grid grid-cols-3 gap-4 items-stretch max-[1180px]:grid-cols-1">
         {/* Inventory Alerts */}
-        <section className="card">
-          <div className="card-header">
-            <h2>Inventory Alerts</h2>
-            <p>Live stock issues requiring attention</p>
+        <section className="card bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius)] shadow-[var(--shadow)] p-5">
+          <div className="card-header flex justify-between gap-4 mb-[18px] max-sm:flex-col max-sm:items-start max-sm:gap-1">
+            <h2 className="m-0 text-[17px] font-bold text-[var(--text)]">Inventory Alerts</h2>
+            <p className="m-0 mt-1.5 text-[var(--muted)] leading-[1.55]">Live stock issues requiring attention</p>
           </div>
           <div className="grid gap-3">
             {lowStock.slice(0, 5).map((product) => (
@@ -178,11 +178,11 @@ export default function Dashboard() {
         </ChartCard>
 
         {/* AI Insights mini card */}
-        <section className="card ai-card">
-          <div className="ai-orb">AI</div>
-          <div className="card-header">
-            <h2>AI Insights</h2>
-            <p>Recommendations from current database records</p>
+        <section className="card ai-card bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius)] shadow-[var(--shadow)] p-5 relative overflow-hidden after:content-[''] after:absolute after:inset-[auto_-40px_-60px_auto] after:w-[160px] after:h-[160px] after:rounded-full after:bg-[rgba(37,99,235,0.08)]">
+          <div className="ai-orb inline-flex items-center justify-center w-11 h-11 text-white bg-gradient-to-br from-[var(--blue)] to-[#0ea5e9] rounded-[14px] font-black mb-3">AI</div>
+          <div className="card-header flex justify-between gap-4 mb-[18px] max-sm:flex-col max-sm:items-start max-sm:gap-1">
+            <h2 className="m-0 text-[17px] font-bold text-[var(--text)]">AI Insights</h2>
+            <p className="m-0 mt-1.5 text-[var(--muted)] leading-[1.55]">Recommendations from current database records</p>
           </div>
           <div className="grid gap-3">
             <p className="m-0 p-3 text-[#344054] bg-[var(--surface-soft)] border border-[var(--border)] rounded-xl">
