@@ -48,156 +48,15 @@ input {
   font: inherit;
 }
 
-.app-shell {
-  display: grid;
-  grid-template-columns: 280px minmax(0, 1fr);
-  height: 100vh;
-  background: var(--app-bg);
-}
-
-.app-shell.sidebar-collapsed {
-  grid-template-columns: 88px minmax(0, 1fr);
-}
-
-.app-sidebar {
-  display: flex;
-  flex-direction: column;
-  gap: 22px;
-  height: 100vh;
-  padding: 18px 16px;
-  background: var(--surface);
-  border-right: 1px solid var(--border);
-}
-
-.sidebar-brand {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  min-height: 44px;
-}
-
-.logo-mark {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 42px;
-  height: 42px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, var(--blue), #38bdf8);
-  color: #ffffff;
-  font-weight: 800;
-  letter-spacing: 0;
-  flex: 0 0 auto;
-}
-
-.logo-mark.small {
-  width: 34px;
-  height: 34px;
-  border-radius: 10px;
-  font-size: 13px;
-}
-
-.brand-copy {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-
-.brand-copy strong,
-.topbar-logo strong {
-  color: var(--text);
-  font-size: 15px;
-}
-
-.brand-copy span {
-  color: var(--muted);
-  font-size: 12px;
-}
-
-.sidebar-toggle {
-  margin-left: auto;
-}
-
-.sidebar-nav {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.nav-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  min-height: 42px;
-  padding: 0 12px;
-  color: #475467;
-  text-decoration: none;
-  border: 0;
-  border-radius: 12px;
-  background: transparent;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.nav-item:hover,
-.nav-item.active {
-  color: var(--blue);
-  background: var(--blue-soft);
-}
-
-.logout-button {
-  margin-top: auto;
-  color: #b42318;
-}
+/* ── Icon utility (used app-wide on SVGs) ─────────────────────────────── */
 
 .icon {
   fill: currentColor;
   flex: 0 0 auto;
 }
 
-.is-collapsed .brand-copy,
-.is-collapsed .nav-item span,
-.is-collapsed .logout-button span {
-  display: none;
-}
+/* ── toolbar-search (used by Toolbar.jsx on all list pages) ───────────── */
 
-.is-collapsed .sidebar-brand,
-.is-collapsed .nav-item {
-  justify-content: center;
-}
-
-.is-collapsed .sidebar-toggle {
-  margin-left: 0;
-}
-
-.app-main {
-  min-width: 0;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
-.topbar {
-  height: 72px;
-  display: flex;
-  align-items: center;
-  gap: 18px;
-  padding: 0 28px;
-  background: rgba(255, 255, 255, 0.9);
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  backdrop-filter: blur(12px);
-  flex: 0 0 auto;
-}
-
-.topbar-logo {
-  display: none;
-  align-items: center;
-  gap: 10px;
-}
-
-.global-search,
 .toolbar-search {
   display: flex;
   align-items: center;
@@ -209,105 +68,12 @@ input {
   padding: 0 14px;
 }
 
-.global-search {
-  width: min(520px, 44vw);
-  height: 44px;
-}
-
-.global-search input,
 .toolbar-search input {
   width: 100%;
   border: 0;
   outline: 0;
   background: transparent;
   color: var(--text);
-}
-
-.topbar-actions {
-  margin-left: auto;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.icon-button {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 38px;
-  height: 38px;
-  color: var(--text);
-  border: 1px solid var(--border);
-  background: var(--surface);
-  border-radius: 10px;
-  cursor: pointer;
-}
-
-.icon-button.theme-toggle {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 38px;
-  font-size: 16px;
-  line-height: 1;
-  background: var(--surface);
-  color: var(--text);
-  border: 1px solid var(--border);
-}
-
-.notification-dot {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 8px;
-  height: 8px;
-  border-radius: 999px;
-  background: var(--red);
-  border: 2px solid var(--surface);
-}
-
-.business-switcher {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  height: 38px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  color: var(--text);
-  background: var(--surface);
-  padding: 0 12px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.avatar {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 38px;
-  height: 38px;
-  border-radius: 999px;
-  background: var(--text);
-  color: var(--surface);
-  font-size: 13px;
-  font-weight: 700;
-  cursor: pointer;
-  overflow: hidden;
-}
-
-.avatar-logo {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: inherit;
-}
-
-.mobile-menu,
-.mobile-sidebar,
-.mobile-sidebar-scrim {
-  display: none;
 }
 
 .page-scroll {
@@ -1480,61 +1246,6 @@ input {
 }
 
 @media (max-width: 860px) {
-  .app-shell,
-  .app-shell.sidebar-collapsed {
-    grid-template-columns: 1fr;
-  }
-
-  .app-shell > .app-sidebar {
-    display: none;
-  }
-
-  .mobile-menu,
-  .topbar-logo {
-    display: inline-flex;
-  }
-
-  .mobile-sidebar {
-    display: block;
-    position: fixed;
-    inset: 0 auto 0 0;
-    width: 280px;
-    z-index: 40;
-    transform: translateX(-100%);
-    transition: transform 0.18s ease;
-  }
-
-  .mobile-sidebar.show {
-    transform: translateX(0);
-  }
-
-  .mobile-sidebar-scrim {
-    display: block;
-    position: fixed;
-    inset: 0;
-    background: rgba(15, 23, 42, 0.35);
-    opacity: 0;
-    pointer-events: none;
-    z-index: 30;
-  }
-
-  .mobile-sidebar-scrim.show {
-    opacity: 1;
-    pointer-events: auto;
-  }
-
-  .topbar {
-    padding: 0 16px;
-  }
-
-  .global-search {
-    display: none;
-  }
-
-  .business-switcher {
-    display: none;
-  }
-
   .page-scroll {
     padding: 20px;
   }
@@ -1594,15 +1305,13 @@ input {
   }
 }
 
-/* Fix: use theme variables for search bars, filter chips, and table action buttons so they adapt in dark mode */
-.global-search,
+/* Fix: use theme variables for search bars so they adapt in dark mode */
 .toolbar-search {
   background: var(--surface);
   border: 1px solid var(--border);
   color: var(--muted);
 }
 
-.global-search input,
 .toolbar-search input {
   color: var(--text);
   background: transparent;

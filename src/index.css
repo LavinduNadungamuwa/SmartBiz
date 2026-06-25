@@ -1,4 +1,8 @@
-*, *::before, *::after { box-sizing: border-box; }
+/* ── Tailwind CSS v4 ────────────────────────────────────────────────────── */
+@import "tailwindcss";
+
+/* ── Project-level resets (kept exactly as-is) ─────────────────────────── */
+
 
 html, body, #root {
   margin: 0;
