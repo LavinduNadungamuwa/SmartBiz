@@ -211,11 +211,7 @@ input {
   font-size: 17px;
 }
 
-.kpi-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 16px;
-}
+/* .kpi-grid — migrated to Tailwind in Dashboard.jsx */
 
 .summary-grid {
   display: grid;
@@ -276,62 +272,7 @@ input {
   background: var(--red-soft);
 }
 
-.dashboard-grid {
-  display: grid;
-  gap: 16px;
-}
-
-.dashboard-grid.three {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
-.dashboard-grid.two {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.dashboard-grid.bottom {
-  align-items: stretch;
-}
-
-.health-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 16px;
-}
-
-.health-card {
-  padding: 18px;
-}
-
-.health-card p {
-  color: var(--muted);
-  margin: 10px 0 4px;
-}
-
-.health-card strong {
-  font-size: 24px;
-}
-
-.health-card small {
-  display: block;
-  color: var(--muted);
-  margin-top: 6px;
-}
-
-.health-dot {
-  display: block;
-  width: 10px;
-  height: 10px;
-  border-radius: 999px;
-}
-
-.health-dot.good {
-  background: var(--green);
-}
-
-.health-dot.watch {
-  background: var(--orange);
-}
+/* .dashboard-grid, .health-grid, .health-card, .health-dot — migrated to Tailwind in Dashboard.jsx */
 
 .chart {
   height: 250px;
@@ -458,33 +399,7 @@ input {
   opacity: 0.7;
 }
 
-.horizontal-bars {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-.hbar-row {
-  display: grid;
-  grid-template-columns: minmax(120px, 1fr) 2fr 44px;
-  align-items: center;
-  gap: 12px;
-  font-size: 13px;
-}
-
-.hbar-row div {
-  height: 10px;
-  background: #edf2fb;
-  border-radius: 999px;
-  overflow: hidden;
-}
-
-.hbar-row i {
-  display: block;
-  height: 100%;
-  background: linear-gradient(90deg, var(--blue), #06b6d4);
-  border-radius: inherit;
-}
+/* .horizontal-bars, .hbar-row — migrated to Tailwind in HorizontalBarChart.jsx */
 
 .pie-card {
   display: flex;
@@ -696,40 +611,13 @@ input {
 .empty-illustration span:nth-child(2) { top: 34px; width: 56px; }
 .empty-illustration span:nth-child(3) { top: 50px; width: 76px; }
 
-.alert-list,
+/* .alert-list, .inventory-alert — migrated to Tailwind in Dashboard.jsx */
+
+/* insight-list and metric-list kept — used by AIInsights.jsx */
 .insight-list,
 .metric-list {
   display: grid;
   gap: 12px;
-}
-
-.inventory-alert {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  padding: 12px;
-  border-radius: 12px;
-  border: 1px solid var(--border);
-}
-
-.inventory-alert strong,
-.inventory-alert span {
-  display: block;
-}
-
-.inventory-alert span {
-  color: var(--muted);
-  font-size: 13px;
-  margin-top: 3px;
-}
-
-.inventory-alert.warning {
-  background: var(--orange-soft);
-}
-
-.inventory-alert.danger {
-  background: var(--red-soft);
 }
 
 .ai-card,
@@ -1228,13 +1116,8 @@ input {
 }
 
 @media (max-width: 1180px) {
-  .kpi-grid,
-  .health-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+  /* .kpi-grid, .health-grid, .dashboard-grid — handled by Tailwind responsive classes */
 
-  .dashboard-grid.three,
-  .dashboard-grid.two,
   .ai-grid,
   .settings-grid {
     grid-template-columns: 1fr;
@@ -1280,10 +1163,7 @@ input {
     font-size: 26px;
   }
 
-  .kpi-grid,
-  .health-grid {
-    grid-template-columns: 1fr;
-  }
+  /* .kpi-grid, .health-grid, .hbar-row — handled by Tailwind responsive classes */
 
   .stat-card {
     min-height: 108px;
@@ -1293,15 +1173,6 @@ input {
   .assistant-hero {
     align-items: flex-start;
     flex-direction: column;
-  }
-
-  .hbar-row {
-    grid-template-columns: 1fr;
-    gap: 7px;
-  }
-
-  .hbar-row strong {
-    display: none;
   }
 }
 
