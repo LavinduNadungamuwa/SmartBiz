@@ -436,7 +436,7 @@ export default function Sales() {
   });
 
   return (
-    <div className="page">
+    <div className="flex flex-col gap-[22px] max-w-[1600px] mx-auto px-[15px]">
       <PageHeader
         eyebrow="Sales"
         title="Sales history"
@@ -444,7 +444,7 @@ export default function Sales() {
         actions={<Button icon="plus" onClick={openCreateModal}>Record new sale</Button>}
       />
 
-      <section className="summary-grid">
+      <section className="grid grid-cols-3 gap-4 max-[860px]:grid-cols-1">
         <StatCard label="Total Sales Value" value={currency(totalSales)} growth="Live" icon="sales" />
         <StatCard label="Orders" value={number((data.sales || []).length)} growth="Live" icon="invoices" />
         <StatCard label="Average Sale" value={currency((data.sales || []).length ? totalSales / (data.sales || []).length : 0)} growth="Live" icon="profit" />
@@ -469,7 +469,7 @@ export default function Sales() {
         }}
       />
 
-      <section className="card">
+      <section className="bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius)] shadow-[var(--shadow)] p-5">
         {rows.length ? (
           <>
             <DataTable
@@ -480,10 +480,22 @@ export default function Sales() {
               onView={handleView}
               onDelete={handleDelete}
             />
-            <div className="pagination">
-              <button onClick={handlePrevPage} disabled={currentPage === 1}>Previous</button>
+            <div className="flex items-center justify-end gap-3 pt-4 text-[var(--muted)]">
+              <button 
+                onClick={handlePrevPage} 
+                disabled={currentPage === 1}
+                className="h-[34px] px-3 border border-[var(--border)] bg-[var(--surface)] text-[var(--text)] rounded-[9px] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Previous
+              </button>
               <span>Page {currentPage} of {totalPages} ({filteredSales.length} sales)</span>
-              <button onClick={handleNextPage} disabled={currentPage === totalPages}>Next</button>
+              <button 
+                onClick={handleNextPage} 
+                disabled={currentPage === totalPages}
+                className="h-[34px] px-3 border border-[var(--border)] bg-[var(--surface)] text-[var(--text)] rounded-[9px] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Next
+              </button>
             </div>
           </>
         ) : (
@@ -498,44 +510,28 @@ export default function Sales() {
 
       {/* CREATE & EDIT MODAL */}
       {modalMode && modalMode !== 'view' && (
-        <div className="modal-overlay" onClick={closeModal}>
-          <div
-            className="modal-container"
-            style={{
-              width: 'min(720px, 96vw)',
-              maxHeight: '90vh',
-              display: 'flex',
-              flexDirection: 'column',
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="modal-header">
-              <h3>{modalMode === 'create' ? 'Record New Sale' : 'Edit Sale Record'}</h3>
-              <button className="modal-close" onClick={closeModal} aria-label="Close">
+        <div className="fixed inset-0 bg-[rgba(15,23,42,0.5)] backdrop-blur-[6px] flex items-center justify-center z-[1000] animate-[fadeIn_0.25s_ease-out]" onClick={closeModal}>
+          <div className="bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius)] shadow-[0_20px_25px_-5px_rgba(0,0,0,0.1),0_10px_10px_-5px_rgba(0,0,0,0.04)] w-[min(720px,96vw)] max-h-[90vh] flex flex-col animate-[slideUp_0.3s_cubic-bezier(0.16,1,0.3,1)] overflow-hidden" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between py-5 px-6 border-b border-[var(--border)]">
+              <h3 className="m-0 text-[18px] font-bold text-[var(--text)]">{modalMode === 'create' ? 'Record New Sale' : 'Edit Sale Record'}</h3>
+              <button className="bg-transparent border-0 text-[var(--muted)] cursor-pointer flex items-center justify-center p-1 rounded-[6px] transition-colors duration-200 hover:bg-[var(--app-bg)] hover:text-[var(--text)]" onClick={closeModal} aria-label="Close">
                 <Icon name="close" size={20} />
               </button>
             </div>
             <form onSubmit={handleSubmit}>
-              <div
-                className="modal-body"
-                style={{
-                  overflowY: 'auto',
-                  overflowX: 'hidden',
-                  maxHeight: 'calc(90vh - 180px)', // leaves room for header/footer
-                }}
-              >
+              <div className="p-6 overflow-y-auto overflow-x-hidden max-h-[calc(90vh-180px)]">
                 {submitError && (
-                  <div style={{ color: 'var(--red)', background: 'var(--red-soft)', padding: '10px 14px', borderRadius: '8px', marginBottom: '16px', fontSize: '14px' }}>
+                  <div className="text-[var(--red)] bg-[var(--red-soft)] py-[10px] px-[14px] rounded-[8px] mb-4 text-[14px]">
                     {submitError}
                   </div>
                 )}
-                <div className="form-grid">
-                  <div className="form-row-2">
-                    <div className="form-field">
-                      <label htmlFor="customerId">Customer *</label>
+                <div className="grid gap-[18px]">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="flex flex-col gap-1.5">
+                      <label htmlFor="customerId" className="text-[13px] font-semibold text-[var(--text)]">Customer *</label>
                       <select
                         id="customerId"
-                        className={formErrors.customerId ? 'error' : ''}
+                        className={`h-[40px] px-3 border rounded-[10px] text-[14px] bg-[var(--surface)] text-[var(--text)] outline-none transition-all duration-200 focus:border-[var(--blue)] focus:shadow-[0_0_0_3px_rgba(37,99,235,0.12)] ${formErrors.customerId ? 'border-[var(--red)]' : 'border-[var(--border)]'}`}
                         value={formData.customerId}
                         onChange={(e) => {
                           setFormData({ ...formData, customerId: e.target.value });
@@ -550,18 +546,18 @@ export default function Sales() {
                           </option>
                         ))}
                       </select>
-                      {formErrors.customerId && <span className="error-msg">{formErrors.customerId}</span>}
+                      {formErrors.customerId && <span className="text-[12px] text-[var(--red)] mt-0.5">{formErrors.customerId}</span>}
                     </div>
 
-                    <div className="form-field">
+                    <div className="flex flex-col gap-1.5">
                       {/* Invoice: editable when creating, read-only display when editing */}
                       {modalMode === 'create' ? (
                         <>
-                          <label htmlFor="invoiceNumber">Invoice Number *</label>
+                          <label htmlFor="invoiceNumber" className="text-[13px] font-semibold text-[var(--text)]">Invoice Number *</label>
                           <input
                             type="text"
                             id="invoiceNumber"
-                            className={formErrors.invoiceNumber ? 'error' : ''}
+                            className={`h-[40px] px-3 border rounded-[10px] text-[14px] bg-[var(--surface)] text-[var(--text)] outline-none transition-all duration-200 focus:border-[var(--blue)] focus:shadow-[0_0_0_3px_rgba(37,99,235,0.12)] ${formErrors.invoiceNumber ? 'border-[var(--red)]' : 'border-[var(--border)]'}`}
                             value={formData.invoiceNumber}
                             onChange={(e) => {
                               setFormData({ ...formData, invoiceNumber: e.target.value });
@@ -570,24 +566,24 @@ export default function Sales() {
                             placeholder="e.g. SALE-1024"
                             required
                           />
-                          {formErrors.invoiceNumber && <span className="error-msg">{formErrors.invoiceNumber}</span>}
+                          {formErrors.invoiceNumber && <span className="text-[12px] text-[var(--red)] mt-0.5">{formErrors.invoiceNumber}</span>}
                         </>
                       ) : (
                         <>
-                          <label>Invoice Number</label>
-                          <div style={{ padding: '10px 12px', borderRadius: '6px', background: 'var(--app-bg)', fontWeight: 700 }}>{formData.invoiceNumber || (selectedSale && (selectedSale.invoiceNumber || `SALE-${selectedSale.id}`))}</div>
+                          <label className="text-[13px] font-semibold text-[var(--text)]">Invoice Number</label>
+                          <div className="py-[10px] px-3 rounded-[6px] bg-[var(--app-bg)] font-bold">{formData.invoiceNumber || (selectedSale && (selectedSale.invoiceNumber || `SALE-${selectedSale.id}`))}</div>
                         </>
                       )}
                     </div>
                   </div>
 
-                  <div className="form-row-2">
-                    <div className="form-field">
-                      <label htmlFor="saleDate">Sale Date *</label>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="flex flex-col gap-1.5">
+                      <label htmlFor="saleDate" className="text-[13px] font-semibold text-[var(--text)]">Sale Date *</label>
                       <input
                         type="date"
                         id="saleDate"
-                        className={formErrors.saleDate ? 'error' : ''}
+                        className={`h-[40px] px-3 border rounded-[10px] text-[14px] bg-[var(--surface)] text-[var(--text)] outline-none transition-all duration-200 focus:border-[var(--blue)] focus:shadow-[0_0_0_3px_rgba(37,99,235,0.12)] ${formErrors.saleDate ? 'border-[var(--red)]' : 'border-[var(--border)]'}`}
                         value={formData.saleDate}
                         onChange={(e) => {
                           setFormData({ ...formData, saleDate: e.target.value });
@@ -595,13 +591,14 @@ export default function Sales() {
                         }}
                         required
                       />
-                      {formErrors.saleDate && <span className="error-msg">{formErrors.saleDate}</span>}
+                      {formErrors.saleDate && <span className="text-[12px] text-[var(--red)] mt-0.5">{formErrors.saleDate}</span>}
                     </div>
 
-                    <div className="form-field">
-                      <label htmlFor="status">Payment Status *</label>
+                    <div className="flex flex-col gap-1.5">
+                      <label htmlFor="status" className="text-[13px] font-semibold text-[var(--text)]">Payment Status *</label>
                       <select
                         id="status"
+                        className="h-[40px] px-3 border border-[var(--border)] rounded-[10px] text-[14px] bg-[var(--surface)] text-[var(--text)] outline-none transition-all duration-200 focus:border-[var(--blue)] focus:shadow-[0_0_0_3px_rgba(37,99,235,0.12)]"
                         value={formData.status}
                         onChange={(e) => setFormData({ ...formData, status: e.target.value })}
                         required
@@ -613,10 +610,11 @@ export default function Sales() {
                     </div>
                   </div>
 
-                  <div className="form-field">
-                    <label htmlFor="paymentMethod">Payment Method</label>
+                  <div className="flex flex-col gap-1.5">
+                    <label htmlFor="paymentMethod" className="text-[13px] font-semibold text-[var(--text)]">Payment Method</label>
                     <select
                       id="paymentMethod"
+                      className="h-[40px] px-3 border border-[var(--border)] rounded-[10px] text-[14px] bg-[var(--surface)] text-[var(--text)] outline-none transition-all duration-200 focus:border-[var(--blue)] focus:shadow-[0_0_0_3px_rgba(37,99,235,0.12)]"
                       value={formData.paymentMethod}
                       onChange={(e) => setFormData({ ...formData, paymentMethod: e.target.value })}
                     >
@@ -627,25 +625,25 @@ export default function Sales() {
                   </div>
 
                   {/* Dynamic Product Items */}
-                  <div style={{ borderTop: '1px solid var(--border)', paddingTop: '16px', marginTop: '8px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                      <h4 style={{ margin: 0, fontWeight: 700 }}>Products List *</h4>
+                  <div className="border-t border-[var(--border)] pt-4 mt-2">
+                    <div className="flex justify-between items-center mb-3">
+                      <h4 className="m-0 font-bold">Products List *</h4>
                       <Button variant="ghost" icon="plus" onClick={addItemRow}>Add Product</Button>
                     </div>
                     {formErrors.itemsGlobal && (
-                      <div className="error-msg" style={{ marginBottom: '12px', display: 'block' }}>{formErrors.itemsGlobal}</div>
+                      <div className="text-[12px] text-[var(--red)] mt-0.5 mb-3 block">{formErrors.itemsGlobal}</div>
                     )}
 
-                    <div style={{ display: 'grid', gap: '12px' }}>
+                    <div className="grid gap-3">
                       {formData.items.map((item, idx) => {
                         const itemErr = formErrors.items?.[idx] || {};
                         return (
-                          <div key={idx} style={{ background: 'var(--app-bg)', padding: '12px', borderRadius: '10px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                          <div key={idx} className="bg-[var(--app-bg)] p-3 rounded-[10px] grid grid-cols-2 gap-2.5">
                             {/* Product selector — full width */}
-                            <div style={{ gridColumn: '1 / -1' }} className="form-field">
-                              <label style={{ fontSize: '11px', color: 'var(--muted)' }}>Product</label>
+                            <div className="col-span-2 flex flex-col gap-1.5">
+                              <label className="text-[11px] text-[var(--muted)]">Product</label>
                               <select
-                                className={itemErr.productId ? 'error' : ''}
+                                className={`h-[40px] px-3 border rounded-[10px] text-[14px] bg-[var(--surface)] text-[var(--text)] outline-none transition-all duration-200 focus:border-[var(--blue)] focus:shadow-[0_0_0_3px_rgba(37,99,235,0.12)] ${itemErr.productId ? 'border-[var(--red)]' : 'border-[var(--border)]'}`}
                                 value={item.productId || ''}
                                 onChange={(e) =>
                                   handleItemChange(idx, 'productId', e.target.value)
@@ -664,61 +662,52 @@ export default function Sales() {
                                 })}
                               </select>
                               {itemErr.productId && (
-                                <span className="error-msg">{itemErr.productId}</span>
+                                <span className="text-[12px] text-[var(--red)] mt-0.5">{itemErr.productId}</span>
                               )}
                             </div>
 
                             {/* Qty */}
-                            <div className="form-field">
-                              <label style={{ fontSize: '11px', color: 'var(--muted)' }}>Qty</label>
+                            <div className="flex flex-col gap-1.5">
+                              <label className="text-[11px] text-[var(--muted)]">Qty</label>
                               <input
                                 type="number"
                                 min="1"
                                 step="1"
-                                className={itemErr.quantity ? 'error' : ''}
+                                className={`h-[40px] px-3 border rounded-[10px] text-[14px] bg-[var(--surface)] text-[var(--text)] outline-none transition-all duration-200 focus:border-[var(--blue)] focus:shadow-[0_0_0_3px_rgba(37,99,235,0.12)] ${itemErr.quantity ? 'border-[var(--red)]' : 'border-[var(--border)]'}`}
                                 value={item.quantity}
                                 onChange={(e) => handleItemChange(idx, 'quantity', e.target.value)}
                                 required
                               />
-                              {itemErr.quantity && <span className="error-msg">{itemErr.quantity}</span>}
+                              {itemErr.quantity && <span className="text-[12px] text-[var(--red)] mt-0.5">{itemErr.quantity}</span>}
                             </div>
 
                             {/* Unit Price */}
-                            <div className="form-field">
-                              <label style={{ fontSize: '11px', color: 'var(--muted)' }}>Price ($)</label>
+                            <div className="flex flex-col gap-1.5">
+                              <label className="text-[11px] text-[var(--muted)]">Price ($)</label>
                               <input
                                 type="number"
                                 min="0.00"
                                 step="0.01"
-                                className={itemErr.unitPrice ? 'error' : ''}
+                                className={`h-[40px] px-3 border rounded-[10px] text-[14px] bg-[var(--surface)] text-[var(--text)] outline-none transition-all duration-200 focus:border-[var(--blue)] focus:shadow-[0_0_0_3px_rgba(37,99,235,0.12)] ${itemErr.unitPrice ? 'border-[var(--red)]' : 'border-[var(--border)]'}`}
                                 value={item.unitPrice}
                                 onChange={(e) => handleItemChange(idx, 'unitPrice', e.target.value)}
                                 required
                               />
-                              {itemErr.unitPrice && <span className="error-msg">{itemErr.unitPrice}</span>}
+                              {itemErr.unitPrice && <span className="text-[12px] text-[var(--red)] mt-0.5">{itemErr.unitPrice}</span>}
                             </div>
 
                             {/* Row total + remove button */}
-                            <div style={{ gridColumn: '1 / -1', display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '4px' }}>
-                              <span style={{ fontSize: '13px', color: 'var(--muted)' }}>
+                            <div className="col-span-2 flex justify-between items-center pt-1">
+                              <span className="text-[13px] text-[var(--muted)]">
                                 Total:&nbsp;
-                                <strong style={{ color: 'var(--text)', fontSize: '14px' }}>
+                                <strong className="text-[var(--text)] text-[14px]">
                                   {currency(Number(item.quantity || 0) * Number(item.unitPrice || 0))}
                                 </strong>
                               </span>
                               <button
                                 type="button"
                                 onClick={() => removeItemRow(idx)}
-                                style={{
-                                  background: 'transparent',
-                                  border: 'none',
-                                  color: 'var(--red)',
-                                  cursor: 'pointer',
-                                  padding: '6px',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center'
-                                }}
+                                className="bg-transparent border-none text-[var(--red)] cursor-pointer p-1.5 flex items-center justify-center"
                                 title="Remove item"
                               >
                                 <Icon name="trash" size={18} />
@@ -731,40 +720,41 @@ export default function Sales() {
                   </div>
 
                   {/* Calculations Breakdowns */}
-                  <div style={{ background: 'var(--app-bg)', padding: '16px', borderRadius: '12px', marginTop: '12px', display: 'grid', gap: '8px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px' }}>
+                  <div className="bg-[var(--app-bg)] p-4 rounded-xl mt-3 grid gap-2">
+                    <div className="flex justify-between text-[14px]">
                       <span>Subtotal:</span>
                       <strong>{currency(calculatedSubtotal)}</strong>
                     </div>
 
-                    <div className="form-field">
-                      <label htmlFor="discount" style={{ fontSize: '12px' }}>Discount ($)</label>
+                    <div className="flex flex-col gap-1.5">
+                      <label htmlFor="discount" className="text-[12px] font-semibold text-[var(--text)]">Discount ($)</label>
                       <input
                         type="number"
                         id="discount"
                         min="0"
                         step="0.01"
-                        className={formErrors.discount ? 'error' : ''}
+                        className={`h-[40px] px-3 border rounded-[10px] text-[14px] bg-[var(--surface)] text-[var(--text)] outline-none transition-all duration-200 focus:border-[var(--blue)] focus:shadow-[0_0_0_3px_rgba(37,99,235,0.12)] ${formErrors.discount ? 'border-[var(--red)]' : 'border-[var(--border)]'}`}
                         value={formData.discount}
                         onChange={(e) => {
                           setFormData({ ...formData, discount: e.target.value });
                           setFormErrors({ ...formErrors, discount: '' });
                         }}
                       />
-                      {formErrors.discount && <span className="error-msg">{formErrors.discount}</span>}
+                      {formErrors.discount && <span className="text-[12px] text-[var(--red)] mt-0.5">{formErrors.discount}</span>}
                     </div>
 
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '16px', fontWeight: 800, borderTop: '1px solid var(--border)', paddingTop: '12px', marginTop: '4px' }}>
+                    <div className="flex justify-between text-[16px] font-extrabold border-t border-[var(--border)] pt-3 mt-1">
                       <span>Total Amount:</span>
-                      <span style={{ color: 'var(--blue)' }}>{currency(calculatedTotal)}</span>
+                      <span className="text-[var(--blue)]">{currency(calculatedTotal)}</span>
                     </div>
                   </div>
 
-                  <div className="form-field">
-                    <label htmlFor="notes">Notes</label>
+                  <div className="flex flex-col gap-1.5">
+                    <label htmlFor="notes" className="text-[13px] font-semibold text-[var(--text)]">Notes</label>
                     <textarea
                       id="notes"
                       rows="2"
+                      className="py-2 px-3 border rounded-[10px] text-[14px] bg-[var(--surface)] text-[var(--text)] outline-none transition-all duration-200 focus:border-[var(--blue)] focus:shadow-[0_0_0_3px_rgba(37,99,235,0.12)] border-[var(--border)]"
                       value={formData.notes}
                       onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                       placeholder="Enter additional details..."
@@ -772,7 +762,7 @@ export default function Sales() {
                   </div>
                 </div>
               </div>
-              <div className="modal-footer">
+              <div className="flex justify-end gap-3 py-[18px] px-6 bg-[var(--surface-soft)] border-t border-[var(--border)]">
                 <Button variant="ghost" onClick={closeModal}>Cancel</Button>
                 <Button type="submit" variant="primary" disabled={submitLoading}>
                   {submitLoading ? 'Saving...' : 'Save Sale Record'}
@@ -785,111 +775,93 @@ export default function Sales() {
 
       {/* VIEW DETAILS MODAL */}
       {modalMode === 'view' && selectedSale && (
-        <div className="modal-overlay" onClick={closeModal}>
-          <div
-            className="modal-container"
-            style={{
-              width: 'min(680px, 96vw)',
-              maxHeight: '90vh',
-              display: 'flex',
-              flexDirection: 'column',
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="modal-header">
+        <div className="fixed inset-0 bg-[rgba(15,23,42,0.5)] backdrop-blur-[6px] flex items-center justify-center z-[1000] animate-[fadeIn_0.25s_ease-out]" onClick={closeModal}>
+          <div className="bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius)] shadow-[0_20px_25px_-5px_rgba(0,0,0,0.1),0_10px_10px_-5px_rgba(0,0,0,0.04)] w-[min(680px,96vw)] max-h-[90vh] flex flex-col animate-[slideUp_0.3s_cubic-bezier(0.16,1,0.3,1)] overflow-hidden" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between py-5 px-6 border-b border-[var(--border)]">
               <h3>Sale Invoice Details</h3>
-              <button className="modal-close" onClick={closeModal} aria-label="Close">
+              <button className="bg-transparent border-0 text-[var(--muted)] cursor-pointer flex items-center justify-center p-1 rounded-[6px] transition-colors duration-200 hover:bg-[var(--app-bg)] hover:text-[var(--text)]" onClick={closeModal} aria-label="Close">
                 <Icon name="close" size={20} />
               </button>
             </div>
-            <div
-              className="modal-body"
-              style={{
-                display: 'grid',
-                gap: '20px',
-                overflowY: 'auto',
-                maxHeight: 'calc(90vh - 160px)', // leaves room for header/footer
-                paddingRight: '8px',
-              }}
-            >
+            <div className="p-6 grid gap-5 overflow-y-auto max-h-[calc(90vh-160px)] pr-2">
               {viewLoading ? (
-                <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--muted)' }}>Loading sale details…</div>
+                <div className="text-center py-10 text-[var(--muted)]">Loading sale details…</div>
               ) : (<>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--border)', paddingBottom: '16px' }}>
+                <div className="flex items-center justify-between border-b border-[var(--border)] pb-4">
                   <div>
-                    <h4 style={{ margin: 0, fontSize: '18px', fontWeight: '700' }}>
+                    <h4 className="m-0 text-[18px] font-bold">
                       {selectedSale.invoiceNumber || `SALE-${selectedSale.id}`}
                     </h4>
-                    <span style={{ color: 'var(--muted)', fontSize: '13px' }}>Date: {date(selectedSale.saleDate)}</span>
+                    <span className="text-[var(--muted)] text-[13px]">Date: {date(selectedSale.saleDate)}</span>
                   </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <span style={{ display: 'inline-block', padding: '6px 12px', borderRadius: '12px', fontSize: '13px', fontWeight: 700, background: selectedSale.status === 'COMPLETED' ? 'var(--blue-soft)' : 'var(--orange-soft)', color: selectedSale.status === 'COMPLETED' ? 'var(--blue)' : 'var(--orange)' }}>
+                  <div className="text-right">
+                    <span className={`inline-block py-1.5 px-3 rounded-[12px] text-[13px] font-bold ${selectedSale.status === 'COMPLETED' ? 'bg-[var(--blue-soft)] text-[var(--blue)]' : 'bg-[var(--orange-soft)] text-[var(--orange)]'}`}>
                       {status(selectedSale.status)}
                     </span>
                   </div>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label style={{ display: 'block', fontSize: '11px', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '4px' }}>Customer Name</label>
+                    <label className="block text-[11px] text-[var(--muted)] font-semibold uppercase mb-1">Customer Name</label>
                     <strong>{customerById[selectedSale.customerId]?.fullName || `Customer #${selectedSale.customerId || '-'}`}</strong>
                   </div>
                   <div>
-                    <label style={{ display: 'block', fontSize: '11px', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '4px' }}>Payment Method</label>
+                    <label className="block text-[11px] text-[var(--muted)] font-semibold uppercase mb-1">Payment Method</label>
                     <strong>{status(selectedSale.paymentMethod)}</strong>
                   </div>
                 </div>
 
                 {/* Items Table */}
-                <div style={{ borderTop: '1px solid var(--border)', paddingTop: '16px' }}>
-                  <label style={{ display: 'block', fontSize: '11px', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '12px' }}>Items Ordered</label>
+                <div className="border-t border-[var(--border)] pt-4">
+                  <label className="block text-[11px] text-[var(--muted)] font-semibold uppercase mb-3">Items Ordered</label>
                   {viewItems.length > 0 ? (
-                    <div style={{ overflowX: 'auto' }}>
-                      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
+                    <div className="overflow-x-auto">
+                      <table className="w-full border-collapse text-[14px]">
                         <thead>
-                          <tr style={{ borderBottom: '2px solid var(--border)' }}>
-                            <th style={{ textAlign: 'left', padding: '8px 10px', fontSize: '11px', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase' }}>Product</th>
-                            <th style={{ textAlign: 'center', padding: '8px 10px', fontSize: '11px', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase' }}>Qty</th>
-                            <th style={{ textAlign: 'right', padding: '8px 10px', fontSize: '11px', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase' }}>Unit Price</th>
-                            <th style={{ textAlign: 'right', padding: '8px 10px', fontSize: '11px', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase' }}>Total</th>
+                          <tr className="border-b-2 border-[var(--border)]">
+                            <th className="text-left p-[8px_10px] text-[11px] text-[var(--muted)] font-semibold uppercase">Product</th>
+                            <th className="text-center p-[8px_10px] text-[11px] text-[var(--muted)] font-semibold uppercase">Qty</th>
+                            <th className="text-right p-[8px_10px] text-[11px] text-[var(--muted)] font-semibold uppercase">Unit Price</th>
+                            <th className="text-right p-[8px_10px] text-[11px] text-[var(--muted)] font-semibold uppercase">Total</th>
                           </tr>
                         </thead>
                         <tbody>
                           {viewItems.map((item, idx) => (
-                            <tr key={idx} style={{ borderBottom: '1px solid var(--border)' }}>
-                              <td style={{ padding: '10px', fontWeight: 500 }}>{item.productName}</td>
-                              <td style={{ padding: '10px', textAlign: 'center' }}>{item.quantity}</td>
-                              <td style={{ padding: '10px', textAlign: 'right' }}>{currency(item.unitPrice)}</td>
-                              <td style={{ padding: '10px', textAlign: 'right', fontWeight: 700 }}>{currency(item.totalPrice)}</td>
+                            <tr key={idx} className="border-b border-[var(--border)]">
+                              <td className="p-2.5 font-medium">{item.productName}</td>
+                              <td className="p-2.5 text-center">{item.quantity}</td>
+                              <td className="p-2.5 text-right">{currency(item.unitPrice)}</td>
+                              <td className="p-2.5 text-right font-bold">{currency(item.totalPrice)}</td>
                             </tr>
                           ))}
                         </tbody>
                         <tfoot>
-                          <tr style={{ borderTop: '1px solid var(--border)' }}>
-                            <td colSpan={3} style={{ padding: '8px 10px', textAlign: 'right', fontSize: '14px', color: 'var(--muted)' }}>Discount:</td>
-                            <td style={{ padding: '8px 10px', textAlign: 'right', fontSize: '14px', color: 'var(--orange)' }}>− {currency(selectedSale.discount ?? 0)}</td>
+                          <tr className="border-t border-[var(--border)]">
+                            <td colSpan={3} className="p-[8px_10px] text-right text-[14px] text-[var(--muted)]">Discount:</td>
+                            <td className="p-[8px_10px] text-right text-[14px] text-[var(--orange)]">− {currency(selectedSale.discount ?? 0)}</td>
                           </tr>
-                          <tr style={{ borderTop: '2px solid var(--border)' }}>
-                            <td colSpan={3} style={{ padding: '10px', textAlign: 'right', fontWeight: 700, fontSize: '15px' }}>Total Amount:</td>
-                            <td style={{ padding: '10px', textAlign: 'right', fontWeight: 800, fontSize: '15px', color: 'var(--blue)' }}>{currency(selectedSale.totalAmount)}</td>
+                          <tr className="border-t-2 border-[var(--border)]">
+                            <td colSpan={3} className="p-2.5 text-right font-bold text-[15px]">Total Amount:</td>
+                            <td className="p-2.5 text-right font-extrabold text-[15px] text-[var(--blue)]">{currency(selectedSale.totalAmount)}</td>
                           </tr>
                         </tfoot>
                       </table>
                     </div>
                   ) : (
-                    <p style={{ margin: 0, fontSize: '14px', color: 'var(--muted)' }}>No item details available.</p>
+                    <p className="m-0 text-[14px] text-[var(--muted)]">No item details available.</p>
                   )}
                 </div>
 
                 {selectedSale.notes && (
-                  <div style={{ borderTop: '1px solid var(--border)', paddingTop: '16px' }}>
-                    <label style={{ display: 'block', fontSize: '11px', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '4px' }}>Notes</label>
-                    <p style={{ margin: 0, fontSize: '14px', whiteSpace: 'pre-line' }}>{selectedSale.notes}</p>
+                  <div className="border-t border-[var(--border)] pt-4">
+                    <label className="block text-[11px] text-[var(--muted)] font-semibold uppercase mb-1">Notes</label>
+                    <p className="m-0 text-[14px] whitespace-pre-line">{selectedSale.notes}</p>
                   </div>
                 )}
               </>)}
             </div>
-            <div className="modal-footer">
+            <div className="flex justify-end gap-3 py-[18px] px-6 bg-[var(--surface-soft)] border-t border-[var(--border)]">
               <Button variant="ghost" onClick={closeModal}>Close</Button>
               <Button variant="primary" icon="edit" onClick={() => {
                 const index = paginatedSales.findIndex(s => s.id === selectedSale.id);
@@ -904,4 +876,5 @@ export default function Sales() {
     </div>
   );
 }
+
 
