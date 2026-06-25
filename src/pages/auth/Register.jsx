@@ -11,7 +11,6 @@ import {
   PrimaryButton,
 } from '../../components/auth';
 import useAuth from '../../store/useAuth';
-import './auth.css';
 
 const INITIAL = {
   businessName: '',
@@ -107,7 +106,16 @@ export default function Register() {
   };
 
   return (
-    <div className="auth-root">
+    <div
+      className="flex w-screen h-screen overflow-hidden text-[var(--text)]"
+      style={{
+        fontFamily: "'DM Sans', sans-serif",
+        background:
+          'radial-gradient(800px 400px at 10% 20%, rgba(37,99,235,0.06), transparent 60%),' +
+          'radial-gradient(700px 360px at 85% 80%, rgba(59,130,246,0.04), transparent 50%),' +
+          'linear-gradient(180deg, var(--app-bg) 0%, var(--surface-soft) 100%)',
+      }}
+    >
       <AuthBrandPanel
         subtitle="Everything your business needs - in one place."
         features={BRAND_FEATURES}
@@ -119,7 +127,10 @@ export default function Register() {
         footer={(
           <>
             Already have an account?{' '}
-            <Link to="/login" className="form-link">
+            <Link
+              to="/login"
+              className="text-[var(--blue)] no-underline font-semibold hover:underline"
+            >
               Sign in
             </Link>
           </>
@@ -127,7 +138,7 @@ export default function Register() {
       >
         <FormError message={apiError} />
         <form onSubmit={handleSubmit} noValidate>
-          <div className="field-row">
+          <div className="flex gap-4 items-stretch max-sm:flex-col max-sm:gap-0">
             <FormField
               name="businessName"
               label="Business name"
@@ -148,7 +159,7 @@ export default function Register() {
             />
           </div>
 
-          <div className="field-row">
+          <div className="flex gap-4 items-stretch max-sm:flex-col max-sm:gap-0">
             <FormField
               name="email"
               label="Email address"
@@ -180,11 +191,16 @@ export default function Register() {
             onChange={handleChange}
           />
 
-          <div className="field-divider">
-            <span>Account security</span>
+          {/* Divider */}
+          <div className="flex items-center gap-3 my-1 mb-[18px]">
+            <span className="flex-1 h-px bg-[rgba(255,255,255,0.1)]" />
+            <span className="text-[11px] uppercase tracking-[0.8px] text-[var(--muted)]">
+              Account security
+            </span>
+            <span className="flex-1 h-px bg-[rgba(255,255,255,0.1)]" />
           </div>
 
-          <div className="field-row">
+          <div className="flex gap-4 items-stretch max-sm:flex-col max-sm:gap-0">
             <PasswordField
               name="password"
               value={form.password}

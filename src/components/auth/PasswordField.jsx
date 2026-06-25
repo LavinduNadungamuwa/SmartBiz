@@ -11,31 +11,40 @@ export default function PasswordField({
   half = false,
 }) {
   return (
-    <div className={`field${half ? ' field--half' : ''}`}>
-      <label className="field__label" htmlFor={name}>
+    <div className={`mb-[14px] flex flex-col gap-[7px]${half ? ' flex-1 min-w-0' : ''}`}>
+      <label
+        className="text-[13px] font-medium text-[var(--muted)]"
+        htmlFor={name}
+      >
         {label}
       </label>
-      <div className="field__password-wrap">
+      <div className="relative">
         <input
           id={name}
           name={name}
           type={showPassword ? 'text' : 'password'}
           autoComplete={autoComplete}
-          className={`field__input${error ? ' field__input--error' : ''}`}
+          className={`auth-input w-full bg-[var(--surface)] border rounded-[10px] px-[14px] py-[11px] pr-11 text-sm text-[var(--text)] caret-[var(--text)] outline-none transition-[border-color,box-shadow,transform] duration-[140ms] placeholder:text-[var(--muted)] focus:border-[var(--blue)] focus:shadow-[0_0_0_3px_rgba(37,99,235,0.12)] focus:-translate-y-px${
+            error
+              ? ' border-[rgba(220,38,38,0.4)]'
+              : ' border-[var(--border)]'
+          }`}
           placeholder={placeholder}
           value={value}
           onChange={onChange}
         />
         <button
           type="button"
-          className="field__eye"
+          className="absolute right-3 top-1/2 -translate-y-1/2 bg-transparent border-0 cursor-pointer text-[var(--muted)] flex p-1 hover:text-[var(--blue)] transition-colors duration-[140ms]"
           onClick={onToggleShow}
           aria-label={showPassword ? 'Hide password' : 'Show password'}
         >
           {showPassword ? <EyeOffIcon /> : <EyeIcon />}
         </button>
       </div>
-      {error && <span className="field__error">{error}</span>}
+      {error && (
+        <span className="text-[12px] text-[#ffbebe] -mt-0.5">{error}</span>
+      )}
     </div>
   );
 }

@@ -1,6 +1,9 @@
 /* ── Tailwind CSS v4 ────────────────────────────────────────────────────── */
 @import "tailwindcss";
 
+/* ── Auth page: font import + autofill pseudo-class overrides ───────────── */
+@import "./pages/auth/auth.css";
+
 /* ── Project-level resets (kept exactly as-is) ─────────────────────────── */
 
 
