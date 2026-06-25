@@ -182,7 +182,7 @@ export default function Suppliers() {
   const totalSuppliedItemsCount = (data.products || []).filter((p) => p.supplierId !== null && p.supplierId !== undefined).length;
 
   return (
-    <div className="page">
+    <div className="flex flex-col gap-[22px] max-w-[1600px] mx-auto px-[15px]">
       <PageHeader
         eyebrow="Procurement"
         title="Suppliers"
@@ -190,7 +190,7 @@ export default function Suppliers() {
         actions={<Button icon="plus" onClick={openCreateModal}>Add supplier</Button>}
       />
 
-      <section className="summary-grid">
+      <section className="grid grid-cols-3 gap-4 max-[860px]:grid-cols-1">
         <StatCard label="Total Suppliers" value={number(totalSuppliersCount)} growth="Live" icon="suppliers" />
         <StatCard label="Active Partnerships" value={number(activePartnershipsCount)} growth="Supplying products" icon="sales" />
         <StatCard label="Supplied Items" value={number(totalSuppliedItemsCount)} growth="Total inventory varieties" icon="products" />
@@ -211,7 +211,7 @@ export default function Suppliers() {
         }}
       />
 
-      <section className="card">
+      <section className="bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius)] shadow-[var(--shadow)] p-5">
         {rows.length ? (
           <>
             <DataTable
@@ -222,10 +222,22 @@ export default function Suppliers() {
               onView={handleView}
               onDelete={handleDelete}
             />
-            <div className="pagination">
-              <button onClick={handlePrevPage} disabled={currentPage === 1}>Previous</button>
+            <div className="flex items-center justify-end gap-3 pt-4 text-[var(--muted)]">
+              <button 
+                onClick={handlePrevPage} 
+                disabled={currentPage === 1}
+                className="h-[34px] px-3 border border-[var(--border)] bg-[var(--surface)] text-[var(--text)] rounded-[9px] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Previous
+              </button>
               <span>Page {currentPage} of {totalPages} ({filteredSuppliers.length} suppliers)</span>
-              <button onClick={handleNextPage} disabled={currentPage === totalPages}>Next</button>
+              <button 
+                onClick={handleNextPage} 
+                disabled={currentPage === totalPages}
+                className="h-[34px] px-3 border border-[var(--border)] bg-[var(--surface)] text-[var(--text)] rounded-[9px] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Next
+              </button>
             </div>
           </>
         ) : (
@@ -240,28 +252,28 @@ export default function Suppliers() {
 
       {/* CREATE & EDIT MODAL */}
       {modalMode && modalMode !== 'view' && (
-        <div className="modal-overlay" onClick={closeModal}>
-          <div className="modal-container" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>{modalMode === 'create' ? 'Add New Supplier' : 'Edit Supplier'}</h3>
-              <button className="modal-close" onClick={closeModal} aria-label="Close">
+        <div className="fixed inset-0 bg-[rgba(15,23,42,0.5)] backdrop-blur-[6px] flex items-center justify-center z-[1000] animate-[fadeIn_0.25s_ease-out]" onClick={closeModal}>
+          <div className="bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius)] shadow-[0_20px_25px_-5px_rgba(0,0,0,0.1),0_10px_10px_-5px_rgba(0,0,0,0.04)] w-[min(540px,94vw)] max-h-[90vh] flex flex-col animate-[slideUp_0.3s_cubic-bezier(0.16,1,0.3,1)] overflow-hidden" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between py-5 px-6 border-b border-[var(--border)]">
+              <h3 className="m-0 text-[18px] font-bold text-[var(--text)]">{modalMode === 'create' ? 'Add New Supplier' : 'Edit Supplier'}</h3>
+              <button className="bg-transparent border-0 text-[var(--muted)] cursor-pointer flex items-center justify-center p-1 rounded-[6px] transition-colors duration-200 hover:bg-[var(--app-bg)] hover:text-[var(--text)]" onClick={closeModal} aria-label="Close">
                 <Icon name="close" size={20} />
               </button>
             </div>
             <form onSubmit={handleSubmit}>
-              <div className="modal-body">
+              <div className="p-6 overflow-y-auto">
                 {submitError && (
-                  <div style={{ color: 'var(--red)', background: 'var(--red-soft)', padding: '10px 14px', borderRadius: '8px', marginBottom: '16px', fontSize: '14px' }}>
+                  <div className="text-[var(--red)] bg-[var(--red-soft)] py-[10px] px-[14px] rounded-[8px] mb-4 text-[14px]">
                     {submitError}
                   </div>
                 )}
-                <div className="form-grid">
-                  <div className="form-field">
-                    <label htmlFor="supplierName">Supplier Name *</label>
+                <div className="grid gap-[18px]">
+                  <div className="flex flex-col gap-1.5">
+                    <label htmlFor="supplierName" className="text-[13px] font-semibold text-[var(--text)]">Supplier Name *</label>
                     <input
                       type="text"
                       id="supplierName"
-                      className={formErrors.supplierName ? 'error' : ''}
+                      className={`h-[40px] px-3 border rounded-[10px] text-[14px] bg-[var(--surface)] text-[var(--text)] outline-none transition-all duration-200 focus:border-[var(--blue)] focus:shadow-[0_0_0_3px_rgba(37,99,235,0.12)] ${formErrors.supplierName ? 'border-[var(--red)]' : 'border-[var(--border)]'}`}
                       value={formData.supplierName}
                       onChange={(e) => {
                         setFormData({ ...formData, supplierName: e.target.value });
@@ -270,16 +282,16 @@ export default function Suppliers() {
                       placeholder="e.g. Acme Corp"
                       required
                     />
-                    {formErrors.supplierName && <span className="error-msg">{formErrors.supplierName}</span>}
+                    {formErrors.supplierName && <span className="text-[12px] text-[var(--red)] mt-0.5">{formErrors.supplierName}</span>}
                   </div>
 
-                  <div className="form-row-2">
-                    <div className="form-field">
-                      <label htmlFor="email">Email Address *</label>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="flex flex-col gap-1.5">
+                      <label htmlFor="email" className="text-[13px] font-semibold text-[var(--text)]">Email Address *</label>
                       <input
                         type="email"
                         id="email"
-                        className={formErrors.email ? 'error' : ''}
+                        className={`h-[40px] px-3 border rounded-[10px] text-[14px] bg-[var(--surface)] text-[var(--text)] outline-none transition-all duration-200 focus:border-[var(--blue)] focus:shadow-[0_0_0_3px_rgba(37,99,235,0.12)] ${formErrors.email ? 'border-[var(--red)]' : 'border-[var(--border)]'}`}
                         value={formData.email}
                         onChange={(e) => {
                           setFormData({ ...formData, email: e.target.value });
@@ -288,15 +300,15 @@ export default function Suppliers() {
                         placeholder="e.g. supplier@example.com"
                         required
                       />
-                      {formErrors.email && <span className="error-msg">{formErrors.email}</span>}
+                      {formErrors.email && <span className="text-[12px] text-[var(--red)] mt-0.5">{formErrors.email}</span>}
                     </div>
 
-                    <div className="form-field">
-                      <label htmlFor="phone">Phone Number *</label>
+                    <div className="flex flex-col gap-1.5">
+                      <label htmlFor="phone" className="text-[13px] font-semibold text-[var(--text)]">Phone Number *</label>
                       <input
                         type="text"
                         id="phone"
-                        className={formErrors.phone ? 'error' : ''}
+                        className={`h-[40px] px-3 border rounded-[10px] text-[14px] bg-[var(--surface)] text-[var(--text)] outline-none transition-all duration-200 focus:border-[var(--blue)] focus:shadow-[0_0_0_3px_rgba(37,99,235,0.12)] ${formErrors.phone ? 'border-[var(--red)]' : 'border-[var(--border)]'}`}
                         value={formData.phone}
                         onChange={(e) => {
                           setFormData({ ...formData, phone: e.target.value });
@@ -305,15 +317,16 @@ export default function Suppliers() {
                         placeholder="e.g. +94 77 123 4567"
                         required
                       />
-                      {formErrors.phone && <span className="error-msg">{formErrors.phone}</span>}
+                      {formErrors.phone && <span className="text-[12px] text-[var(--red)] mt-0.5">{formErrors.phone}</span>}
                     </div>
                   </div>
 
-                  <div className="form-field">
-                    <label htmlFor="address">Address</label>
+                  <div className="flex flex-col gap-1.5">
+                    <label htmlFor="address" className="text-[13px] font-semibold text-[var(--text)]">Address</label>
                     <textarea
                       id="address"
                       rows="3"
+                      className="py-2 px-3 border rounded-[10px] text-[14px] bg-[var(--surface)] text-[var(--text)] outline-none transition-all duration-200 focus:border-[var(--blue)] focus:shadow-[0_0_0_3px_rgba(37,99,235,0.12)] border-[var(--border)]"
                       value={formData.address}
                       onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                       placeholder="e.g. 456 Industrial Zone, Colombo"
@@ -321,7 +334,7 @@ export default function Suppliers() {
                   </div>
                 </div>
               </div>
-              <div className="modal-footer">
+              <div className="flex justify-end gap-3 py-[18px] px-6 bg-[var(--surface-soft)] border-t border-[var(--border)]">
                 <Button variant="ghost" onClick={closeModal}>Cancel</Button>
                 <Button type="submit" variant="primary" disabled={submitLoading}>
                   {submitLoading ? 'Saving...' : 'Save Supplier'}
@@ -334,65 +347,65 @@ export default function Suppliers() {
 
       {/* VIEW MODAL */}
       {modalMode === 'view' && selectedSupplier && (
-        <div className="modal-overlay" onClick={closeModal}>
-          <div className="modal-container" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>Supplier Profile</h3>
-              <button className="modal-close" onClick={closeModal} aria-label="Close">
+        <div className="fixed inset-0 bg-[rgba(15,23,42,0.5)] backdrop-blur-[6px] flex items-center justify-center z-[1000] animate-[fadeIn_0.25s_ease-out]" onClick={closeModal}>
+          <div className="bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius)] shadow-[0_20px_25px_-5px_rgba(0,0,0,0.1),0_10px_10px_-5px_rgba(0,0,0,0.04)] w-[min(540px,94vw)] max-h-[90vh] flex flex-col animate-[slideUp_0.3s_cubic-bezier(0.16,1,0.3,1)] overflow-hidden" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between py-5 px-6 border-b border-[var(--border)]">
+              <h3 className="m-0 text-[18px] font-bold text-[var(--text)]">Supplier Profile</h3>
+              <button className="bg-transparent border-0 text-[var(--muted)] cursor-pointer flex items-center justify-center p-1 rounded-[6px] transition-colors duration-200 hover:bg-[var(--app-bg)] hover:text-[var(--text)]" onClick={closeModal} aria-label="Close">
                 <Icon name="close" size={20} />
               </button>
             </div>
-            <div className="modal-body" style={{ display: 'grid', gap: '20px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '16px', paddingBottom: '16px', borderBottom: '1px solid var(--border)' }}>
-                <div style={{ width: '56px', height: '56px', borderRadius: '999px', background: 'var(--blue-soft)', color: 'var(--blue)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', fontWeight: '800' }}>
+            <div className="p-6 overflow-y-auto grid gap-5">
+              <div className="flex items-center gap-4 pb-4 border-b border-[var(--border)]">
+                <div className="w-14 h-14 rounded-full bg-[var(--blue-soft)] text-[var(--blue)] flex items-center justify-center text-[20px] font-extrabold">
                   {selectedSupplier.supplierName?.charAt(0).toUpperCase()}
                 </div>
                 <div>
-                  <h4 style={{ margin: 0, fontSize: '18px', fontWeight: '700' }}>{selectedSupplier.supplierName}</h4>
-                  <span style={{ color: 'var(--muted)', fontSize: '13px' }}>Supplier ID: #{selectedSupplier.id}</span>
+                  <h4 className="m-0 text-[18px] font-bold">{selectedSupplier.supplierName}</h4>
+                  <span className="text-[var(--muted)] text-[13px]">Supplier ID: #{selectedSupplier.id}</span>
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label style={{ display: 'block', fontSize: '12px', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '4px' }}>Email</label>
-                  <strong style={{ wordBreak: 'break-all' }}>{selectedSupplier.email}</strong>
+                  <label className="block text-[12px] text-[var(--muted)] font-semibold uppercase mb-1">Email</label>
+                  <strong className="break-all">{selectedSupplier.email}</strong>
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '12px', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '4px' }}>Phone</label>
+                  <label className="block text-[12px] text-[var(--muted)] font-semibold uppercase mb-1">Phone</label>
                   <strong>{selectedSupplier.phone}</strong>
                 </div>
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '12px', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '4px' }}>Address</label>
-                <p style={{ margin: 0, color: 'var(--text)' }}>{selectedSupplier.address || 'No address provided'}</p>
+                <label className="block text-[12px] text-[var(--muted)] font-semibold uppercase mb-1">Address</label>
+                <p className="m-0 text-[var(--text)]">{selectedSupplier.address || 'No address provided'}</p>
               </div>
 
               {/* LIST OF PRODUCTS SUPPLIED */}
-              <div style={{ marginTop: '8px', borderTop: '1px solid var(--border)', paddingTop: '16px' }}>
-                <label style={{ display: 'block', fontSize: '12px', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '8px' }}>
+              <div className="mt-2 border-t border-[var(--border)] pt-4">
+                <label className="block text-[12px] text-[var(--muted)] font-semibold uppercase mb-2">
                   Products Supplied ({(data.products || []).filter((p) => p.supplierId === selectedSupplier.id).length})
                 </label>
                 {(() => {
                   const suppliedProducts = (data.products || []).filter((p) => p.supplierId === selectedSupplier.id);
                   if (suppliedProducts.length > 0) {
                     return (
-                      <div style={{ display: 'grid', gap: '8px', maxHeight: '150px', overflowY: 'auto', paddingRight: '4px' }}>
+                      <div className="grid gap-2 max-h-[150px] overflow-y-auto pr-1">
                         {suppliedProducts.map((p) => (
-                          <div key={p.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--app-bg)', padding: '8px 12px', borderRadius: '8px', fontSize: '13px' }}>
-                            <span style={{ fontWeight: 600 }}>{p.productName}</span>
-                            <span style={{ color: 'var(--muted)' }}>{p.category} | {number(p.stockQuantity)} units</span>
+                          <div key={p.id} className="flex justify-between items-center bg-[var(--app-bg)] py-2 px-3 rounded-lg text-[13px]">
+                            <span className="font-semibold">{p.productName}</span>
+                            <span className="text-[var(--muted)]">{p.category} | {number(p.stockQuantity)} units</span>
                           </div>
                         ))}
                       </div>
                     );
                   }
-                  return <span style={{ color: 'var(--muted)', fontSize: '13px' }}>No products supplied by this supplier.</span>;
+                  return <span className="text-[var(--muted)] text-[13px]">No products supplied by this supplier.</span>;
                 })()}
               </div>
             </div>
-            <div className="modal-footer">
+            <div className="flex justify-end gap-3 py-[18px] px-6 bg-[var(--surface-soft)] border-t border-[var(--border)]">
               <Button variant="ghost" onClick={closeModal}>Close</Button>
               <Button variant="primary" icon="edit" onClick={() => {
                 const supplier = selectedSupplier;
