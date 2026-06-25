@@ -19,26 +19,26 @@ function initials(name) {
 
 function SectionCard({ icon, title, description, children, actions }) {
   return (
-    <div className="s-card">
-      <div className="s-card-head">
-        <div className="s-card-icon">{icon}</div>
+    <div className="bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius)] shadow-[var(--shadow)] overflow-hidden transition-shadow duration-200 hover:shadow-[0_20px_48px_rgba(30,41,59,0.11)]">
+      <div className="flex items-start gap-3.5 p-[22px_24px_18px] border-b border-[var(--border)] bg-[var(--surface-soft)] max-[560px]:p-[16px_16px_14px]">
+        <div className="inline-flex items-center justify-center w-10 h-10 rounded-[12px] bg-[var(--blue-soft)] text-[var(--blue)] shrink-0">{icon}</div>
         <div>
-          <h2 className="s-card-title">{title}</h2>
-          {description && <p className="s-card-desc">{description}</p>}
+          <h2 className="m-0 mb-[2px] text-[16px] font-bold text-[var(--text)]">{title}</h2>
+          {description && <p className="m-0 text-[13px] text-[var(--muted)]">{description}</p>}
         </div>
-        {actions && <div className="s-card-head-actions">{actions}</div>}
+        {actions && <div className="ml-auto flex gap-2 shrink-0">{actions}</div>}
       </div>
-      <div className="s-card-body">{children}</div>
+      <div className="p-6 grid gap-5 max-[560px]:p-4">{children}</div>
     </div>
   );
 }
 
 function FormField({ label, children, hint }) {
   return (
-    <div className="sf-field">
-      <label className="sf-label">{label}</label>
+    <div className="flex flex-col gap-1.5">
+      <label className="text-[13px] font-semibold text-[var(--text)]">{label}</label>
       {children}
-      {hint && <span className="sf-hint">{hint}</span>}
+      {hint && <span className="text-[12px] text-[var(--muted)] mt-0.5">{hint}</span>}
     </div>
   );
 }
@@ -46,7 +46,7 @@ function FormField({ label, children, hint }) {
 function SInput({ value, onChange, placeholder, type = 'text', readOnly }) {
   return (
     <input
-      className="sf-input"
+      className="h-[42px] px-[13px] border-[1.5px] border-[var(--border)] rounded-[10px] bg-[var(--surface)] text-[var(--text)] font-inherit text-[14px] outline-none transition-all duration-[180ms] w-full box-border focus:border-[var(--blue)] focus:shadow-[0_0_0_3px_rgba(37,99,235,0.1)]"
       type={type}
       value={value}
       onChange={onChange}
@@ -58,7 +58,7 @@ function SInput({ value, onChange, placeholder, type = 'text', readOnly }) {
 
 function SSelect({ value, onChange, options }) {
   return (
-    <select className="sf-input sf-select" value={value} onChange={onChange}>
+    <select className="h-[42px] px-[13px] border-[1.5px] border-[var(--border)] rounded-[10px] bg-[var(--surface)] text-[var(--text)] font-inherit text-[14px] outline-none transition-all duration-[180ms] w-full box-border focus:border-[var(--blue)] focus:shadow-[0_0_0_3px_rgba(37,99,235,0.1)] cursor-pointer appearance-auto" value={value} onChange={onChange}>
       {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
     </select>
   );
@@ -66,37 +66,51 @@ function SSelect({ value, onChange, options }) {
 
 function SettingsToggle({ checked, onChange, label, description }) {
   return (
-    <div className="s-toggle-row">
-      <div className="s-toggle-info">
-        <span className="s-toggle-label">{label}</span>
-        {description && <span className="s-toggle-desc">{description}</span>}
+    <div className="flex items-center justify-between gap-4 py-3.5 border-b border-[var(--border)] last:border-b-0 transition-colors duration-150">
+      <div className="grid gap-[2px] min-w-0">
+        <span className="text-[14px] font-semibold text-[var(--text)]">{label}</span>
+        {description && <span className="text-[12px] text-[var(--muted)] leading-[1.4]">{description}</span>}
       </div>
       <button
-        className={`s-switch ${checked ? 'on' : ''}`}
+        className={`relative w-12 h-[27px] rounded-full border-0 cursor-pointer shrink-0 transition-colors duration-200 p-0 flex items-center ${checked ? 'bg-[var(--blue)]' : 'bg-[var(--border)]'}`}
         role="switch"
         aria-checked={checked}
         onClick={() => onChange(!checked)}
         type="button"
       >
-        <span className="s-switch-thumb" />
+        <span className={`absolute top-[3px] left-[3px] w-[21px] h-[21px] rounded-full bg-white shadow-[0_2px_6px_rgba(30,41,59,0.22)] transition-transform duration-200 ease-[cubic-bezier(0.34,1.56,0.64,1)] block ${checked ? 'translate-x-[21px]' : ''}`} />
       </button>
     </div>
   );
 }
 
 function StatPill({ label, value, color = 'blue' }) {
+  const colorClasses = {
+    blue: 'bg-[var(--blue-soft)] border-[rgba(37,99,235,0.12)] text-[var(--blue)]',
+    green: 'bg-[var(--green-soft)] border-[rgba(22,163,74,0.12)] text-[var(--green)]',
+    purple: 'bg-[rgba(139,92,246,0.07)] border-[rgba(139,92,246,0.12)] text-[#7c3aed] dark:text-[#a78bfa] dark:bg-[rgba(139,92,246,0.1)]',
+    orange: 'bg-[var(--orange-soft)] border-[rgba(245,158,11,0.12)] text-[var(--orange)]',
+  }[color] || '';
+
   return (
-    <div className={`s-stat-pill s-stat-${color}`}>
-      <span className="s-stat-label">{label}</span>
-      <strong className="s-stat-value">{value}</strong>
+    <div className={`grid gap-1.5 p-[14px_16px] rounded-[14px] border-[1.5px] ${colorClasses}`}>
+      <span className="text-[11px] font-bold uppercase tracking-[0.06em] opacity-75">{label}</span>
+      <strong className="text-[22px] font-extrabold">{value}</strong>
     </div>
   );
 }
 
 function AiStatusDot({ connected }) {
   return (
-    <span className={`ai-status-dot ${connected ? 'connected' : 'disconnected'}`}>
-      <span className="dot-pulse" />
+    <span className={`inline-flex items-center gap-[7px] text-[13px] font-bold ${connected ? 'text-[var(--green)]' : 'text-[var(--red)]'}`}>
+      {connected ? (
+        <span className="relative flex h-2.5 w-2.5 shrink-0">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--green)] opacity-75"></span>
+          <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[var(--green)]"></span>
+        </span>
+      ) : (
+        <span className="inline-block w-2.5 h-2.5 rounded-full bg-[var(--red)] shrink-0" />
+      )}
       {connected ? 'Connected' : 'Disconnected'}
     </span>
   );
@@ -201,14 +215,14 @@ export default function Settings() {
   const usagePct = Math.round((monthlyUsed / monthlyLimit) * 100);
 
   return (
-    <div className="page settings-page">
+    <div className="flex flex-col gap-[22px] max-w-[1600px] mx-auto px-[15px] pb-[100px]">
       <PageHeader
         eyebrow="Configuration"
         title="Settings"
         description="Manage your business profile, account, notifications, and preferences."
       />
 
-      <div className="settings-sections">
+      <div className="grid gap-5">
 
         {/* ── 1. BUSINESS PROFILE ─────────────────────────────────────── */}
         <SectionCard
@@ -216,24 +230,24 @@ export default function Settings() {
           title="Business Profile"
           description="Your public business information and branding"
         >
-          <div className="logo-upload-row">
-            <div className="logo-preview" onClick={() => logoInputRef.current?.click()}>
+          <div className="flex items-start gap-5 p-4 border-[1.5px] border-dashed border-[var(--border)] rounded-[14px] bg-[var(--surface-soft)] cursor-pointer transition-all duration-[180ms] hover:border-[var(--blue)] hover:bg-[var(--blue-soft)] max-[860px]:flex-col">
+            <div className="w-20 h-20 rounded-[14px] border-[1.5px] border-[var(--border)] bg-[var(--surface)] flex items-center justify-center shrink-0 overflow-hidden cursor-pointer transition-all duration-[180ms] hover:border-[var(--blue)]" onClick={() => logoInputRef.current?.click()}>
               {business.logo
-                ? <img src={business.logo} alt="Business logo" className="logo-img" />
-                : <div className="logo-placeholder"><CameraIcon /><span>Upload Logo</span></div>}
+                ? <img src={business.logo} alt="Business logo" className="w-full h-full object-cover" />
+                : <div className="flex flex-col items-center gap-[5px] text-[var(--muted)] text-[11px] text-center"><CameraIcon /><span>Upload Logo</span></div>}
             </div>
-            <div className="logo-info">
-              <p className="logo-tip">Click to upload your business logo</p>
-              <p className="logo-formats">PNG, JPG or SVG · Max 2 MB · Recommended 200×200 px</p>
-              <button type="button" className="s-btn s-btn-ghost" onClick={() => logoInputRef.current?.click()}>
+            <div className="grid gap-1 min-w-0">
+              <p className="m-0 text-[14px] font-semibold text-[var(--text)]">Click to upload your business logo</p>
+              <p className="m-0 text-[12px] text-[var(--muted)]">PNG, JPG or SVG · Max 2 MB · Recommended 200×200 px</p>
+              <button type="button" className="inline-flex items-center gap-[7px] h-[38px] px-4 rounded-[10px] border-[1.5px] border-[var(--border)] font-inherit text-[14px] font-semibold cursor-pointer transition-all duration-150 active:scale-[0.98] whitespace-nowrap bg-[var(--surface)] text-[var(--text)] hover:bg-[var(--surface-soft)]" onClick={() => logoInputRef.current?.click()}>
                 <UploadIcon /> Change Logo
               </button>
             </div>
             <input ref={logoInputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleLogoChange} />
           </div>
 
-          <h3 className="s-edit-heading">Edit Business Details</h3>
-          <div className="sf-grid-2">
+          <h3 className="m-[4px_0_16px] text-[13px] font-bold text-[var(--muted)] uppercase tracking-[0.07em] pb-2.5 border-b border-[var(--border)]">Edit Business Details</h3>
+          <div className="grid grid-cols-2 gap-4 max-[1180px]:grid-cols-1">
             <FormField label="Business Name">
               <SInput value={business.name} onChange={e => setBusiness(b => ({ ...b, name: e.target.value }))} placeholder="Your Business Name" />
             </FormField>
@@ -251,10 +265,10 @@ export default function Settings() {
             <SInput value={business.address} onChange={e => setBusiness(b => ({ ...b, address: e.target.value }))} placeholder="Street, City, Country" />
           </FormField>
 
-          <div className="s-card-actions">
+          <div className="flex gap-2.5 flex-wrap pt-1">
             <button
               type="button"
-              className="s-btn s-btn-primary"
+              className="inline-flex items-center gap-[7px] h-[38px] px-4 rounded-[10px] border-[1.5px] border-transparent font-inherit text-[14px] font-semibold cursor-pointer transition-all duration-150 active:scale-[0.98] whitespace-nowrap bg-[var(--blue)] text-white shadow-[0_6px_18px_rgba(37,99,235,0.25)] hover:bg-[var(--blue-600)] hover:shadow-[0_8px_24px_rgba(37,99,235,0.3)] [&.saved]:bg-[var(--green)] [&.saved]:border-[var(--green)] [&.saved]:shadow-[0_6px_18px_rgba(22,163,74,0.25)]"
               onClick={() => {
                 updateUser({ businessName: business.name });
                 const btn = document.getElementById('biz-save-btn');
@@ -277,34 +291,34 @@ export default function Settings() {
           title="Account Settings"
           description="Your personal account information and security"
         >
-          <div className="account-profile-row">
-            <div className="account-avatar-wrap">
-              <div className="account-avatar" onClick={() => fileInputRef.current?.click()}>
+          <div className="flex items-start gap-5 max-[860px]:flex-col">
+            <div className="relative shrink-0">
+              <div className="relative w-[72px] h-[72px] rounded-full flex items-center justify-center cursor-pointer overflow-hidden border-3 border-[var(--surface)] shadow-[0_0_0_2px_var(--blue)] hover:shadow-[0_0_0_3px_var(--blue)] transition-shadow duration-200" onClick={() => fileInputRef.current?.click()}>
                 {profilePic
-                  ? <img src={profilePic} alt="Profile" className="avatar-img" />
-                  : <span className="avatar-initials">{initials(userName)}</span>}
-                <div className="avatar-overlay"><CameraIcon /></div>
+                  ? <img src={profilePic} alt="Profile" className="w-full h-full object-cover" />
+                  : <span className="text-[22px] font-extrabold text-white">{initials(userName)}</span>}
+                <div className="absolute inset-0 bg-black/45 flex items-center justify-center text-white opacity-0 hover:opacity-100 transition-opacity duration-180 rounded-full"><CameraIcon /></div>
               </div>
               <input ref={fileInputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleProfilePicChange} />
             </div>
-            <div className="account-info">
-              <div className="account-name-row">
-                <strong className="account-name">{userName}</strong>
+            <div className="grid gap-1.5 min-w-0">
+              <div className="flex items-center gap-2.5">
+                <strong className="text-[18px] font-bold text-[var(--text)]">{userName}</strong>
                 <span className={`role-badge role-${userRole.toLowerCase()}`}>{userRole}</span>
               </div>
-              <span className="account-email">{user.email || user.sub || 'user@smartbiz.lk'}</span>
-              <div className="account-meta">
+              <span className="text-[14px] text-[var(--muted)]">{user.email || user.sub || 'user@smartbiz.lk'}</span>
+              <div className="flex flex-col gap-1 mt-1">
                 <span><ClockIcon /> Last login: <b>Today, 09:40 AM</b></span>
                 <span><CalendarIcon /> Member since: <b>Jan 15, 2025</b></span>
               </div>
             </div>
           </div>
 
-          <div className="s-card-actions">
-            <button type="button" className="s-btn s-btn-ghost">
+          <div className="flex gap-2.5 flex-wrap pt-1">
+            <button type="button" className="inline-flex items-center gap-[7px] h-[38px] px-4 rounded-[10px] border-[1.5px] border-[var(--border)] font-inherit text-[14px] font-semibold cursor-pointer transition-all duration-150 active:scale-[0.98] whitespace-nowrap bg-[var(--surface)] text-[var(--text)] hover:bg-[var(--surface-soft)]">
               <KeyIcon /> Change Password
             </button>
-            <button type="button" className="s-btn s-btn-secondary">
+            <button type="button" className="inline-flex items-center gap-[7px] h-[38px] px-4 rounded-[10px] border-[1.5px] border-[rgba(37,99,235,0.15)] font-inherit text-[14px] font-semibold cursor-pointer transition-all duration-150 active:scale-[0.98] whitespace-nowrap bg-[var(--blue-soft)] text-[var(--blue)] hover:bg-[rgba(37,99,235,0.12)]">
               <EditIcon /> Edit Profile
             </button>
           </div>
@@ -316,7 +330,7 @@ export default function Settings() {
           title="Notifications"
           description="Choose what you want to be notified about"
         >
-          <div className="s-toggles-list">
+          <div className="grid gap-0">
             <SettingsToggle
               checked={notifs.emailNotifications}
               onChange={v => setNotifs(n => ({ ...n, emailNotifications: v }))}
@@ -362,7 +376,7 @@ export default function Settings() {
           title="Preferences"
           description="Customize how SmartBiz looks and behaves"
         >
-          <div className="sf-grid-2">
+          <div className="grid grid-cols-2 gap-4 max-[1180px]:grid-cols-1">
             <FormField label="Currency">
               <SSelect
                 value={prefs.currency}
@@ -416,7 +430,7 @@ export default function Settings() {
             </FormField>
           </div>
 
-          <div className="s-toggles-list s-toggles-compact">
+          <div className="grid gap-0 border-t border-[var(--border)] pt-1">
             <SettingsToggle
               checked={prefs.darkMode}
               onChange={v => handlePrefChange('darkMode', v)}
@@ -438,46 +452,46 @@ export default function Settings() {
           title="AI Insights Configuration"
           description="Manage your AI assistant connection and usage"
         >
-          <div className="ai-status-bar">
-            <div className="ai-status-info">
-              <div className="ai-status-row">
-                <span className="ai-label">Status</span>
+          <div className="grid grid-cols-[1fr_1.5fr] gap-6 p-5 border-[1.5px] border-[var(--border)] rounded-[14px] bg-[var(--surface-soft)] max-[1180px]:grid-cols-1">
+            <div className="grid gap-3.5 content-start">
+              <div className="flex flex-col gap-1.25">
+                <span className="text-[12px] font-bold text-[var(--muted)] uppercase tracking-[0.06em]">Status</span>
                 <AiStatusDot connected={aiStatus.connected} />
               </div>
-              <div className="ai-status-row">
-                <span className="ai-label">Current Model</span>
-                <span className="ai-value ai-model-badge">GPT-4o-mini</span>
+              <div className="flex flex-col gap-1.25">
+                <span className="text-[12px] font-bold text-[var(--muted)] uppercase tracking-[0.06em]">Current Model</span>
+                <span className="inline-flex items-center h-[26px] px-2.5 rounded-[8px] bg-[var(--blue-soft)] text-[var(--blue)] text-[13px] font-bold border border-[rgba(37,99,235,0.15)] w-fit">GPT-4o-mini</span>
               </div>
             </div>
-            <div className="ai-usage-wrap">
-              <div className="ai-usage-header">
-                <span className="ai-label">Monthly Requests Used</span>
-                <span className="ai-usage-count"><strong>{monthlyUsed}</strong> / {monthlyLimit}</span>
+            <div className="grid gap-2 content-start">
+              <div className="flex justify-between items-center">
+                <span className="text-[12px] font-bold text-[var(--muted)] uppercase tracking-[0.06em]">Monthly Requests Used</span>
+                <span className="text-[13px] text-[var(--muted)]"><strong className="text-[var(--text)] text-[15px] font-bold">{monthlyUsed}</strong> / {monthlyLimit}</span>
               </div>
-              <div className="ai-usage-bar">
-                <div className="ai-usage-fill" style={{ width: `${usagePct}%`, background: usagePct > 80 ? 'var(--orange)' : 'var(--blue)' }} />
+              <div className="h-2 rounded-full bg-[var(--border)] overflow-hidden">
+                <div className="h-full rounded-full transition-all duration-600 ease-[cubic-bezier(0.34,1.56,0.64,1)]" style={{ width: `${usagePct}%`, background: usagePct > 80 ? 'var(--orange)' : 'var(--blue)' }} />
               </div>
-              <div className="ai-usage-footer">
-                <span className="ai-remaining">
-                  <span className="ai-remaining-dot" style={{ background: usagePct > 80 ? 'var(--orange)' : 'var(--green)' }} />
+              <div className="flex justify-between items-center">
+                <span className="flex items-center gap-1.5 text-[12px] text-[var(--muted)]">
+                  <span className="w-[7px] h-[7px] rounded-full shrink-0" style={{ background: usagePct > 80 ? 'var(--orange)' : 'var(--green)' }} />
                   {monthlyLimit - monthlyUsed} requests remaining
                 </span>
-                <span className="ai-pct">{usagePct}% used</span>
+                <span className="text-[12px] text-[var(--muted)] font-semibold">{usagePct}% used</span>
               </div>
             </div>
           </div>
 
-          <div className="s-card-actions">
+          <div className="flex gap-2.5 flex-wrap pt-1">
             <button
               type="button"
-              className={`s-btn s-btn-ghost ${aiStatus.testing ? 'loading' : ''}`}
+              className={`inline-flex items-center gap-[7px] h-[38px] px-4 rounded-[10px] border-[1.5px] border-[var(--border)] font-inherit text-[14px] font-semibold cursor-pointer transition-all duration-150 active:scale-[0.98] whitespace-nowrap bg-[var(--surface)] text-[var(--text)] hover:bg-[var(--surface-soft)] ${aiStatus.testing ? 'opacity-70 cursor-not-allowed' : ''}`}
               onClick={handleTestConnection}
               disabled={aiStatus.testing}
             >
               {aiStatus.testing ? <SpinnerIcon /> : <ZapIcon />}
               {aiStatus.testing ? 'Testing…' : 'Test Connection'}
             </button>
-            <button type="button" className="s-btn s-btn-secondary" onClick={() => setAiStatus(s => ({ ...s }))}>
+            <button type="button" className="inline-flex items-center gap-[7px] h-[38px] px-4 rounded-[10px] border-[1.5px] border-[var(--border)] font-inherit text-[14px] font-semibold cursor-pointer transition-all duration-150 active:scale-[0.98] whitespace-nowrap bg-[var(--surface)] text-[var(--text)] hover:bg-[var(--surface-soft)]" onClick={() => setAiStatus(s => ({ ...s }))}>
               <RefreshIcon /> Refresh Status
             </button>
           </div>
@@ -489,39 +503,39 @@ export default function Settings() {
           title="Subscription & Usage"
           description="Your current plan and resource consumption"
         >
-          <div className="plan-hero">
-            <div className="plan-badge">
-              <span className="plan-tier">PRO PLAN</span>
-              <span className="plan-billing">Billed monthly</span>
+          <div className="flex items-center justify-between p-[18px_22px] rounded-[14px] bg-gradient-to-br from-[var(--blue)] to-[#0ea5e9] text-white max-[860px]:flex-col max-[860px]:items-start max-[860px]:gap-2.5">
+            <div className="grid gap-1">
+              <span className="text-[11px] font-extrabold tracking-[0.1em] opacity-85">PRO PLAN</span>
+              <span className="text-[13px] opacity-70">Billed monthly</span>
             </div>
-            <div className="plan-price">
-              <strong>LKR 2,990</strong>
-              <span>/month</span>
+            <div className="flex items-baseline gap-1">
+              <strong className="text-[28px] font-extrabold">LKR 2,990</strong>
+              <span className="text-[14px] opacity-75">/month</span>
             </div>
           </div>
 
-          <div className="s-stats-grid">
+          <div className="grid grid-cols-4 gap-3 max-[1180px]:grid-cols-2">
             <StatPill label="Total Products" value={number(data.products?.length ?? 48)} color="blue" />
             <StatPill label="Total Customers" value={number(data.customers?.length ?? 134)} color="green" />
             <StatPill label="Total Invoices" value={number(data.invoices?.length ?? 312)} color="purple" />
             <StatPill label="Storage Used" value="1.4 GB" color="orange" />
           </div>
 
-          <div className="storage-bar-wrap">
-            <div className="storage-bar-header">
-              <span className="ai-label">Storage Usage</span>
-              <span className="ai-pct">1.4 GB of 5 GB</span>
+          <div className="grid gap-2">
+            <div className="flex justify-between items-center">
+              <span className="text-[12px] font-bold text-[var(--muted)] uppercase tracking-[0.06em]">Storage Usage</span>
+              <span className="text-[12px] text-[var(--muted)] font-semibold">1.4 GB of 5 GB</span>
             </div>
-            <div className="ai-usage-bar">
-              <div className="ai-usage-fill storage-fill" style={{ width: '28%' }} />
+            <div className="h-2 rounded-full bg-[var(--border)] overflow-hidden">
+              <div className="h-full rounded-full bg-gradient-to-r from-[var(--blue)] to-[#06b6d4] transition-all duration-600 ease-[cubic-bezier(0.34,1.56,0.64,1)]" style={{ width: '28%' }} />
             </div>
           </div>
 
-          <div className="s-card-actions">
-            <button type="button" className="s-btn s-btn-primary">
+          <div className="flex gap-2.5 flex-wrap pt-1">
+            <button type="button" className="inline-flex items-center gap-[7px] h-[38px] px-4 rounded-[10px] border-[1.5px] border-transparent font-inherit text-[14px] font-semibold cursor-pointer transition-all duration-150 active:scale-[0.98] whitespace-nowrap bg-[var(--blue)] text-white shadow-[0_6px_18px_rgba(37,99,235,0.25)] hover:bg-[var(--blue-600)] hover:shadow-[0_8px_24px_rgba(37,99,235,0.3)]">
               <CrownIcon /> Upgrade Plan
             </button>
-            <button type="button" className="s-btn s-btn-ghost">
+            <button type="button" className="inline-flex items-center gap-[7px] h-[38px] px-4 rounded-[10px] border-[1.5px] border-[var(--border)] font-inherit text-[14px] font-semibold cursor-pointer transition-all duration-150 active:scale-[0.98] whitespace-nowrap bg-[var(--surface)] text-[var(--text)] hover:bg-[var(--surface-soft)]">
               <ReceiptIcon /> View Billing History
             </button>
           </div>
@@ -530,15 +544,15 @@ export default function Settings() {
       </div>
 
       {/* ── STICKY FOOTER ───────────────────────────────────────────────── */}
-      <div className="settings-footer">
-        <div className="settings-footer-inner">
-          <button type="button" className="s-btn s-btn-ghost s-btn-lg">
+      <div className="sticky bottom-0 z-20 bg-[var(--surface)] border-t border-[var(--border)] backdrop-blur-md shadow-[0_-6px_24px_rgba(30,41,59,0.08)] mx-[-28px] mb-[-28px] max-[860px]:mx-[-20px] max-[860px]:mb-[-20px] max-[560px]:mx-[-16px] max-[560px]:mb-[-16px]">
+        <div className="flex items-center justify-end gap-3 p-[14px_28px] max-w-[1600px] mx-auto">
+          <button type="button" className="inline-flex items-center gap-[7px] px-[22px] rounded-[10px] border-[1.5px] border-[var(--border)] font-inherit cursor-pointer transition-all duration-150 active:scale-[0.98] whitespace-nowrap bg-[var(--surface)] text-[var(--text)] hover:bg-[var(--surface-soft)] h-[44px] text-[15px]">
             Cancel
           </button>
           <button
             id="save-all-btn"
             type="button"
-            className="s-btn s-btn-primary s-btn-lg"
+            className="inline-flex items-center gap-[7px] px-[22px] rounded-[10px] border-[1.5px] border-transparent font-inherit cursor-pointer transition-all duration-150 active:scale-[0.98] whitespace-nowrap bg-[var(--blue)] text-white shadow-[0_6px_18px_rgba(37,99,235,0.25)] hover:bg-[var(--blue-600)] hover:shadow-[0_8px_24px_rgba(37,99,235,0.3)] h-[44px] text-[15px] [&.saved]:bg-[var(--green)] [&.saved]:border-[var(--green)] [&.saved]:shadow-[0_6px_18px_rgba(22,163,74,0.25)]"
             onClick={handleSaveAll}
           >
             <SaveIcon /> Save All Changes
