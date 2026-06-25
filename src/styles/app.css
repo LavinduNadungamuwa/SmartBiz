@@ -678,25 +678,6 @@ input {
 .metric-list span {
   color: var(--muted);
 }
-
-.report-toolbar {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.report-toolbar label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--muted);
-  background: #ffffff;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 10px 12px;
-}
-
-.report-toolbar input,
 .settings-field input {
   border: 1px solid var(--border);
   border-radius: 10px;
@@ -718,26 +699,10 @@ input {
   accent-color: #ffffff;
 }
 
-.report-type-grid,
 .ai-grid,
 .settings-grid {
   display: grid;
   gap: 16px;
-}
-
-.report-type-grid {
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-}
-
-.report-type-grid button {
-  min-height: 72px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: #ffffff;
-  color: #344054;
-  box-shadow: var(--shadow);
-  cursor: pointer;
-  font-weight: 800;
 }
 
 .assistant-hero {
@@ -1121,10 +1086,6 @@ input {
   .settings-grid {
     grid-template-columns: 1fr;
   }
-
-  .report-type-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
 }
 
 @media (max-width: 860px) {
@@ -1147,8 +1108,7 @@ input {
     width: 100%;
   }
 
-  .summary-grid,
-  .report-type-grid {
+  .summary-grid {
     grid-template-columns: 1fr;
   }
 }
