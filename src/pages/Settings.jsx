@@ -215,7 +215,12 @@ export default function Settings() {
   const usagePct = Math.round((monthlyUsed / monthlyLimit) * 100);
 
   return (
-    <div className="flex flex-col gap-[22px] max-w-[1600px] mx-auto px-[15px] pb-[100px]">
+    <div className="flex flex-col gap-[22px] max-w-[1600px] mx-auto px-[15px]">
+      <style>{`
+        main {
+          padding-bottom: 0 !important;
+        }
+      `}</style>
       <PageHeader
         eyebrow="Configuration"
         title="Settings"
@@ -499,6 +504,7 @@ export default function Settings() {
 
         {/* ── 6. SUBSCRIPTION & USAGE ─────────────────────────────────── */}
         <SectionCard
+          className="mb-6"
           icon={<CrownIcon />}
           title="Subscription & Usage"
           description="Your current plan and resource consumption"
@@ -544,7 +550,7 @@ export default function Settings() {
       </div>
 
       {/* ── STICKY FOOTER ───────────────────────────────────────────────── */}
-      <div className="sticky bottom-0 z-20 bg-[var(--surface)] border-t border-[var(--border)] backdrop-blur-md shadow-[0_-6px_24px_rgba(30,41,59,0.08)] mx-[-28px] mb-[-28px] max-[860px]:mx-[-20px] max-[860px]:mb-[-20px] max-[560px]:mx-[-16px] max-[560px]:mb-[-16px]">
+      <div className="sticky bottom-0 z-20 bg-[var(--surface)] border-t border-[var(--border)] backdrop-blur-md shadow-[0_-6px_24px_rgba(30,41,59,0.08)] mx-[-43px] max-[860px]:mx-[-35px] max-[560px]:mx-[-31px]">
         <div className="flex items-center justify-end gap-3 p-[14px_28px] max-w-[1600px] mx-auto">
           <button type="button" className="inline-flex items-center gap-[7px] px-[22px] rounded-[10px] border-[1.5px] border-[var(--border)] font-inherit cursor-pointer transition-all duration-150 active:scale-[0.98] whitespace-nowrap bg-[var(--surface)] text-[var(--text)] hover:bg-[var(--surface-soft)] h-[44px] text-[15px]">
             Cancel
