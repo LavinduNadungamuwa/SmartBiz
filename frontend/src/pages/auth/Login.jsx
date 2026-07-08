@@ -10,7 +10,6 @@ import {
   PrimaryButton,
 } from '../../components/auth';
 import useAuth from '../../store/useAuth';
-import './auth.css';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -76,7 +75,16 @@ export default function Login() {
   };
 
   return (
-    <div className="auth-root">
+    <div
+      className="flex w-screen h-screen overflow-hidden text-[var(--text)]"
+      style={{
+        fontFamily: "'DM Sans', sans-serif",
+        background:
+          'radial-gradient(800px 400px at 10% 20%, rgba(37,99,235,0.06), transparent 60%),' +
+          'radial-gradient(700px 360px at 85% 80%, rgba(59,130,246,0.04), transparent 50%),' +
+          'linear-gradient(180deg, var(--app-bg) 0%, var(--surface-soft) 100%)',
+      }}
+    >
       <AuthBrandPanel />
       <AuthFormCard
         title="Welcome back!"
@@ -84,7 +92,10 @@ export default function Login() {
         footer={(
           <>
             Don&apos;t have an account?{' '}
-            <Link to="/register" className="form-link">
+            <Link
+              to="/register"
+              className="text-[var(--blue)] no-underline font-semibold hover:underline"
+            >
               Create one free
             </Link>
           </>

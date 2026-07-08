@@ -45,18 +45,20 @@ export default function Dashboard() {
     .slice(0, 5);
 
   return (
-    <div className="page">
+    <div className="page flex flex-col gap-[22px] max-w-[1600px] mx-auto px-[15px]">
       <PageHeader
         eyebrow="Dashboard"
         title="Business overview"
         description="Live metrics from smartbiz_db through the SmartBiz backend."
       />
 
-      <section className="kpi-grid">
+      {/* KPI stat cards — 4-col grid, collapses to 2 then 1 */}
+      <section className="grid grid-cols-4 gap-4 max-lg:grid-cols-2 max-sm:grid-cols-1">
         {kpis.map((kpi) => <StatCard key={kpi.label} trend="up" {...kpi} />)}
       </section>
 
-      <section className="dashboard-grid three">
+      {/* Charts row — 3 col */}
+      <section className="grid grid-cols-3 gap-4 max-[1180px]:grid-cols-1">
         <ChartCard title="Sales Performance" subtitle="Sales trend over time">
           <AreaChart data={revenue.values} labels={revenue.labels} />
         </ChartCard>
@@ -68,21 +70,31 @@ export default function Dashboard() {
         </ChartCard>
       </section>
 
-      <section className="health-grid">
+      {/* Health metrics row — 4 col */}
+      <section className="grid grid-cols-4 gap-4 max-lg:grid-cols-2 max-sm:grid-cols-1">
         {healthMetrics.map((metric) => (
-          <article className="health-card" key={metric.label}>
-            <span className={`health-dot ${metric.status}`} />
-            <p>{metric.label}</p>
-            <strong>{metric.value}</strong>
-            <small>{metric.note}</small>
+          <article
+            key={metric.label}
+            className="bg-surface border border-border rounded-radius shadow-shadow p-[18px]"
+          >
+            <span
+              className={[
+                'block w-2.5 h-2.5 rounded-full',
+                metric.status === 'good' ? 'bg-green' : 'bg-orange',
+              ].join(' ')}
+            />
+            <p className="text-muted mt-[10px] mb-1">{metric.label}</p>
+            <strong className="text-2xl">{metric.value}</strong>
+            <small className="block text-muted mt-1.5">{metric.note}</small>
           </article>
         ))}
       </section>
 
-      <section className="dashboard-grid two">
-        <section className="card">
-          <div className="card-header">
-            <h2>Recent Sales</h2>
+      {/* Recent Sales + Recent Invoices — 2 col */}
+      <section className="grid grid-cols-2 gap-4 max-[1180px]:grid-cols-1">
+        <section className="card bg-surface border border-border rounded-radius shadow-shadow p-5">
+          <div className="card-header flex justify-between gap-4 mb-[18px]">
+            <h2 className="m-0 text-[17px] font-bold text-text">Recent Sales</h2>
           </div>
           <DataTable
             columns={['Sale ID', 'Customer', 'Amount', 'Date', 'Status']}
@@ -103,9 +115,9 @@ export default function Dashboard() {
             }
           />
         </section>
-        <section className="card">
-          <div className="card-header">
-            <h2>Recent Invoices</h2>
+        <section className="card bg-surface border border-border rounded-radius shadow-shadow p-5">
+          <div className="card-header flex justify-between gap-4 mb-[18px]">
+            <h2 className="m-0 text-[17px] font-bold text-text">Recent Invoices</h2>
           </div>
           <DataTable
             columns={['Invoice Number', 'Sale', 'Total', 'Issue Date', 'Status']}
@@ -128,18 +140,30 @@ export default function Dashboard() {
         </section>
       </section>
 
-      <section className="dashboard-grid three bottom">
-        <section className="card">
-          <div className="card-header">
-            <h2>Inventory Alerts</h2>
-            <p>Live stock issues requiring attention</p>
+      {/* Bottom row — 3 col, stretch-aligned */}
+      <section className="grid grid-cols-3 gap-4 items-stretch max-[1180px]:grid-cols-1">
+        {/* Inventory Alerts */}
+        <section className="card bg-surface border border-border rounded-radius shadow-shadow p-5">
+          <div className="card-header flex justify-between gap-4 mb-[18px] max-sm:flex-col max-sm:items-start max-sm:gap-1">
+            <h2 className="m-0 text-[17px] font-bold text-text">Inventory Alerts</h2>
+            <p className="m-0 mt-1.5 text-muted leading-[1.55]">Live stock issues requiring attention</p>
           </div>
-          <div className="alert-list">
+          <div className="grid gap-3">
             {lowStock.slice(0, 5).map((product) => (
-              <div className={`inventory-alert ${Number(product.stockQuantity || 0) <= 0 ? 'danger' : 'warning'}`} key={product.id}>
+              <div
+                key={product.id}
+                className={[
+                  'flex justify-between items-center gap-3 p-3 rounded-xl border border-border',
+                  Number(product.stockQuantity || 0) <= 0
+                    ? 'bg-red-soft'
+                    : 'bg-orange-soft',
+                ].join(' ')}
+              >
                 <div>
-                  <strong>{product.productName}</strong>
-                  <span>{number(product.stockQuantity)} units available</span>
+                  <strong className="block">{product.productName}</strong>
+                  <span className="block text-muted text-[13px] mt-[3px]">
+                    {number(product.stockQuantity)} units available
+                  </span>
                 </div>
                 <StatusBadge>{productStatus(product.stockQuantity)}</StatusBadge>
               </div>
@@ -147,20 +171,32 @@ export default function Dashboard() {
             {!lowStock.length && <p className="muted-note">No low-stock products right now.</p>}
           </div>
         </section>
+
+        {/* Top Product Stock horizontal bar chart */}
         <ChartCard title="Top Product Stock" subtitle="Current inventory levels">
           <HorizontalBarChart data={topProducts} />
         </ChartCard>
-        <section className="card ai-card">
-          <div className="ai-orb">AI</div>
-          <div className="card-header">
-            <h2>AI Insights</h2>
-            <p>Recommendations from current database records</p>
+
+        {/* AI Insights mini card */}
+        <section className="card ai-card bg-surface border border-border rounded-radius shadow-shadow p-5 relative overflow-hidden after:content-[''] after:absolute after:inset-[auto_-40px_-60px_auto] after:w-[160px] after:h-[160px] after:rounded-full after:bg-blue-soft">
+          <div className="ai-orb inline-flex items-center justify-center w-11 h-11 text-white bg-gradient-to-br from-blue to-[#0ea5e9] rounded-[14px] font-black mb-3">AI</div>
+          <div className="card-header flex justify-between gap-4 mb-[18px] max-sm:flex-col max-sm:items-start max-sm:gap-1">
+            <h2 className="m-0 text-[17px] font-bold text-text">AI Insights</h2>
+            <p className="m-0 mt-1.5 text-muted leading-[1.55]">Recommendations from current database records</p>
           </div>
-          <div className="insight-list">
-            <p>{`Revenue currently totals ${currency(summary.totalRevenue)} with ${number(summary.totalSales)} recorded sales.`}</p>
-            <p>{lowStock.length ? `${lowStock.length} products need stock attention.` : 'Inventory levels look stable.'}</p>
-            <p>{invoices.some((invoice) => status(invoice.status) === 'Overdue') ? 'Overdue invoices need follow-up.' : 'No overdue invoice status found.'}</p>
-            <p>{expenses.length ? `Expense records total ${currency(summary.totalExpenses)}.` : 'No expenses have been recorded yet.'}</p>
+          <div className="grid gap-3">
+            <p className="m-0 p-3 text-text bg-surface-soft border border-border rounded-xl">
+              {`Revenue currently totals ${currency(summary.totalRevenue)} with ${number(summary.totalSales)} recorded sales.`}
+            </p>
+            <p className="m-0 p-3 text-text bg-surface-soft border border-border rounded-xl">
+              {lowStock.length ? `${lowStock.length} products need stock attention.` : 'Inventory levels look stable.'}
+            </p>
+            <p className="m-0 p-3 text-text bg-surface-soft border border-border rounded-xl">
+              {invoices.some((invoice) => status(invoice.status) === 'Overdue') ? 'Overdue invoices need follow-up.' : 'No overdue invoice status found.'}
+            </p>
+            <p className="m-0 p-3 text-text bg-surface-soft border border-border rounded-xl">
+              {expenses.length ? `Expense records total ${currency(summary.totalExpenses)}.` : 'No expenses have been recorded yet.'}
+            </p>
           </div>
         </section>
       </section>

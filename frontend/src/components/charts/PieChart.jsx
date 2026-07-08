@@ -1,10 +1,10 @@
 import { currency } from '../../utils/formatters';
 
 const PALETTE = [
-  'var(--blue)',     // Theme Blue
-  'var(--green)',    // Theme Green
-  'var(--orange)',   // Theme Orange
-  'var(--red)',      // Theme Red
+  '#3b82f6',         // blue-500
+  '#10b981',         // emerald-500
+  '#f59e0b',         // amber-500
+  '#ef4444',         // red-500
   '#8b5cf6',         // Purple
   '#ec4899',         // Pink
   '#06b6d4',         // Cyan
@@ -24,14 +24,17 @@ export default function PieChart({ data = [] }) {
   // If total is 0, render empty/placeholder state
   if (total === 0 || data.length === 0) {
     return (
-      <div className="pie-card">
-        <div 
-          className="pie-chart" 
-          style={{ background: 'conic-gradient(var(--border) 0% 100%)' }} 
+      <div className="flex items-center justify-center gap-[26px] min-h-[240px] max-sm:flex-col max-sm:items-start">
+        <div
+          className="w-[168px] h-[168px] rounded-full shrink-0"
+          style={{
+            background: 'conic-gradient(var(--border) 0% 100%)',
+            boxShadow: 'inset 0 0 0 26px var(--surface), 0 12px 30px rgba(30,41,59,0.12)',
+          }}
         />
-        <div className="pie-legend">
-          <span>
-            <i style={{ backgroundColor: 'var(--muted)' }} />
+        <div className="grid gap-[10px]">
+          <span className="flex items-center gap-2 text-muted text-[13px]">
+            <i className="w-2.5 h-2.5 rounded-full bg-muted" />
             No expense data recorded
           </span>
         </div>
@@ -67,19 +70,22 @@ export default function PieChart({ data = [] }) {
   const backgroundStyle = `conic-gradient(${gradientSlices.join(', ')})`;
 
   return (
-    <div className="pie-card">
-      <div 
-        className="pie-chart" 
-        style={{ background: backgroundStyle }} 
+    <div className="flex items-center justify-center gap-[26px] min-h-[240px] max-sm:flex-col max-sm:items-start">
+      <div
+        className="w-[168px] h-[168px] rounded-full shrink-0"
+        style={{
+          background: backgroundStyle,
+          boxShadow: 'inset 0 0 0 26px var(--surface), 0 12px 30px rgba(30,41,59,0.12)',
+        }}
       />
-      <div className="pie-legend">
+      <div className="grid gap-[10px]">
         {chartItems.map((item) => (
-          <span key={item.label || item.name}>
-            <i style={{ backgroundColor: item.color }} />
-            <span style={{ fontWeight: 600, color: 'var(--text)' }}>
+          <span key={item.label || item.name} className="flex items-center gap-2 text-muted text-[13px]">
+            <i className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
+            <span className="font-semibold text-text">
               {item.label || item.name}
             </span>
-            <span style={{ fontSize: '12px', color: 'var(--muted)', marginLeft: '4px' }}>
+            <span className="text-[12px] text-muted ml-4">
               ({item.percentage.toFixed(1)}% &bull; {currency(item.value)})
             </span>
           </span>
@@ -88,4 +94,3 @@ export default function PieChart({ data = [] }) {
     </div>
   );
 }
-

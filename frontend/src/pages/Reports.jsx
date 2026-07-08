@@ -219,32 +219,32 @@ export default function Reports() {
   // ── Render ────────────────────────────────────────────────────────────────
 
   return (
-    <div className="page">
+    <div className="flex flex-col gap-[22px] max-w-[1600px] mx-auto px-[15px]">
       <PageHeader
         eyebrow="Reports"
         title="Reporting Dashboard"
         description="Generate and print reports from live SmartBiz records."
         actions={(
           <Button variant="primary" onClick={printHandlers[selectedReport]}>
-            <Icon name="print" size={17} style={{ marginRight: 6 }} /> Print {selectedReport}
+            <Icon name="print" size={17} className="mr-[6px]" /> Print {selectedReport}
           </Button>
         )}
       />
 
       {/* Report Type Selector */}
-      <section className="report-type-grid">
+      <section className="report-type-grid grid grid-cols-5 gap-4 max-[1180px]:grid-cols-3 max-[860px]:grid-cols-1">
         {REPORT_TYPES.map(({ key, icon }) => (
           <button
             key={key}
             type="button"
             onClick={() => setSelectedReport(key)}
-            style={selectedReport === key ? {
-              background: 'var(--blue-soft)',
-              color: 'var(--blue)',
-              borderColor: 'var(--blue)',
-            } : {}}
+            className={`min-h-[72px] border rounded-[var(--radius)] shadow-[var(--shadow)] cursor-pointer font-extrabold transition-colors duration-200 ${
+              selectedReport === key
+                ? 'bg-[var(--blue-soft)] text-[var(--blue)] border-[var(--blue)]'
+                : 'bg-[var(--surface)] text-[var(--text)] border-[var(--border)]'
+            }`}
           >
-            <span style={{ fontSize: '22px', display: 'flex', justifyContent: 'center', marginBottom: '6px' }}>
+            <span className="text-[22px] flex justify-center mb-[6px]">
               <Icon name={icon} size={24} />
             </span>
             {key}
@@ -253,38 +253,39 @@ export default function Reports() {
       </section>
 
       {/* Date range filter */}
-      <div className="report-toolbar">
-        <label>
+      <div className="report-toolbar flex gap-3 flex-wrap">
+        <label className="flex items-center gap-2 bg-[var(--surface)] text-[var(--text)] border border-[var(--border)] rounded-[12px] py-2.5 px-3">
           From
           <input
             type="date"
             value={fromDate}
             onChange={(e) => setFromDate(e.target.value)}
+            className="border border-[var(--border)] rounded-[10px] bg-[var(--surface)] text-[var(--text)] py-[9px] px-[10px] outline-0"
           />
         </label>
-        <label>
+        <label className="flex items-center gap-2 bg-[var(--surface)] text-[var(--text)] border border-[var(--border)] rounded-[12px] py-2.5 px-3">
           To
           <input
             type="date"
             value={toDate}
             onChange={(e) => setToDate(e.target.value)}
+            className="border border-[var(--border)] rounded-[10px] bg-[var(--surface)] text-[var(--text)] py-[9px] px-[10px] outline-0"
           />
         </label>
         {(fromDate || toDate) && (
-          <button
-            type="button"
-            className="app-button ghost"
+          <Button
+            variant="ghost"
             onClick={() => { setFromDate(''); setToDate(''); }}
           >
             <Icon name="close" size={15} /> Clear filter
-          </button>
+          </Button>
         )}
       </div>
 
       {/* ── SALES REPORT ─────────────────────────────────────────────── */}
       {selectedReport === 'Sales Report' && (
         <>
-          <section className="summary-grid">
+          <section className="grid grid-cols-3 gap-4 max-[860px]:grid-cols-1">
             <StatCard label="Total Sales" value={currency(totalSales)} growth="Live" icon="revenue" />
             <StatCard label="Transactions" value={number(filteredSales.length)} growth="Live" icon="revenue" />
             <StatCard
@@ -295,7 +296,7 @@ export default function Reports() {
             />
           </section>
 
-          <section className="dashboard-grid two">
+          <section className="grid grid-cols-2 gap-4 max-[1180px]:grid-cols-1">
             <ChartCard title="Sales Over Time" subtitle="Monthly totals">
               <LineChart data={revenue.values} labels={revenue.labels} />
             </ChartCard>
@@ -304,36 +305,47 @@ export default function Reports() {
             </ChartCard>
           </section>
 
-          <section className="card">
-            <h3 style={{ margin: '0 0 16px', fontSize: '16px' }}>Sales Transactions</h3>
+          <section className="bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius)] shadow-[var(--shadow)] p-5">
+            <h3 className="m-0 mb-4 text-[16px] font-bold text-[var(--text)]">Sales Transactions</h3>
             {filteredSales.length ? (
-              <div className="table-wrap">
-                <table className="data-table">
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse min-w-[760px]">
                   <thead>
-                    <tr>
-                      <th style={{ width: '12%' }}>Sale ID</th>
-                      <th style={{ width: '20%' }}>Customer</th>
-                      <th style={{ width: '18%' }}>Date</th>
-                      <th style={{ width: '18%' }}>Payment Method</th>
-                      <th style={{ width: '15%' }}>Status</th>
-                      <th style={{ width: '17%', textAlign: 'right' }}>Total Amount</th>
+                    <tr className="border-b-2 border-[var(--border)]">
+                      <th className="w-[12%] py-3.5 px-3 text-left text-[12px] font-semibold text-[var(--muted)] uppercase tracking-wider bg-[var(--surface-soft)]">Sale ID</th>
+                      <th className="w-[20%] py-3.5 px-3 text-left text-[12px] font-semibold text-[var(--muted)] uppercase tracking-wider bg-[var(--surface-soft)]">Customer</th>
+                      <th className="w-[18%] py-3.5 px-3 text-left text-[12px] font-semibold text-[var(--muted)] uppercase tracking-wider bg-[var(--surface-soft)]">Date</th>
+                      <th className="w-[18%] py-3.5 px-3 text-left text-[12px] font-semibold text-[var(--muted)] uppercase tracking-wider bg-[var(--surface-soft)]">Payment Method</th>
+                      <th className="w-[15%] py-3.5 px-3 text-left text-[12px] font-semibold text-[var(--muted)] uppercase tracking-wider bg-[var(--surface-soft)]">Status</th>
+                      <th className="w-[17%] py-3.5 px-3 text-right text-[12px] font-semibold text-[var(--muted)] uppercase tracking-wider bg-[var(--surface-soft)]">Total Amount</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredSales.map((sale) => {
+                    {filteredSales.map((sale, idx) => {
                       const custName = customerById[sale.customerId]?.fullName || `Customer #${sale.customerId || '-'}`;
+                      const isLast = idx === filteredSales.length - 1;
+                      const borderClass = isLast ? '' : 'border-b border-[var(--border)]';
+                      const statusLower = sale.status?.toLowerCase() || '';
+                      const statusClass = 
+                        ['paid', 'completed', 'in-stock'].includes(statusLower)
+                          ? 'bg-[var(--green-soft)] text-[var(--green)]'
+                          : ['pending', 'low-stock'].includes(statusLower)
+                          ? 'bg-[var(--orange-soft)] text-[#b76b00]'
+                          : ['overdue', 'out-of-stock', 'refunded'].includes(statusLower)
+                          ? 'bg-[var(--red-soft)] text-[var(--red)]'
+                          : 'bg-[var(--blue-soft)] text-[var(--blue)]';
                       return (
                         <tr key={sale.id ?? sale.saleId}>
-                          <td>#{sale.saleId ?? sale.id}</td>
-                          <td style={{ fontWeight: 500 }}>{custName}</td>
-                          <td>{date(sale.saleDate)}</td>
-                          <td>{status(sale.paymentMethod ?? '')}</td>
-                          <td>
-                            <span className={`status-badge ${sale.status?.toLowerCase() || ''}`}>
+                          <td className={`py-3.5 px-3 text-left text-[14px] text-[var(--text)] ${borderClass}`}>#{sale.saleId ?? sale.id}</td>
+                          <td className={`py-3.5 px-3 text-left text-[14px] text-[var(--text)] font-medium ${borderClass}`}>{custName}</td>
+                          <td className={`py-3.5 px-3 text-left text-[14px] text-[var(--text)] ${borderClass}`}>{date(sale.saleDate)}</td>
+                          <td className={`py-3.5 px-3 text-left text-[14px] text-[var(--text)] ${borderClass}`}>{status(sale.paymentMethod ?? '')}</td>
+                          <td className={`py-3.5 px-3 text-left text-[14px] text-[var(--text)] ${borderClass}`}>
+                            <span className={`inline-flex items-center min-h-[24px] px-[9px] rounded-full text-[12px] font-extrabold ${statusClass}`}>
                               {status(sale.status ?? '')}
                             </span>
                           </td>
-                          <td style={{ textAlign: 'right', fontWeight: 700 }}>{currency(sale.totalAmount)}</td>
+                          <td className={`py-3.5 px-3 text-right text-[14px] text-[var(--text)] font-bold ${borderClass}`}>{currency(sale.totalAmount)}</td>
                         </tr>
                       );
                     })}
@@ -341,7 +353,7 @@ export default function Reports() {
                 </table>
               </div>
             ) : (
-              <p style={{ color: 'var(--muted)', margin: 0 }}>No sales in the selected date range.</p>
+              <p className="text-[var(--muted)] m-0">No sales in the selected date range.</p>
             )}
           </section>
         </>
@@ -350,7 +362,7 @@ export default function Reports() {
       {/* ── REVENUE REPORT ───────────────────────────────────────────── */}
       {selectedReport === 'Revenue Report' && (
         <>
-          <section className="summary-grid">
+          <section className="grid grid-cols-3 gap-4 max-[860px]:grid-cols-1">
             <StatCard label="Total Revenue" value={currency(totalSales)} growth="Live" icon="revenue" />
             <StatCard label="Total Expenses" value={currency(totalExpenses)} growth="Live" icon="expenses" />
             <StatCard label="Net Profit" value={currency(profit)} growth={profit >= 0 ? 'Profitable' : 'Loss'} icon="revenue" />
@@ -359,7 +371,7 @@ export default function Reports() {
             <StatCard label="Products Listed" value={number(totalProducts)} growth="Live" icon="inventory" />
           </section>
 
-          <section className="dashboard-grid two">
+          <section className="grid grid-cols-2 gap-4 max-[1180px]:grid-cols-1">
             <ChartCard title="Revenue Trend" subtitle="Monthly sales totals">
               <LineChart data={revenue.values} labels={revenue.labels} />
             </ChartCard>
@@ -368,33 +380,46 @@ export default function Reports() {
             </ChartCard>
           </section>
 
-          <section className="card">
-            <h3 style={{ margin: '0 0 16px', fontSize: '16px' }}>Invoice Summary</h3>
-            <div className="table-wrap">
-              <table className="data-table">
+          <section className="bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius)] shadow-[var(--shadow)] p-5">
+            <h3 className="m-0 mb-4 text-[16px] font-bold text-[var(--text)]">Invoice Summary</h3>
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse min-w-[760px]">
                 <thead>
-                  <tr>
-                    <th style={{ width: '20%' }}>Invoice No.</th>
-                    <th style={{ width: '20%' }}>Issue Date</th>
-                    <th style={{ width: '20%' }}>Due Date</th>
-                    <th style={{ width: '20%' }}>Status</th>
-                    <th style={{ width: '20%', textAlign: 'right' }}>Amount</th>
+                  <tr className="border-b-2 border-[var(--border)]">
+                    <th className="w-[20%] py-3.5 px-3 text-left text-[12px] font-semibold text-[var(--muted)] uppercase tracking-wider bg-[var(--surface-soft)]">Invoice No.</th>
+                    <th className="w-[20%] py-3.5 px-3 text-left text-[12px] font-semibold text-[var(--muted)] uppercase tracking-wider bg-[var(--surface-soft)]">Issue Date</th>
+                    <th className="w-[20%] py-3.5 px-3 text-left text-[12px] font-semibold text-[var(--muted)] uppercase tracking-wider bg-[var(--surface-soft)]">Due Date</th>
+                    <th className="w-[20%] py-3.5 px-3 text-left text-[12px] font-semibold text-[var(--muted)] uppercase tracking-wider bg-[var(--surface-soft)]">Status</th>
+                    <th className="w-[20%] py-3.5 px-3 text-right text-[12px] font-semibold text-[var(--muted)] uppercase tracking-wider bg-[var(--surface-soft)]">Amount</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {data.invoices?.map((inv) => (
-                    <tr key={inv.id}>
-                      <td>{inv.invoiceNumber || `INV-${inv.id}`}</td>
-                      <td>{date(inv.issueDate)}</td>
-                      <td>{date(inv.dueDate)}</td>
-                      <td>
-                        <span className={`status-badge ${inv.status?.toLowerCase()}`}>
-                          {status(inv.status)}
-                        </span>
-                      </td>
-                      <td style={{ textAlign: 'right', fontWeight: 700 }}>{currency(inv.totalAmount)}</td>
-                    </tr>
-                  ))}
+                  {data.invoices?.map((inv, idx) => {
+                    const isLast = idx === (data.invoices?.length || 0) - 1;
+                    const borderClass = isLast ? '' : 'border-b border-[var(--border)]';
+                    const statusLower = inv.status?.toLowerCase() || '';
+                    const statusClass = 
+                      ['paid', 'completed', 'in-stock'].includes(statusLower)
+                        ? 'bg-[var(--green-soft)] text-[var(--green)]'
+                        : ['pending', 'low-stock'].includes(statusLower)
+                        ? 'bg-[var(--orange-soft)] text-[#b76b00]'
+                        : ['overdue', 'out-of-stock', 'refunded'].includes(statusLower)
+                        ? 'bg-[var(--red-soft)] text-[var(--red)]'
+                        : 'bg-[var(--blue-soft)] text-[var(--blue)]';
+                    return (
+                      <tr key={inv.id}>
+                        <td className={`py-3.5 px-3 text-left text-[14px] text-[var(--text)] ${borderClass}`}>{inv.invoiceNumber || `INV-${inv.id}`}</td>
+                        <td className={`py-3.5 px-3 text-left text-[14px] text-[var(--text)] ${borderClass}`}>{date(inv.issueDate)}</td>
+                        <td className={`py-3.5 px-3 text-left text-[14px] text-[var(--text)] ${borderClass}`}>{date(inv.dueDate)}</td>
+                        <td className={`py-3.5 px-3 text-left text-[14px] text-[var(--text)] ${borderClass}`}>
+                          <span className={`inline-flex items-center min-h-[24px] px-[9px] rounded-full text-[12px] font-extrabold ${statusClass}`}>
+                            {status(inv.status)}
+                          </span>
+                        </td>
+                        <td className={`py-3.5 px-3 text-right text-[14px] text-[var(--text)] font-bold ${borderClass}`}>{currency(inv.totalAmount)}</td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -405,7 +430,7 @@ export default function Reports() {
       {/* ── EXPENSE REPORT ───────────────────────────────────────────── */}
       {selectedReport === 'Expense Report' && (
         <>
-          <section className="summary-grid">
+          <section className="grid grid-cols-3 gap-4 max-[860px]:grid-cols-1">
             <StatCard label="Total Expenses" value={currency(totalExpenses)} growth="Live" icon="expenses" />
             <StatCard label="No. of Expenses" value={number(filteredExpenses.length)} growth="Live" icon="expenses" />
             <StatCard
@@ -416,7 +441,7 @@ export default function Reports() {
             />
           </section>
 
-          <section className="dashboard-grid two">
+          <section className="grid grid-cols-2 gap-4 max-[1180px]:grid-cols-1">
             <ChartCard title="Expenses Over Time" subtitle="Monthly totals">
               <LineChart data={expenses.values} labels={expenses.labels} />
             </ChartCard>
@@ -425,33 +450,37 @@ export default function Reports() {
             </ChartCard>
           </section>
 
-          <section className="card">
-            <h3 style={{ margin: '0 0 16px', fontSize: '16px' }}>Expense Records</h3>
+          <section className="bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius)] shadow-[var(--shadow)] p-5">
+            <h3 className="m-0 mb-4 text-[16px] font-bold text-[var(--text)]">Expense Records</h3>
             {filteredExpenses.length ? (
-              <div className="table-wrap">
-                <table className="data-table">
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse min-w-[760px]">
                   <thead>
-                    <tr>
-                      <th style={{ width: '40%' }}>Description</th>
-                      <th style={{ width: '20%' }}>Category</th>
-                      <th style={{ width: '20%' }}>Date</th>
-                      <th style={{ width: '20%', textAlign: 'right' }}>Amount</th>
+                    <tr className="border-b-2 border-[var(--border)]">
+                      <th className="w-[40%] py-3.5 px-3 text-left text-[12px] font-semibold text-[var(--muted)] uppercase tracking-wider bg-[var(--surface-soft)]">Description</th>
+                      <th className="w-[20%] py-3.5 px-3 text-left text-[12px] font-semibold text-[var(--muted)] uppercase tracking-wider bg-[var(--surface-soft)]">Category</th>
+                      <th className="w-[20%] py-3.5 px-3 text-left text-[12px] font-semibold text-[var(--muted)] uppercase tracking-wider bg-[var(--surface-soft)]">Date</th>
+                      <th className="w-[20%] py-3.5 px-3 text-right text-[12px] font-semibold text-[var(--muted)] uppercase tracking-wider bg-[var(--surface-soft)]">Amount</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredExpenses.map((exp) => (
-                      <tr key={exp.id}>
-                        <td>{exp.notes ?? '—'}</td>
-                        <td>{exp.category ?? '—'}</td>
-                        <td>{date(exp.expenseDate)}</td>
-                        <td style={{ textAlign: 'right', fontWeight: 700 }}>{currency(exp.amount)}</td>
-                      </tr>
-                    ))}
+                    {filteredExpenses.map((exp, idx) => {
+                      const isLast = idx === filteredExpenses.length - 1;
+                      const borderClass = isLast ? '' : 'border-b border-[var(--border)]';
+                      return (
+                        <tr key={exp.id}>
+                          <td className={`py-3.5 px-3 text-left text-[14px] text-[var(--text)] ${borderClass}`}>{exp.notes ?? '—'}</td>
+                          <td className={`py-3.5 px-3 text-left text-[14px] text-[var(--text)] ${borderClass}`}>{exp.category ?? '—'}</td>
+                          <td className={`py-3.5 px-3 text-left text-[14px] text-[var(--text)] ${borderClass}`}>{date(exp.expenseDate)}</td>
+                          <td className={`py-3.5 px-3 text-right text-[14px] text-[var(--text)] font-bold ${borderClass}`}>{currency(exp.amount)}</td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
             ) : (
-              <p style={{ color: 'var(--muted)', margin: 0 }}>No expenses in the selected date range.</p>
+              <p className="text-[var(--muted)] m-0">No expenses in the selected date range.</p>
             )}
           </section>
         </>
@@ -460,7 +489,7 @@ export default function Reports() {
       {/* ── INVENTORY REPORT ─────────────────────────────────────────── */}
       {selectedReport === 'Inventory Report' && (
         <>
-          <section className="summary-grid">
+          <section className="grid grid-cols-3 gap-4 max-[860px]:grid-cols-1">
             <StatCard label="Total Products" value={number(totalProducts)} growth="Live" icon="inventory" />
             <StatCard
               label="Low Stock Items"
@@ -476,31 +505,43 @@ export default function Reports() {
             />
           </section>
 
-          <section className="card">
-            <h3 style={{ margin: '0 0 16px', fontSize: '16px' }}>Inventory Status</h3>
-            <div className="table-wrap">
-              <table className="data-table">
+          <section className="bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius)] shadow-[var(--shadow)] p-5">
+            <h3 className="m-0 mb-4 text-[16px] font-bold text-[var(--text)]">Inventory Status</h3>
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse min-w-[760px]">
                 <thead>
-                  <tr>
-                    <th style={{ width: '25%' }}>Product Name</th>
-                    <th style={{ width: '15%' }}>Category</th>
-                    <th style={{ width: '20%', textAlign: 'right' }}>Stock Qty</th>
-                    <th style={{ width: '20%', textAlign: 'right' }}>Selling Price</th>
-                    <th style={{ width: '20%' }}>Status</th>
+                  <tr className="border-b-2 border-[var(--border)]">
+                    <th className="w-[25%] py-3.5 px-3 text-left text-[12px] font-semibold text-[var(--muted)] uppercase tracking-wider bg-[var(--surface-soft)]">Product Name</th>
+                    <th className="w-[15%] py-3.5 px-3 text-left text-[12px] font-semibold text-[var(--muted)] uppercase tracking-wider bg-[var(--surface-soft)]">Category</th>
+                    <th className="w-[20%] py-3.5 px-3 text-right text-[12px] font-semibold text-[var(--muted)] uppercase tracking-wider bg-[var(--surface-soft)]">Stock Qty</th>
+                    <th className="w-[20%] py-3.5 px-3 text-right text-[12px] font-semibold text-[var(--muted)] uppercase tracking-wider bg-[var(--surface-soft)]">Selling Price</th>
+                    <th className="w-[20%] py-3.5 px-3 text-left text-[12px] font-semibold text-[var(--muted)] uppercase tracking-wider bg-[var(--surface-soft)]">Status</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {data.products?.map((product) => {
+                  {data.products?.map((product, idx) => {
                     const qty = Number(product.stockQuantity || 0);
                     const stockStatus = qty <= 0 ? 'out-of-stock' : qty <= 10 ? 'low-stock' : 'in-stock';
                     const stockLabel = qty <= 0 ? 'Out of Stock' : qty <= 10 ? 'Low Stock' : 'In Stock';
+                    const isLast = idx === (data.products?.length || 0) - 1;
+                    const borderClass = isLast ? '' : 'border-b border-[var(--border)]';
+                    const statusClass = 
+                      stockStatus === 'in-stock'
+                        ? 'bg-[var(--green-soft)] text-[var(--green)]'
+                        : stockStatus === 'low-stock'
+                        ? 'bg-[var(--orange-soft)] text-[#b76b00]'
+                        : 'bg-[var(--red-soft)] text-[var(--red)]';
                     return (
                       <tr key={product.id}>
-                        <td style={{ fontWeight: 500 }}>{product.productName}</td>
-                        <td>{product.category ?? '—'}</td>
-                        <td style={{ textAlign: 'right' }}>{number(qty)}</td>
-                        <td style={{ textAlign: 'right' }}>{currency(product.unitPrice ?? 0)}</td>
-                        <td><span className={`status-badge ${stockStatus}`}>{stockLabel}</span></td>
+                        <td className={`py-3.5 px-3 text-left text-[14px] text-[var(--text)] font-medium ${borderClass}`}>{product.productName}</td>
+                        <td className={`py-3.5 px-3 text-left text-[14px] text-[var(--text)] ${borderClass}`}>{product.category ?? '—'}</td>
+                        <td className={`py-3.5 px-3 text-right text-[14px] text-[var(--text)] ${borderClass}`}>{number(qty)}</td>
+                        <td className={`py-3.5 px-3 text-right text-[14px] text-[var(--text)] ${borderClass}`}>{currency(product.unitPrice ?? 0)}</td>
+                        <td className={`py-3.5 px-3 text-left text-[14px] text-[var(--text)] ${borderClass}`}>
+                          <span className={`inline-flex items-center min-h-[24px] px-[9px] rounded-full text-[12px] font-extrabold ${statusClass}`}>
+                            {stockLabel}
+                          </span>
+                        </td>
                       </tr>
                     );
                   })}
@@ -514,33 +555,37 @@ export default function Reports() {
       {/* ── CUSTOMER REPORT ──────────────────────────────────────────── */}
       {selectedReport === 'Customer Report' && (
         <>
-          <section className="summary-grid">
+          <section className="grid grid-cols-3 gap-4 max-[860px]:grid-cols-1">
             <StatCard label="Total Customers" value={number(data.customers?.length || 0)} growth="Live" icon="revenue" />
             <StatCard label="Paid Invoices" value={number(paidInvoices)} growth="Live" icon="invoice" />
             <StatCard label="Total Revenue" value={currency(totalSales)} growth="Live" icon="revenue" />
           </section>
 
-          <section className="card">
-            <h3 style={{ margin: '0 0 16px', fontSize: '16px' }}>Customer Directory</h3>
-            <div className="table-wrap">
-              <table className="data-table">
+          <section className="bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius)] shadow-[var(--shadow)] p-5">
+            <h3 className="m-0 mb-4 text-[16px] font-bold text-[var(--text)]">Customer Directory</h3>
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse min-w-[760px]">
                 <thead>
-                  <tr>
-                    <th>Full Name</th>
-                    <th>Email</th>
-                    <th>Phone</th>
-                    <th>Address</th>
+                  <tr className="border-b-2 border-[var(--border)]">
+                    <th className="py-3.5 px-3 text-left text-[12px] font-semibold text-[var(--muted)] uppercase tracking-wider bg-[var(--surface-soft)]">Full Name</th>
+                    <th className="py-3.5 px-3 text-left text-[12px] font-semibold text-[var(--muted)] uppercase tracking-wider bg-[var(--surface-soft)]">Email</th>
+                    <th className="py-3.5 px-3 text-left text-[12px] font-semibold text-[var(--muted)] uppercase tracking-wider bg-[var(--surface-soft)]">Phone</th>
+                    <th className="py-3.5 px-3 text-left text-[12px] font-semibold text-[var(--muted)] uppercase tracking-wider bg-[var(--surface-soft)]">Address</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {data.customers?.map((customer) => (
-                    <tr key={customer.id}>
-                      <td style={{ fontWeight: 500 }}>{customer.fullName ?? '—'}</td>
-                      <td>{customer.email ?? '—'}</td>
-                      <td>{customer.phone ?? '—'}</td>
-                      <td style={{ color: 'var(--muted)' }}>{customer.address ?? '—'}</td>
-                    </tr>
-                  ))}
+                  {data.customers?.map((customer, idx) => {
+                    const isLast = idx === (data.customers?.length || 0) - 1;
+                    const borderClass = isLast ? '' : 'border-b border-[var(--border)]';
+                    return (
+                      <tr key={customer.id}>
+                        <td className={`py-3.5 px-3 text-left text-[14px] text-[var(--text)] font-medium ${borderClass}`}>{customer.fullName ?? '—'}</td>
+                        <td className={`py-3.5 px-3 text-left text-[14px] text-[var(--text)] ${borderClass}`}>{customer.email ?? '—'}</td>
+                        <td className={`py-3.5 px-3 text-left text-[14px] text-[var(--text)] ${borderClass}`}>{customer.phone ?? '—'}</td>
+                        <td className={`py-3.5 px-3 text-left text-[14px] text-[var(--muted)] ${borderClass}`}>{customer.address ?? '—'}</td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

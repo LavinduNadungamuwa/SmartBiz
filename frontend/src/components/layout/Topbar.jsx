@@ -24,35 +24,91 @@ export default function Topbar({ onMenuClick }) {
   const businessLogo = user.businessLogo || null;
 
   return (
-    <header className="topbar">
-      <button className="icon-button mobile-menu" type="button" onClick={onMenuClick} aria-label="Open navigation">
+    <header
+      className="flex items-center gap-[18px] h-[72px] px-7 shrink-0
+                 bg-surface border-b border-border backdrop-blur-[12px]"
+    >
+      {/* Mobile hamburger — hidden on md+ */}
+      <button
+        type="button"
+        onClick={onMenuClick}
+        aria-label="Open navigation"
+        className="relative inline-flex items-center justify-center w-[38px] h-[38px]
+                   text-text border border-border bg-surface
+                   rounded-[10px] cursor-pointer md:hidden"
+      >
         <Icon name="menu" />
       </button>
-      <div className="topbar-logo">
-        <span className="logo-mark small">SB</span>
-        <strong>SmartBiz</strong>
+
+      {/* Mobile logo — hidden on md+ */}
+      <div className="hidden items-center gap-[10px] md:hidden [.mobile-open_&]:flex">
+        <span
+          className="inline-flex items-center justify-center shrink-0 w-[34px] h-[34px] rounded-[10px]
+                     bg-gradient-to-br from-blue to-[#38bdf8] text-white font-extrabold text-[13px]"
+        >
+          SB
+        </span>
+        <strong className="text-text text-[15px]">SmartBiz</strong>
       </div>
-      <label className="global-search">
+
+      {/* Global search — hidden on mobile */}
+      <label
+        className="hidden md:flex items-center gap-[10px] h-[44px] w-[min(520px,44vw)]
+                   px-[14px] text-muted bg-surface
+                   border border-border rounded-xl cursor-text"
+      >
         <Icon name="search" size={18} />
-        <input type="search" placeholder="Search customers, invoices, products..." />
+        <input
+          type="search"
+          placeholder="Search customers, invoices, products..."
+          className="w-full border-0 outline-none bg-transparent text-text"
+        />
       </label>
-      <div className="topbar-actions">
-        <button className="icon-button notification-button" type="button" aria-label="Notifications">
+
+      {/* Right-side actions */}
+      <div className="ml-auto flex items-center gap-3">
+        {/* Notifications */}
+        <button
+          type="button"
+          aria-label="Notifications"
+          className="relative inline-flex items-center justify-center w-[38px] h-[38px]
+                     text-text border border-border bg-surface
+                     rounded-[10px] cursor-pointer"
+        >
           <Icon name="bell" />
-          <span className="notification-dot" />
+          {/* Notification dot */}
+          <span
+            className="absolute top-2 right-2 w-2 h-2 rounded-full
+                       bg-red border-2 border-surface"
+          />
         </button>
-        <button className="business-switcher" type="button">
+
+        {/* Business switcher — hidden on mobile */}
+        <button
+          type="button"
+          className="hidden md:inline-flex items-center gap-2 h-[38px] px-3
+                     border border-border rounded-[10px]
+                     text-text bg-surface font-semibold cursor-pointer"
+        >
           {businessName}
-          <span>v</span>
         </button>
+
+        {/* Dark-mode toggle */}
         <Toggle
           checked={theme === 'dark'}
-          onChange={() => setTheme(t => (t === 'dark' ? 'light' : 'dark'))}
+          onChange={() => setTheme((t) => (t === 'dark' ? 'light' : 'dark'))}
           ariaLabel="Toggle dark mode"
         />
-        <div className="avatar" aria-label="User profile">
+
+        {/* Avatar */}
+        <div
+          aria-label="User profile"
+          className="inline-flex items-center justify-center w-[38px] h-[38px]
+                     rounded-full bg-text text-surface
+                     text-[13px] font-bold cursor-pointer overflow-hidden"
+        >
           {businessLogo
-            ? <img src={businessLogo} alt="Business logo" className="avatar-logo" />
+            ? <img src={businessLogo} alt="Business logo" className="w-full h-full object-cover rounded-[inherit]" />
             : initials}
         </div>
       </div>

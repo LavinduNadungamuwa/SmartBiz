@@ -233,32 +233,35 @@ export default function Expenses() {
   ]);
 
   return (
-    <div className="page">
+    <div className="flex flex-col gap-[22px] max-w-[1600px] mx-auto px-[15px]">
       <PageHeader
         eyebrow="Finance"
         title="Expenses"
         description="Live expense records from smartbiz_db."
         actions={<Button icon="plus" onClick={openCreateModal}>Add expense</Button>}
       />
-      <section className="summary-grid">
+      <section className="grid grid-cols-3 gap-4 max-[860px]:grid-cols-1">
         <StatCard label="Total Expenses" value={currency(totalExpenses)} growth="Live" trend="down" icon="expenses" />
         <StatCard label="Largest Category" value={largestCategory} growth="Live" icon="products" />
         <StatCard label="Expense Records" value={String(expensesList.length)} growth="Live" icon="reports" />
       </section>
-      <section className="dashboard-grid two">
+      <section className="grid grid-cols-2 gap-4 max-[1180px]:grid-cols-1">
         <ChartCard title="Expense Breakdown" subtitle="Spend distribution by category">
           <PieChart data={pieChartData} />
         </ChartCard>
-        <section className="card">
-          <div className="card-header">
-            <h2>Expense Analytics</h2>
-            <p>Category totals from the database</p>
+        <section className="bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius)] shadow-[var(--shadow)] p-5">
+          <div className="flex justify-between gap-4 mb-[18px]">
+            <h2 className="m-0 text-[17px] font-bold text-[var(--text)]">Expense Analytics</h2>
+            <p className="m-0 mt-1.5 text-[var(--muted)] leading-[1.55]">Category totals from the database</p>
           </div>
-          <div className="metric-list">
+          <div className="grid gap-3">
             {Object.entries(categoryTotals).map(([category, amount]) => (
-              <div key={category}><span>{category}</span><strong>{currency(amount)}</strong></div>
+              <div key={category} className="flex justify-between items-center p-[13px] bg-[var(--surface-soft)] rounded-[12px] text-[var(--text)]">
+                <span className="text-[var(--muted)]">{category}</span>
+                <strong>{currency(amount)}</strong>
+              </div>
             ))}
-            {!Object.keys(categoryTotals).length && <p className="muted-note">No expense categories recorded yet.</p>}
+            {!Object.keys(categoryTotals).length && <p className="text-[var(--muted)] m-0">No expense categories recorded yet.</p>}
           </div>
         </section>
       </section>
@@ -276,7 +279,7 @@ export default function Expenses() {
           setCurrentPage(1);
         }}
       />
-      <section className="card">
+      <section className="bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius)] shadow-[var(--shadow)] p-5">
         {rows.length ? (
           <>
             <DataTable
@@ -287,10 +290,22 @@ export default function Expenses() {
               onView={handleView}
               onDelete={handleDelete}
             />
-            <div className="pagination">
-              <button onClick={handlePrevPage} disabled={currentPage === 1}>Previous</button>
+            <div className="flex items-center justify-end gap-3 pt-4 text-[var(--muted)]">
+              <button 
+                onClick={handlePrevPage} 
+                disabled={currentPage === 1}
+                className="h-[34px] px-3 border border-[var(--border)] bg-[var(--surface)] text-[var(--text)] rounded-[9px] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Previous
+              </button>
               <span>Page {currentPage} of {totalPages} ({filteredExpenses.length} expenses)</span>
-              <button onClick={handleNextPage} disabled={currentPage === totalPages}>Next</button>
+              <button 
+                onClick={handleNextPage} 
+                disabled={currentPage === totalPages}
+                className="h-[34px] px-3 border border-[var(--border)] bg-[var(--surface)] text-[var(--text)] rounded-[9px] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Next
+              </button>
             </div>
           </>
         ) : (
@@ -305,28 +320,28 @@ export default function Expenses() {
 
       {/* CREATE & EDIT MODAL */}
       {modalMode && modalMode !== 'view' && (
-        <div className="modal-overlay" onClick={closeModal}>
-          <div className="modal-container" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>{modalMode === 'create' ? 'Add New Expense' : 'Edit Expense'}</h3>
-              <button className="modal-close" onClick={closeModal} aria-label="Close">
+        <div className="fixed inset-0 bg-[rgba(15,23,42,0.5)] backdrop-blur-[6px] flex items-center justify-center z-[1000] animate-[fadeIn_0.25s_ease-out]" onClick={closeModal}>
+          <div className="bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius)] shadow-[0_20px_25px_-5px_rgba(0,0,0,0.1),0_10px_10px_-5px_rgba(0,0,0,0.04)] w-[min(540px,94vw)] max-h-[90vh] flex flex-col animate-[slideUp_0.3s_cubic-bezier(0.16,1,0.3,1)] overflow-hidden" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between py-5 px-6 border-b border-[var(--border)]">
+              <h3 className="m-0 text-[18px] font-bold text-[var(--text)]">{modalMode === 'create' ? 'Add New Expense' : 'Edit Expense'}</h3>
+              <button className="bg-transparent border-0 text-[var(--muted)] cursor-pointer flex items-center justify-center p-1 rounded-[6px] transition-colors duration-200 hover:bg-[var(--app-bg)] hover:text-[var(--text)]" onClick={closeModal} aria-label="Close">
                 <Icon name="close" size={20} />
               </button>
             </div>
             <form onSubmit={handleSubmit}>
-              <div className="modal-body">
+              <div className="p-6 overflow-y-auto">
                 {submitError && (
-                  <div style={{ color: 'var(--red)', background: 'var(--red-soft)', padding: '10px 14px', borderRadius: '8px', marginBottom: '16px', fontSize: '14px' }}>
+                  <div className="text-[var(--red)] bg-[var(--red-soft)] py-[10px] px-[14px] rounded-[8px] mb-4 text-[14px]">
                     {submitError}
                   </div>
                 )}
-                <div className="form-grid">
-                  <div className="form-field">
-                    <label htmlFor="title">Description / Title *</label>
+                <div className="grid gap-[18px]">
+                  <div className="flex flex-col gap-1.5">
+                    <label htmlFor="title" className="text-[13px] font-semibold text-[var(--text)]">Description / Title *</label>
                     <input
                       type="text"
                       id="title"
-                      className={formErrors.title ? 'error' : ''}
+                      className={`h-[40px] px-3 border rounded-[10px] text-[14px] bg-[var(--surface)] text-[var(--text)] outline-none transition-all duration-200 focus:border-[var(--blue)] focus:shadow-[0_0_0_3px_rgba(37,99,235,0.12)] ${formErrors.title ? 'border-[var(--red)]' : 'border-[var(--border)]'}`}
                       value={formData.title}
                       onChange={(e) => {
                         setFormData({ ...formData, title: e.target.value });
@@ -335,15 +350,15 @@ export default function Expenses() {
                       placeholder="e.g. Office Stationery / Server hosting"
                       required
                     />
-                    {formErrors.title && <span className="error-msg">{formErrors.title}</span>}
+                    {formErrors.title && <span className="text-[12px] text-[var(--red)] mt-0.5">{formErrors.title}</span>}
                   </div>
 
-                  <div className="form-row-2">
-                    <div className="form-field">
-                      <label htmlFor="category">Category *</label>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="flex flex-col gap-1.5">
+                      <label htmlFor="category" className="text-[13px] font-semibold text-[var(--text)]">Category *</label>
                       <select
                         id="category"
-                        className={formErrors.category ? 'error' : ''}
+                        className={`h-[40px] px-3 border rounded-[10px] text-[14px] bg-[var(--surface)] text-[var(--text)] outline-none transition-all duration-200 focus:border-[var(--blue)] focus:shadow-[0_0_0_3px_rgba(37,99,235,0.12)] ${formErrors.category ? 'border-[var(--red)]' : 'border-[var(--border)]'}`}
                         value={formData.category}
                         onChange={(e) => {
                           setFormData({ ...formData, category: e.target.value });
@@ -361,33 +376,34 @@ export default function Expenses() {
                         <option value="Utilities">Utilities</option>
                         <option value="Other">Other (Custom)</option>
                       </select>
-                      {formErrors.category && <span className="error-msg">{formErrors.category}</span>}
+                      {formErrors.category && <span className="text-[12px] text-[var(--red)] mt-0.5">{formErrors.category}</span>}
                     </div>
 
                     {formData.category === 'Other' && (
-                      <div className="form-field">
-                        <label htmlFor="customCategory">Specify Category *</label>
+                      <div className="flex flex-col gap-1.5">
+                        <label htmlFor="customCategory" className="text-[13px] font-semibold text-[var(--text)]">Specify Category *</label>
                         <input
                           type="text"
                           id="customCategory"
                           value={customCategory}
                           onChange={(e) => setCustomCategory(e.target.value)}
                           placeholder="e.g. Consultancy"
+                          className="h-[40px] px-3 border border-[var(--border)] rounded-[10px] text-[14px] bg-[var(--surface)] text-[var(--text)] outline-none transition-all duration-200 focus:border-[var(--blue)] focus:shadow-[0_0_0_3px_rgba(37,99,235,0.12)]"
                           required
                         />
                       </div>
                     )}
                   </div>
 
-                  <div className="form-row-2">
-                    <div className="form-field">
-                      <label htmlFor="amount">Amount ($) *</label>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="flex flex-col gap-1.5">
+                      <label htmlFor="amount" className="text-[13px] font-semibold text-[var(--text)]">Amount ($) *</label>
                       <input
                         type="number"
                         id="amount"
                         min="0.01"
                         step="0.01"
-                        className={formErrors.amount ? 'error' : ''}
+                        className={`h-[40px] px-3 border rounded-[10px] text-[14px] bg-[var(--surface)] text-[var(--text)] outline-none transition-all duration-200 focus:border-[var(--blue)] focus:shadow-[0_0_0_3px_rgba(37,99,235,0.12)] ${formErrors.amount ? 'border-[var(--red)]' : 'border-[var(--border)]'}`}
                         value={formData.amount}
                         onChange={(e) => {
                           setFormData({ ...formData, amount: e.target.value });
@@ -396,15 +412,15 @@ export default function Expenses() {
                         placeholder="e.g. 150.00"
                         required
                       />
-                      {formErrors.amount && <span className="error-msg">{formErrors.amount}</span>}
+                      {formErrors.amount && <span className="text-[12px] text-[var(--red)] mt-0.5">{formErrors.amount}</span>}
                     </div>
 
-                    <div className="form-field">
-                      <label htmlFor="expenseDate">Date *</label>
+                    <div className="flex flex-col gap-1.5">
+                      <label htmlFor="expenseDate" className="text-[13px] font-semibold text-[var(--text)]">Date *</label>
                       <input
                         type="date"
                         id="expenseDate"
-                        className={formErrors.expenseDate ? 'error' : ''}
+                        className={`h-[40px] px-3 border rounded-[10px] text-[14px] bg-[var(--surface)] text-[var(--text)] outline-none transition-all duration-200 focus:border-[var(--blue)] focus:shadow-[0_0_0_3px_rgba(37,99,235,0.12)] ${formErrors.expenseDate ? 'border-[var(--red)]' : 'border-[var(--border)]'}`}
                         value={formData.expenseDate}
                         onChange={(e) => {
                           setFormData({ ...formData, expenseDate: e.target.value });
@@ -412,15 +428,15 @@ export default function Expenses() {
                         }}
                         required
                       />
-                      {formErrors.expenseDate && <span className="error-msg">{formErrors.expenseDate}</span>}
+                      {formErrors.expenseDate && <span className="text-[12px] text-[var(--red)] mt-0.5">{formErrors.expenseDate}</span>}
                     </div>
                   </div>
 
-                  <div className="form-field">
-                    <label htmlFor="paymentMethod">Payment Method *</label>
+                  <div className="flex flex-col gap-1.5">
+                    <label htmlFor="paymentMethod" className="text-[13px] font-semibold text-[var(--text)]">Payment Method *</label>
                     <select
                       id="paymentMethod"
-                      className={formErrors.paymentMethod ? 'error' : ''}
+                      className={`h-[40px] px-3 border rounded-[10px] text-[14px] bg-[var(--surface)] text-[var(--text)] outline-none transition-all duration-200 focus:border-[var(--blue)] focus:shadow-[0_0_0_3px_rgba(37,99,235,0.12)] ${formErrors.paymentMethod ? 'border-[var(--red)]' : 'border-[var(--border)]'}`}
                       value={formData.paymentMethod}
                       onChange={(e) => {
                         setFormData({ ...formData, paymentMethod: e.target.value });
@@ -432,22 +448,23 @@ export default function Expenses() {
                       <option value="CARD">Card</option>
                       <option value="BANK_TRANSFER">Bank Transfer</option>
                     </select>
-                    {formErrors.paymentMethod && <span className="error-msg">{formErrors.paymentMethod}</span>}
+                    {formErrors.paymentMethod && <span className="text-[12px] text-[var(--red)] mt-0.5">{formErrors.paymentMethod}</span>}
                   </div>
 
-                  <div className="form-field">
-                    <label htmlFor="notes">Notes / Additional Details</label>
+                  <div className="flex flex-col gap-1.5">
+                    <label htmlFor="notes" className="text-[13px] font-semibold text-[var(--text)]">Notes / Additional Details</label>
                     <textarea
                       id="notes"
                       rows="3"
                       value={formData.notes}
                       onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                       placeholder="Enter extra details here..."
+                      className="px-3 py-2 border border-[var(--border)] rounded-[10px] text-[14px] bg-[var(--surface)] text-[var(--text)] outline-none transition-all duration-200 focus:border-[var(--blue)] focus:shadow-[0_0_0_3px_rgba(37,99,235,0.12)]"
                     />
                   </div>
                 </div>
               </div>
-              <div className="modal-footer">
+              <div className="flex justify-end gap-3 py-[18px] px-6 bg-[var(--surface-soft)] border-t border-[var(--border)]">
                 <Button variant="ghost" onClick={closeModal}>Cancel</Button>
                 <Button type="submit" variant="primary" disabled={submitLoading}>
                   {submitLoading ? 'Saving...' : 'Save Expense'}
@@ -460,62 +477,62 @@ export default function Expenses() {
 
       {/* VIEW MODAL */}
       {modalMode === 'view' && selectedExpense && (
-        <div className="modal-overlay" onClick={closeModal}>
-          <div className="modal-container" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>Expense Details</h3>
-              <button className="modal-close" onClick={closeModal} aria-label="Close">
+        <div className="fixed inset-0 bg-[rgba(15,23,42,0.5)] backdrop-blur-[6px] flex items-center justify-center z-[1000] animate-[fadeIn_0.25s_ease-out]" onClick={closeModal}>
+          <div className="bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius)] shadow-[0_20px_25px_-5px_rgba(0,0,0,0.1),0_10px_10px_-5px_rgba(0,0,0,0.04)] w-[min(540px,94vw)] max-h-[90vh] flex flex-col animate-[slideUp_0.3s_cubic-bezier(0.16,1,0.3,1)] overflow-hidden" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between py-5 px-6 border-b border-[var(--border)]">
+              <h3 className="m-0 text-[18px] font-bold text-[var(--text)]">Expense Details</h3>
+              <button className="bg-transparent border-0 text-[var(--muted)] cursor-pointer flex items-center justify-center p-1 rounded-[6px] transition-colors duration-200 hover:bg-[var(--app-bg)] hover:text-[var(--text)]" onClick={closeModal} aria-label="Close">
                 <Icon name="close" size={20} />
               </button>
             </div>
-            <div className="modal-body" style={{ display: 'grid', gap: '20px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '16px', paddingBottom: '16px', borderBottom: '1px solid var(--border)' }}>
-                <div style={{ width: '56px', height: '56px', borderRadius: '12px', background: 'var(--red-soft)', color: 'var(--red)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', fontWeight: '800' }}>
+            <div className="p-6 overflow-y-auto grid gap-5">
+              <div className="flex items-center gap-4 pb-4 border-b border-[var(--border)]">
+                <div className="w-14 h-14 rounded-xl bg-[var(--red-soft)] text-[var(--red)] flex items-center justify-center text-[20px] font-extrabold">
                   $
                 </div>
                 <div>
-                  <h4 style={{ margin: 0, fontSize: '18px', fontWeight: '700' }}>{selectedExpense.title || selectedExpense.notes || 'Expense'}</h4>
-                  <span style={{ color: 'var(--muted)', fontSize: '13px' }}>Expense ID: #{selectedExpense.id}</span>
+                  <h4 className="m-0 text-[18px] font-bold">{selectedExpense.title || selectedExpense.notes || 'Expense'}</h4>
+                  <span className="text-[var(--muted)] text-[13px]">Expense ID: #{selectedExpense.id}</span>
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label style={{ display: 'block', fontSize: '12px', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '4px' }}>Category</label>
+                  <label className="block text-[12px] text-[var(--muted)] font-semibold uppercase mb-1">Category</label>
                   <strong>{selectedExpense.category || '-'}</strong>
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '12px', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '4px' }}>Payment Method</label>
+                  <label className="block text-[12px] text-[var(--muted)] font-semibold uppercase mb-1">Payment Method</label>
                   <strong>{selectedExpense.paymentMethod || '-'}</strong>
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label style={{ display: 'block', fontSize: '12px', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '4px' }}>Expense Date</label>
+                  <label className="block text-[12px] text-[var(--muted)] font-semibold uppercase mb-1">Expense Date</label>
                   <strong>{date(selectedExpense.expenseDate)}</strong>
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '12px', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '4px' }}>Recorded At</label>
+                  <label className="block text-[12px] text-[var(--muted)] font-semibold uppercase mb-1">Recorded At</label>
                   <strong>{date(selectedExpense.createdAt)}</strong>
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label style={{ display: 'block', fontSize: '12px', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '4px' }}>Amount</label>
-                  <strong style={{ color: 'var(--red)' }}>
+                  <label className="block text-[12px] text-[var(--muted)] font-semibold uppercase mb-1">Amount</label>
+                  <strong className="text-[var(--red)]">
                     {currency(selectedExpense.amount)}
                   </strong>
                 </div>
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '12px', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '4px' }}>Notes</label>
-                <p style={{ margin: 0, color: 'var(--text)' }}>{selectedExpense.notes || 'No extra notes.'}</p>
+                <label className="block text-[12px] text-[var(--muted)] font-semibold uppercase mb-1">Notes</label>
+                <p className="m-0 text-[var(--text)]">{selectedExpense.notes || 'No extra notes.'}</p>
               </div>
             </div>
-            <div className="modal-footer">
+            <div className="flex justify-end gap-3 py-[18px] px-6 bg-[var(--surface-soft)] border-t border-[var(--border)]">
               <Button variant="ghost" onClick={closeModal}>Close</Button>
               <Button variant="primary" icon="edit" onClick={() => {
                 const expense = selectedExpense;

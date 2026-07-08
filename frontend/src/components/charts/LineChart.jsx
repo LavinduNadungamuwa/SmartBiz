@@ -6,11 +6,21 @@ export default function LineChart({ data, labels = [] }) {
   }).join(' ');
 
   return (
-    <div className="chart line-chart">
-      <svg viewBox="0 0 100 100" preserveAspectRatio="none">
-        <polyline points={points} />
+    <div className="h-[250px]">
+      <svg
+        viewBox="0 0 100 100"
+        preserveAspectRatio="none"
+        className="w-full h-[210px] overflow-visible"
+        style={{
+          background: 'linear-gradient(var(--border) 1px, transparent 1px) 0 0 / 100% 25%',
+        }}
+      >
+        <polyline
+          points={points}
+          style={{ fill: 'none', stroke: 'var(--blue)', strokeWidth: 3, vectorEffect: 'non-scaling-stroke' }}
+        />
       </svg>
-      <div className="chart-axis">
+      <div className="flex justify-between text-muted text-xs mt-2.5">
         {(labels.length ? labels : ['Jan', 'Mar', 'May', 'Jul', 'Sep', 'Nov']).map((label) => (
           <span key={label}>{label}</span>
         ))}

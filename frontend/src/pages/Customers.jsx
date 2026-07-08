@@ -11,11 +11,11 @@ import { currency, date } from '../utils/formatters';
 
 export default function Customers() {
   const { data, loading, error, reload } = useBusinessData();
-  
+
   // Search & Filter State
   const [searchValue, setSearchValue] = useState('');
   const [activeFilter, setActiveFilter] = useState(null);
-  
+
   // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
@@ -48,11 +48,10 @@ export default function Customers() {
   // Filter & Search Logic
   const filteredCustomers = (data.customers || []).filter((customer) => {
     const stats = getCustomerStats(customer.id);
-    
-    // Search matching
+
     const query = searchValue.toLowerCase().trim();
     if (query) {
-      const matchesSearch = 
+      const matchesSearch =
         customer.fullName?.toLowerCase().includes(query) ||
         customer.email?.toLowerCase().includes(query) ||
         customer.phone?.toLowerCase().includes(query) ||
@@ -60,21 +59,13 @@ export default function Customers() {
       if (!matchesSearch) return false;
     }
 
-    // Filter chip matching
-    if (activeFilter === 'Active') {
-      return stats.salesCount > 0;
-    }
-    if (activeFilter === 'High value') {
-      return stats.totalPurchases >= 500;
-    }
+    if (activeFilter === 'Active') return stats.salesCount > 0;
+    if (activeFilter === 'High value') return stats.totalPurchases >= 500;
     if (activeFilter === 'Recent purchase') {
       if (stats.lastPurchase === '-') return false;
-      const lastDate = new Date(stats.lastPurchase);
-      const diffTime = Math.abs(new Date() - lastDate);
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      const diffDays = Math.ceil(Math.abs(new Date() - new Date(stats.lastPurchase)) / 86400000);
       return diffDays <= 30;
     }
-
     return true;
   });
 
@@ -88,7 +79,7 @@ export default function Customers() {
   const handlePrevPage = () => setCurrentPage((p) => Math.max(1, p - 1));
   const handleNextPage = () => setCurrentPage((p) => Math.min(totalPages, p + 1));
 
-  // Modal actions
+  // Modal helpers
   const openCreateModal = () => {
     setFormData({ fullName: '', email: '', phone: '', address: '' });
     setFormErrors({});
@@ -126,7 +117,6 @@ export default function Customers() {
   const handleDelete = async (index) => {
     const customer = paginatedCustomers[index];
     if (!customer) return;
-
     if (window.confirm(`Are you sure you want to delete customer "${customer.fullName}"?`)) {
       try {
         await deleteCustomer(customer.id);
@@ -152,14 +142,10 @@ export default function Customers() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const errors = validateForm();
-    if (Object.keys(errors).length > 0) {
-      setFormErrors(errors);
-      return;
-    }
+    if (Object.keys(errors).length > 0) { setFormErrors(errors); return; }
 
     setSubmitLoading(true);
     setSubmitError('');
-
     try {
       if (modalMode === 'create') {
         await createCustomer(formData);
@@ -169,9 +155,7 @@ export default function Customers() {
       reload();
       closeModal();
     } catch (err) {
-      setSubmitError(
-        err.response?.data?.message || err.message || 'Failed to save customer. Please try again.'
-      );
+      setSubmitError(err.response?.data?.message || err.message || 'Failed to save customer. Please try again.');
     } finally {
       setSubmitLoading(false);
     }
@@ -188,29 +172,33 @@ export default function Customers() {
     ];
   });
 
+  /* ── Close icon SVG (reused in both modals) ──────────────────────────── */
+  const CloseIcon = () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="18" y1="6" x2="6" y2="18" />
+      <line x1="6" y1="6" x2="18" y2="18" />
+    </svg>
+  );
+
   return (
-    <div className="page">
+    <div className="page flex flex-col gap-[22px] max-w-[1600px] mx-auto px-[15px]">
       <PageHeader
         eyebrow="CRM"
         title="Customers"
         description="Live customer records from smartbiz_db."
         actions={<Button icon="plus" onClick={openCreateModal}>Add customer</Button>}
       />
+
       <Toolbar
         searchPlaceholder="Search customers..."
         filters={['Active', 'High value', 'Recent purchase']}
         searchValue={searchValue}
-        onSearchChange={(val) => {
-          setSearchValue(val);
-          setCurrentPage(1);
-        }}
+        onSearchChange={(val) => { setSearchValue(val); setCurrentPage(1); }}
         activeFilter={activeFilter}
-        onFilterClick={(filter) => {
-          setActiveFilter(filter);
-          setCurrentPage(1);
-        }}
+        onFilterClick={(filter) => { setActiveFilter(filter); setCurrentPage(1); }}
       />
-      <section className="card">
+
+      <section className="card bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius)] shadow-[var(--shadow)] p-5">
         {rows.length ? (
           <>
             <DataTable
@@ -221,10 +209,22 @@ export default function Customers() {
               onView={handleView}
               onDelete={handleDelete}
             />
-            <div className="pagination">
-              <button onClick={handlePrevPage} disabled={currentPage === 1}>Previous</button>
+            <div className="pagination flex items-center justify-end gap-3 pt-4 text-[var(--muted)]">
+              <button
+                onClick={handlePrevPage}
+                disabled={currentPage === 1}
+                className="h-[34px] px-3 border border-[var(--border)] bg-[var(--surface)] text-[var(--text)] rounded-[9px] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Previous
+              </button>
               <span>Page {currentPage} of {totalPages} ({filteredCustomers.length} customers)</span>
-              <button onClick={handleNextPage} disabled={currentPage === totalPages}>Next</button>
+              <button
+                onClick={handleNextPage}
+                disabled={currentPage === totalPages}
+                className="h-[34px] px-3 border border-[var(--border)] bg-[var(--surface)] text-[var(--text)] rounded-[9px] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Next
+              </button>
             </div>
           </>
         ) : (
@@ -237,93 +237,82 @@ export default function Customers() {
         )}
       </section>
 
-      {/* CREATE & EDIT MODAL */}
+      {/* ── CREATE / EDIT MODAL ─────────────────────────────────────────── */}
       {modalMode && modalMode !== 'view' && (
-        <div className="modal-overlay" onClick={closeModal}>
-          <div className="modal-container" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>{modalMode === 'create' ? 'Add New Customer' : 'Edit Customer'}</h3>
-              <button className="modal-close" onClick={closeModal} aria-label="Close">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="18" y1="6" x2="6" y2="18"></line>
-                  <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
+        <div className="modal-overlay fixed inset-0 bg-[rgba(15,23,42,0.5)] backdrop-blur-[6px] flex items-center justify-center z-[1000] animate-[fadeIn_0.25s_ease-out]" onClick={closeModal}>
+          <div className="modal-container bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius)] shadow-[0_20px_25px_-5px_rgba(0,0,0,0.1),0_10px_10px_-5px_rgba(0,0,0,0.04)] w-[min(540px,94vw)] max-h-[90vh] flex flex-col animate-[slideUp_0.3s_cubic-bezier(0.16,1,0.3,1)] overflow-hidden" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header flex items-center justify-between py-5 px-6 border-b border-[var(--border)]">
+              <h3 className="m-0 text-[18px] font-bold text-[var(--text)]">{modalMode === 'create' ? 'Add New Customer' : 'Edit Customer'}</h3>
+              <button className="modal-close bg-transparent border-0 text-[var(--muted)] cursor-pointer flex items-center justify-center p-1 rounded-[6px] transition-colors duration-200 hover:bg-[var(--app-bg)] hover:text-[var(--text)]" onClick={closeModal} aria-label="Close">
+                <CloseIcon />
               </button>
             </div>
             <form onSubmit={handleSubmit}>
-              <div className="modal-body">
+              <div className="modal-body p-6 overflow-y-auto text-[var(--text)]">
                 {submitError && (
-                  <div style={{ color: 'var(--red)', background: 'var(--red-soft)', padding: '10px 14px', borderRadius: '8px', marginBottom: '16px', fontSize: '14px' }}>
+                  <div className="mb-4 px-[14px] py-[10px] rounded-lg text-sm text-[var(--red)] bg-[var(--red-soft)]">
                     {submitError}
                   </div>
                 )}
-                <div className="form-grid">
-                  <div className="form-field">
-                    <label htmlFor="fullName">Full Name *</label>
+                <div className="form-grid grid gap-[18px]">
+                  <div className="form-field flex flex-col gap-1.5">
+                    <label htmlFor="fullName" className="text-[13px] font-semibold text-[var(--text)]">Full Name *</label>
                     <input
                       type="text"
                       id="fullName"
-                      className={formErrors.fullName ? 'error' : ''}
+                      className={`h-[40px] px-3 border rounded-[10px] text-[14px] bg-[var(--surface)] text-[var(--text)] outline-none transition-all duration-200 focus:border-[var(--blue)] focus:shadow-[0_0_0_3px_rgba(37,99,235,0.12)] ${formErrors.fullName ? 'border-[var(--red)]' : 'border-[var(--border)]'}`}
                       value={formData.fullName}
-                      onChange={(e) => {
-                        setFormData({ ...formData, fullName: e.target.value });
-                        setFormErrors({ ...formErrors, fullName: '' });
-                      }}
+                      onChange={(e) => { setFormData({ ...formData, fullName: e.target.value }); setFormErrors({ ...formErrors, fullName: '' }); }}
                       placeholder="e.g. John Doe"
                       required
                     />
-                    {formErrors.fullName && <span className="error-msg">{formErrors.fullName}</span>}
+                    {formErrors.fullName && <span className="error-msg text-[12px] text-[var(--red)] mt-0.5">{formErrors.fullName}</span>}
                   </div>
-                  
-                  <div className="form-row-2">
-                    <div className="form-field">
-                      <label htmlFor="email">Email Address *</label>
+
+                  <div className="form-row-2 grid grid-cols-2 gap-4">
+                    <div className="form-field flex flex-col gap-1.5">
+                      <label htmlFor="email" className="text-[13px] font-semibold text-[var(--text)]">Email Address *</label>
                       <input
                         type="email"
                         id="email"
-                        className={formErrors.email ? 'error' : ''}
+                        className={`h-[40px] px-3 border rounded-[10px] text-[14px] bg-[var(--surface)] text-[var(--text)] outline-none transition-all duration-200 focus:border-[var(--blue)] focus:shadow-[0_0_0_3px_rgba(37,99,235,0.12)] ${formErrors.email ? 'border-[var(--red)]' : 'border-[var(--border)]'}`}
                         value={formData.email}
-                        onChange={(e) => {
-                          setFormData({ ...formData, email: e.target.value });
-                          setFormErrors({ ...formErrors, email: '' });
-                        }}
+                        onChange={(e) => { setFormData({ ...formData, email: e.target.value }); setFormErrors({ ...formErrors, email: '' }); }}
                         placeholder="e.g. john@example.com"
                         required
                       />
-                      {formErrors.email && <span className="error-msg">{formErrors.email}</span>}
+                      {formErrors.email && <span className="error-msg text-[12px] text-[var(--red)] mt-0.5">{formErrors.email}</span>}
                     </div>
-                    
-                    <div className="form-field">
-                      <label htmlFor="phone">Phone Number *</label>
+
+                    <div className="form-field flex flex-col gap-1.5">
+                      <label htmlFor="phone" className="text-[13px] font-semibold text-[var(--text)]">Phone Number *</label>
                       <input
                         type="text"
                         id="phone"
-                        className={formErrors.phone ? 'error' : ''}
+                        className={`h-[40px] px-3 border rounded-[10px] text-[14px] bg-[var(--surface)] text-[var(--text)] outline-none transition-all duration-200 focus:border-[var(--blue)] focus:shadow-[0_0_0_3px_rgba(37,99,235,0.12)] ${formErrors.phone ? 'border-[var(--red)]' : 'border-[var(--border)]'}`}
                         value={formData.phone}
-                        onChange={(e) => {
-                          setFormData({ ...formData, phone: e.target.value });
-                          setFormErrors({ ...formErrors, phone: '' });
-                        }}
+                        onChange={(e) => { setFormData({ ...formData, phone: e.target.value }); setFormErrors({ ...formErrors, phone: '' }); }}
                         placeholder="e.g. +94 77 123 4567"
                         required
                       />
-                      {formErrors.phone && <span className="error-msg">{formErrors.phone}</span>}
+                      {formErrors.phone && <span className="error-msg text-[12px] text-[var(--red)] mt-0.5">{formErrors.phone}</span>}
                     </div>
                   </div>
 
-                  <div className="form-field">
-                    <label htmlFor="address">Address</label>
+                  <div className="form-field flex flex-col gap-1.5">
+                    <label htmlFor="address" className="text-[13px] font-semibold text-[var(--text)]">Address</label>
                     <textarea
                       id="address"
                       rows="3"
                       value={formData.address}
                       onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                       placeholder="e.g. 123 Main St, Colombo"
+                      className="px-3 py-2 border border-[var(--border)] rounded-[10px] text-[14px] bg-[var(--surface)] text-[var(--text)] outline-none transition-all duration-200 focus:border-[var(--blue)] focus:shadow-[0_0_0_3px_rgba(37,99,235,0.12)] w-full"
                     />
                   </div>
                 </div>
               </div>
-              <div className="modal-footer">
+              <div className="modal-footer flex justify-end gap-3 py-[18px] px-6 bg-[var(--surface-soft)] border-t border-[var(--border)]">
                 <Button variant="ghost" onClick={closeModal}>Cancel</Button>
                 <Button type="submit" variant="primary" disabled={submitLoading}>
                   {submitLoading ? 'Saving...' : 'Save Customer'}
@@ -334,72 +323,81 @@ export default function Customers() {
         </div>
       )}
 
-      {/* VIEW MODAL */}
+      {/* ── VIEW MODAL ──────────────────────────────────────────────────── */}
       {modalMode === 'view' && selectedCustomer && (
-        <div className="modal-overlay" onClick={closeModal}>
-          <div className="modal-container" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>Customer Profile</h3>
-              <button className="modal-close" onClick={closeModal} aria-label="Close">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="18" y1="6" x2="6" y2="18"></line>
-                  <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
+        <div className="modal-overlay fixed inset-0 bg-[rgba(15,23,42,0.5)] backdrop-blur-[6px] flex items-center justify-center z-[1000] animate-[fadeIn_0.25s_ease-out]" onClick={closeModal}>
+          <div className="modal-container bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius)] shadow-[0_20px_25px_-5px_rgba(0,0,0,0.1),0_10px_10px_-5px_rgba(0,0,0,0.04)] w-[min(540px,94vw)] max-h-[90vh] flex flex-col animate-[slideUp_0.3s_cubic-bezier(0.16,1,0.3,1)] overflow-hidden" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header flex items-center justify-between py-5 px-6 border-b border-[var(--border)]">
+              <h3 className="m-0 text-[18px] font-bold text-[var(--text)]">Customer Profile</h3>
+              <button className="modal-close bg-transparent border-0 text-[var(--muted)] cursor-pointer flex items-center justify-center p-1 rounded-[6px] transition-colors duration-200 hover:bg-[var(--app-bg)] hover:text-[var(--text)]" onClick={closeModal} aria-label="Close">
+                <CloseIcon />
               </button>
             </div>
-            <div className="modal-body" style={{ display: 'grid', gap: '20px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '16px', paddingBottom: '16px', borderBottom: '1px solid var(--border)' }}>
-                <div style={{ width: '56px', height: '56px', borderRadius: '999px', background: 'var(--blue-soft)', color: 'var(--blue)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', fontWeight: '800' }}>
+
+            <div className="modal-body p-6 overflow-y-auto grid gap-5 text-[var(--text)]">
+              {/* Avatar + name row */}
+              <div className="flex items-center gap-4 pb-4 border-b border-[var(--border)]">
+                <div className="flex items-center justify-center w-14 h-14 rounded-full bg-[var(--blue-soft)] text-[var(--blue)] text-xl font-extrabold shrink-0">
                   {selectedCustomer.fullName?.charAt(0).toUpperCase()}
                 </div>
                 <div>
-                  <h4 style={{ margin: 0, fontSize: '18px', fontWeight: '700' }}>{selectedCustomer.fullName}</h4>
-                  <span style={{ color: 'var(--muted)', fontSize: '13px' }}>Customer ID: #{selectedCustomer.id}</span>
+                  <h4 className="m-0 text-lg font-bold text-[var(--text)]">{selectedCustomer.fullName}</h4>
+                  <span className="text-[var(--muted)] text-[13px]">Customer ID: #{selectedCustomer.id}</span>
                 </div>
               </div>
-              
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+
+              {/* Contact details */}
+              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label style={{ display: 'block', fontSize: '12px', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '4px' }}>Email</label>
-                  <strong style={{ wordBreak: 'break-all' }}>{selectedCustomer.email}</strong>
+                  <label className="block text-xs text-[var(--muted)] font-semibold uppercase mb-1">Email</label>
+                  <strong className="break-all">{selectedCustomer.email}</strong>
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '12px', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '4px' }}>Phone</label>
+                  <label className="block text-xs text-[var(--muted)] font-semibold uppercase mb-1">Phone</label>
                   <strong>{selectedCustomer.phone}</strong>
                 </div>
               </div>
 
+              {/* Address */}
               <div>
-                <label style={{ display: 'block', fontSize: '12px', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '4px' }}>Address</label>
-                <p style={{ margin: 0, color: 'var(--text)' }}>{selectedCustomer.address || 'No address provided'}</p>
+                <label className="block text-xs text-[var(--muted)] font-semibold uppercase mb-1">Address</label>
+                <p className="m-0 text-[var(--text)]">{selectedCustomer.address || 'No address provided'}</p>
               </div>
 
-              <div style={{ background: 'var(--app-bg)', padding: '16px', borderRadius: '12px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginTop: '8px' }}>
+              {/* Purchase stats */}
+              <div className="grid grid-cols-2 gap-4 mt-2 p-4 rounded-xl bg-[var(--app-bg)]">
                 <div>
-                  <label style={{ display: 'block', fontSize: '12px', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '4px' }}>Total Purchases</label>
-                  <strong style={{ fontSize: '18px', color: 'var(--blue)' }}>{currency(getCustomerStats(selectedCustomer.id).totalPurchases)}</strong>
+                  <label className="block text-xs text-[var(--muted)] font-semibold uppercase mb-1">Total Purchases</label>
+                  <strong className="text-lg text-[var(--blue)]">{currency(getCustomerStats(selectedCustomer.id).totalPurchases)}</strong>
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '12px', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '4px' }}>Last Purchase</label>
-                  <strong style={{ fontSize: '18px' }}>{getCustomerStats(selectedCustomer.id).lastPurchase}</strong>
+                  <label className="block text-xs text-[var(--muted)] font-semibold uppercase mb-1">Last Purchase</label>
+                  <strong className="text-lg">{getCustomerStats(selectedCustomer.id).lastPurchase}</strong>
                 </div>
               </div>
             </div>
-            <div className="modal-footer">
+
+            <div className="modal-footer flex justify-end gap-3 py-[18px] px-6 bg-[var(--surface-soft)] border-t border-[var(--border)]">
               <Button variant="ghost" onClick={closeModal}>Close</Button>
-              <Button variant="primary" icon="edit" onClick={() => {
-                const customer = selectedCustomer;
-                setSelectedCustomer(customer);
-                setFormData({
-                  fullName: customer.fullName || '',
-                  email: customer.email || '',
-                  phone: customer.phone || '',
-                  address: customer.address || '',
-                });
-                setFormErrors({});
-                setSubmitError('');
-                setModalMode('edit');
-              }}>Edit Profile</Button>
+              <Button
+                variant="primary"
+                icon="edit"
+                onClick={() => {
+                  const customer = selectedCustomer;
+                  setSelectedCustomer(customer);
+                  setFormData({
+                    fullName: customer.fullName || '',
+                    email: customer.email || '',
+                    phone: customer.phone || '',
+                    address: customer.address || '',
+                  });
+                  setFormErrors({});
+                  setSubmitError('');
+                  setModalMode('edit');
+                }}
+              >
+                Edit Profile
+              </Button>
             </div>
           </div>
         </div>

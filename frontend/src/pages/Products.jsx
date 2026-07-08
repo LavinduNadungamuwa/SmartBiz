@@ -207,7 +207,7 @@ export default function Products() {
   const inStockProductsCount = (data.products || []).length - lowStockProductsCount - outOfStockProductsCount;
 
   return (
-    <div className="page">
+    <div className="flex flex-col gap-[22px] max-w-[1600px] mx-auto px-[15px]">
       <PageHeader
         eyebrow="Inventory"
         title="Products"
@@ -215,7 +215,7 @@ export default function Products() {
         actions={<Button icon="plus" onClick={openCreateModal}>Add product</Button>}
       />
       
-      <section className="summary-grid">
+      <section className="grid grid-cols-3 gap-4 max-[860px]:grid-cols-1">
         <StatCard label="In Stock" value={number(inStockProductsCount)} growth="Live" icon="products" />
         <StatCard label="Low Stock" value={number(lowStockProductsCount)} growth="Needs review" trend="down" icon="expenses" />
         <StatCard label="Out of Stock" value={number(outOfStockProductsCount)} growth="Needs reorder" trend="down" icon="suppliers" />
@@ -236,7 +236,7 @@ export default function Products() {
         }}
       />
 
-      <section className="card">
+      <section className="bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius)] shadow-[var(--shadow)] p-5">
         {rows.length ? (
           <>
             <DataTable
@@ -247,10 +247,22 @@ export default function Products() {
               onView={handleView}
               onDelete={handleDelete}
             />
-            <div className="pagination">
-              <button onClick={handlePrevPage} disabled={currentPage === 1}>Previous</button>
+            <div className="flex items-center justify-end gap-3 pt-4 text-[var(--muted)]">
+              <button 
+                onClick={handlePrevPage} 
+                disabled={currentPage === 1}
+                className="h-[34px] px-3 border border-[var(--border)] bg-[var(--surface)] text-[var(--text)] rounded-[9px] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Previous
+              </button>
               <span>Page {currentPage} of {totalPages} ({filteredProducts.length} products)</span>
-              <button onClick={handleNextPage} disabled={currentPage === totalPages}>Next</button>
+              <button 
+                onClick={handleNextPage} 
+                disabled={currentPage === totalPages}
+                className="h-[34px] px-3 border border-[var(--border)] bg-[var(--surface)] text-[var(--text)] rounded-[9px] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Next
+              </button>
             </div>
           </>
         ) : (
@@ -265,28 +277,28 @@ export default function Products() {
 
       {/* CREATE & EDIT MODAL */}
       {modalMode && modalMode !== 'view' && (
-        <div className="modal-overlay" onClick={closeModal}>
-          <div className="modal-container" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>{modalMode === 'create' ? 'Add New Product' : 'Edit Product'}</h3>
-              <button className="modal-close" onClick={closeModal} aria-label="Close">
+        <div className="fixed inset-0 bg-[rgba(15,23,42,0.5)] backdrop-blur-[6px] flex items-center justify-center z-[1000] animate-[fadeIn_0.25s_ease-out]" onClick={closeModal}>
+          <div className="bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius)] shadow-[0_20px_25px_-5px_rgba(0,0,0,0.1),0_10px_10px_-5px_rgba(0,0,0,0.04)] w-[min(540px,94vw)] max-h-[90vh] flex flex-col animate-[slideUp_0.3s_cubic-bezier(0.16,1,0.3,1)] overflow-hidden" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between py-5 px-6 border-b border-[var(--border)]">
+              <h3 className="m-0 text-[18px] font-bold text-[var(--text)]">{modalMode === 'create' ? 'Add New Product' : 'Edit Product'}</h3>
+              <button className="bg-transparent border-0 text-[var(--muted)] cursor-pointer flex items-center justify-center p-1 rounded-[6px] transition-colors duration-200 hover:bg-[var(--app-bg)] hover:text-[var(--text)]" onClick={closeModal} aria-label="Close">
                 <Icon name="close" size={20} />
               </button>
             </div>
             <form onSubmit={handleSubmit}>
-              <div className="modal-body">
+              <div className="p-6 overflow-y-auto">
                 {submitError && (
-                  <div style={{ color: 'var(--red)', background: 'var(--red-soft)', padding: '10px 14px', borderRadius: '8px', marginBottom: '16px', fontSize: '14px' }}>
+                  <div className="text-[var(--red)] bg-[var(--red-soft)] py-[10px] px-[14px] rounded-[8px] mb-4 text-[14px]">
                     {submitError}
                   </div>
                 )}
-                <div className="form-grid">
-                  <div className="form-field">
-                    <label htmlFor="productName">Product Name *</label>
+                <div className="grid gap-[18px]">
+                  <div className="flex flex-col gap-1.5">
+                    <label htmlFor="productName" className="text-[13px] font-semibold text-[var(--text)]">Product Name *</label>
                     <input
                       type="text"
                       id="productName"
-                      className={formErrors.productName ? 'error' : ''}
+                      className={`h-[40px] px-3 border rounded-[10px] text-[14px] bg-[var(--surface)] text-[var(--text)] outline-none transition-all duration-200 focus:border-[var(--blue)] focus:shadow-[0_0_0_3px_rgba(37,99,235,0.12)] ${formErrors.productName ? 'border-[var(--red)]' : 'border-[var(--border)]'}`}
                       value={formData.productName}
                       onChange={(e) => {
                         setFormData({ ...formData, productName: e.target.value });
@@ -295,15 +307,15 @@ export default function Products() {
                       placeholder="e.g. Wireless Mouse"
                       required
                     />
-                    {formErrors.productName && <span className="error-msg">{formErrors.productName}</span>}
+                    {formErrors.productName && <span className="text-[12px] text-[var(--red)] mt-0.5">{formErrors.productName}</span>}
                   </div>
 
-                  <div className="form-field">
-                    <label htmlFor="category">Category *</label>
+                  <div className="flex flex-col gap-1.5">
+                    <label htmlFor="category" className="text-[13px] font-semibold text-[var(--text)]">Category *</label>
                     <input
                       type="text"
                       id="category"
-                      className={formErrors.category ? 'error' : ''}
+                      className={`h-[40px] px-3 border rounded-[10px] text-[14px] bg-[var(--surface)] text-[var(--text)] outline-none transition-all duration-200 focus:border-[var(--blue)] focus:shadow-[0_0_0_3px_rgba(37,99,235,0.12)] ${formErrors.category ? 'border-[var(--red)]' : 'border-[var(--border)]'}`}
                       value={formData.category}
                       onChange={(e) => {
                         setFormData({ ...formData, category: e.target.value });
@@ -312,18 +324,18 @@ export default function Products() {
                       placeholder="e.g. Electronics"
                       required
                     />
-                    {formErrors.category && <span className="error-msg">{formErrors.category}</span>}
+                    {formErrors.category && <span className="text-[12px] text-[var(--red)] mt-0.5">{formErrors.category}</span>}
                   </div>
 
-                  <div className="form-row-2">
-                    <div className="form-field">
-                      <label htmlFor="stockQuantity">Stock Quantity *</label>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="flex flex-col gap-1.5">
+                      <label htmlFor="stockQuantity" className="text-[13px] font-semibold text-[var(--text)]">Stock Quantity *</label>
                       <input
                         type="number"
                         id="stockQuantity"
                         min="0"
                         step="1"
-                        className={formErrors.stockQuantity ? 'error' : ''}
+                        className={`h-[40px] px-3 border rounded-[10px] text-[14px] bg-[var(--surface)] text-[var(--text)] outline-none transition-all duration-200 focus:border-[var(--blue)] focus:shadow-[0_0_0_3px_rgba(37,99,235,0.12)] ${formErrors.stockQuantity ? 'border-[var(--red)]' : 'border-[var(--border)]'}`}
                         value={formData.stockQuantity}
                         onChange={(e) => {
                           setFormData({ ...formData, stockQuantity: e.target.value });
@@ -332,17 +344,17 @@ export default function Products() {
                         placeholder="e.g. 50"
                         required
                       />
-                      {formErrors.stockQuantity && <span className="error-msg">{formErrors.stockQuantity}</span>}
+                      {formErrors.stockQuantity && <span className="text-[12px] text-[var(--red)] mt-0.5">{formErrors.stockQuantity}</span>}
                     </div>
 
-                    <div className="form-field">
-                      <label htmlFor="unitPrice">Unit Price ($) *</label>
+                    <div className="flex flex-col gap-1.5">
+                      <label htmlFor="unitPrice" className="text-[13px] font-semibold text-[var(--text)]">Unit Price ($) *</label>
                       <input
                         type="number"
                         id="unitPrice"
                         min="0.01"
                         step="0.01"
-                        className={formErrors.unitPrice ? 'error' : ''}
+                        className={`h-[40px] px-3 border rounded-[10px] text-[14px] bg-[var(--surface)] text-[var(--text)] outline-none transition-all duration-200 focus:border-[var(--blue)] focus:shadow-[0_0_0_3px_rgba(37,99,235,0.12)] ${formErrors.unitPrice ? 'border-[var(--red)]' : 'border-[var(--border)]'}`}
                         value={formData.unitPrice}
                         onChange={(e) => {
                           setFormData({ ...formData, unitPrice: e.target.value });
@@ -351,15 +363,15 @@ export default function Products() {
                         placeholder="e.g. 29.99"
                         required
                       />
-                      {formErrors.unitPrice && <span className="error-msg">{formErrors.unitPrice}</span>}
+                      {formErrors.unitPrice && <span className="text-[12px] text-[var(--red)] mt-0.5">{formErrors.unitPrice}</span>}
                     </div>
                   </div>
 
-                  <div className="form-field">
-                    <label htmlFor="supplierId">Supplier *</label>
+                  <div className="flex flex-col gap-1.5">
+                    <label htmlFor="supplierId" className="text-[13px] font-semibold text-[var(--text)]">Supplier *</label>
                     <select
                       id="supplierId"
-                      className={formErrors.supplierId ? 'error' : ''}
+                      className={`h-[40px] px-3 border rounded-[10px] text-[14px] bg-[var(--surface)] text-[var(--text)] outline-none transition-all duration-200 focus:border-[var(--blue)] focus:shadow-[0_0_0_3px_rgba(37,99,235,0.12)] ${formErrors.supplierId ? 'border-[var(--red)]' : 'border-[var(--border)]'}`}
                       value={formData.supplierId}
                       onChange={(e) => {
                         setFormData({ ...formData, supplierId: e.target.value });
@@ -374,11 +386,11 @@ export default function Products() {
                         </option>
                       ))}
                     </select>
-                    {formErrors.supplierId && <span className="error-msg">{formErrors.supplierId}</span>}
+                    {formErrors.supplierId && <span className="text-[12px] text-[var(--red)] mt-0.5">{formErrors.supplierId}</span>}
                   </div>
                 </div>
               </div>
-              <div className="modal-footer">
+              <div className="flex justify-end gap-3 py-[18px] px-6 bg-[var(--surface-soft)] border-t border-[var(--border)]">
                 <Button variant="ghost" onClick={closeModal}>Cancel</Button>
                 <Button type="submit" variant="primary" disabled={submitLoading}>
                   {submitLoading ? 'Saving...' : 'Save Product'}
@@ -391,48 +403,48 @@ export default function Products() {
 
       {/* VIEW MODAL */}
       {modalMode === 'view' && selectedProduct && (
-        <div className="modal-overlay" onClick={closeModal}>
-          <div className="modal-container" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>Product Details</h3>
-              <button className="modal-close" onClick={closeModal} aria-label="Close">
+        <div className="fixed inset-0 bg-[rgba(15,23,42,0.5)] backdrop-blur-[6px] flex items-center justify-center z-[1000] animate-[fadeIn_0.25s_ease-out]" onClick={closeModal}>
+          <div className="bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius)] shadow-[0_20px_25px_-5px_rgba(0,0,0,0.1),0_10px_10px_-5px_rgba(0,0,0,0.04)] w-[min(540px,94vw)] max-h-[90vh] flex flex-col animate-[slideUp_0.3s_cubic-bezier(0.16,1,0.3,1)] overflow-hidden" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between py-5 px-6 border-b border-[var(--border)]">
+              <h3 className="m-0 text-[18px] font-bold text-[var(--text)]">Product Details</h3>
+              <button className="bg-transparent border-0 text-[var(--muted)] cursor-pointer flex items-center justify-center p-1 rounded-[6px] transition-colors duration-200 hover:bg-[var(--app-bg)] hover:text-[var(--text)]" onClick={closeModal} aria-label="Close">
                 <Icon name="close" size={20} />
               </button>
             </div>
-            <div className="modal-body" style={{ display: 'grid', gap: '20px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '16px', paddingBottom: '16px', borderBottom: '1px solid var(--border)' }}>
-                <div style={{ width: '56px', height: '56px', borderRadius: '12px', background: 'var(--blue-soft)', color: 'var(--blue)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', fontWeight: '800' }}>
+            <div className="p-6 overflow-y-auto grid gap-5">
+              <div className="flex items-center gap-4 pb-4 border-b border-[var(--border)]">
+                <div className="w-14 h-14 rounded-xl bg-[var(--blue-soft)] text-[var(--blue)] flex items-center justify-center text-[20px] font-extrabold">
                   {selectedProduct.productName?.charAt(0).toUpperCase()}
                 </div>
                 <div>
-                  <h4 style={{ margin: 0, fontSize: '18px', fontWeight: '700' }}>{selectedProduct.productName}</h4>
-                  <span style={{ color: 'var(--muted)', fontSize: '13px' }}>Product ID: #{selectedProduct.id}</span>
+                  <h4 className="m-0 text-[18px] font-bold">{selectedProduct.productName}</h4>
+                  <span className="text-[var(--muted)] text-[13px]">Product ID: #{selectedProduct.id}</span>
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label style={{ display: 'block', fontSize: '12px', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '4px' }}>Category</label>
+                  <label className="block text-[12px] text-[var(--muted)] font-semibold uppercase mb-1">Category</label>
                   <strong>{selectedProduct.category || '-'}</strong>
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '12px', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '4px' }}>Supplier</label>
+                  <label className="block text-[12px] text-[var(--muted)] font-semibold uppercase mb-1">Supplier</label>
                   <strong>{supplierById[selectedProduct.supplierId]?.supplierName || `Supplier #${selectedProduct.supplierId || '-'}`}</strong>
                 </div>
               </div>
 
-              <div style={{ background: 'var(--app-bg)', padding: '16px', borderRadius: '12px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginTop: '8px' }}>
+              <div className="bg-[var(--app-bg)] p-4 rounded-xl grid grid-cols-2 gap-4 mt-2">
                 <div>
-                  <label style={{ display: 'block', fontSize: '12px', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '4px' }}>Unit Price</label>
-                  <strong style={{ fontSize: '18px', color: 'var(--blue)' }}>{currency(selectedProduct.unitPrice)}</strong>
+                  <label className="block text-[12px] text-[var(--muted)] font-semibold uppercase mb-1">Unit Price</label>
+                  <strong className="text-[18px] text-[var(--blue)]">{currency(selectedProduct.unitPrice)}</strong>
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '12px', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '4px' }}>Stock Quantity</label>
-                  <strong style={{ fontSize: '18px' }}>{number(selectedProduct.stockQuantity)} units</strong>
+                  <label className="block text-[12px] text-[var(--muted)] font-semibold uppercase mb-1">Stock Quantity</label>
+                  <strong className="text-[18px]">{number(selectedProduct.stockQuantity)} units</strong>
                 </div>
               </div>
             </div>
-            <div className="modal-footer">
+            <div className="flex justify-end gap-3 py-[18px] px-6 bg-[var(--surface-soft)] border-t border-[var(--border)]">
               <Button variant="ghost" onClick={closeModal}>Close</Button>
               <Button variant="primary" icon="edit" onClick={() => {
                 const product = selectedProduct;

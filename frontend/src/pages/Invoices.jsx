@@ -312,10 +312,10 @@ export default function Invoices() {
     : (saleDetails?.subtotal ?? selectedInvoice?.totalAmount ?? 0);
 
   return (
-    <div className="page">
+    <div className="flex flex-col gap-[22px] max-w-[1600px] mx-auto px-[15px]">
       <PageHeader eyebrow="Billing" title="Invoices" description="Live invoice records from smartbiz_db." />
       <Toolbar searchPlaceholder="Search invoices..." filters={['Paid', 'Pending', 'Overdue']} />
-      <section className="card">
+      <section className="bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius)] shadow-[var(--shadow)] p-5">
         {rows.length ? (
           <DataTable columns={['Invoice Number', 'Customer', 'Amount', 'Issue Date', 'Due Date', 'Status']} rows={rows} actions="invoice" onView={openView} onPrint={handlePrintByIndex} onDownloadPDF={handleDownloadPDFByIndex} />
         ) : (
@@ -325,49 +325,47 @@ export default function Invoices() {
 
       {/* VIEW MODAL */}
       {selectedInvoice && (
-        <div className="modal-overlay" onClick={closeView}>
+        <div className="fixed inset-0 bg-[rgba(15,23,42,0.5)] backdrop-blur-[6px] flex items-center justify-center z-[1000] animate-[fadeIn_0.25s_ease-out]" onClick={closeView}>
           <div
-            className="modal-container"
-            style={{ width: 'min(680px, 96vw)', maxHeight: '90vh', display: 'flex', flexDirection: 'column' }}
+            className="bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius)] shadow-[0_20px_25px_-5px_rgba(0,0,0,0.1),0_10px_10px_-5px_rgba(0,0,0,0.04)] w-[min(680px,96vw)] max-h-[90vh] flex flex-col animate-[slideUp_0.3s_cubic-bezier(0.16,1,0.3,1)] overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="modal-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div className="flex items-center justify-between py-5 px-6 border-b border-[var(--border)]">
               <div>
-                <h3>Invoice Details</h3>
-                <div style={{ fontSize: '13px', color: 'var(--muted)', marginTop: '6px' }}>
+                <h3 className="m-0 text-[18px] font-bold text-[var(--text)]">Invoice Details</h3>
+                <div className="text-[13px] text-[var(--muted)] mt-[6px]">
                   Sale ID: {selectedInvoice.saleId ?? '—'}
                 </div>
               </div>
-              <button className="modal-close" onClick={closeView} aria-label="Close">
+              <button className="bg-transparent border-0 text-[var(--muted)] cursor-pointer flex items-center justify-center p-1 rounded-[6px] transition-colors duration-200 hover:bg-[var(--app-bg)] hover:text-[var(--text)]" onClick={closeView} aria-label="Close">
                 <Icon name="close" size={20} />
               </button>
             </div>
 
             {/* Body */}
             <div
-              className="modal-body"
-              style={{ display: 'grid', gap: '20px', overflowY: 'auto', maxHeight: 'calc(90vh - 160px)', paddingRight: '8px' }}
+              className="p-6 overflow-y-auto grid gap-5 max-h-[calc(90vh-160px)] pr-2"
             >
               {/* Invoice number + status badge */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '1px solid var(--border)', paddingBottom: '16px' }}>
+              <div className="flex justify-between items-start border-b border-[var(--border)] pb-4">
                 <div>
-                  <h4 style={{ margin: 0, fontSize: '18px', fontWeight: 700 }}>{selectedInvoice.invoiceNumber || `INV-${selectedInvoice.id}`}</h4>
-                  <span style={{ color: 'var(--muted)', fontSize: '13px' }}>Issue: {date(selectedInvoice.issueDate)} &bull; Due: {date(selectedInvoice.dueDate)}</span>
+                  <h4 className="m-0 text-[18px] font-bold">{selectedInvoice.invoiceNumber || `INV-${selectedInvoice.id}`}</h4>
+                  <span className="text-[var(--muted)] text-[13px]">Issue: {date(selectedInvoice.issueDate)} &bull; Due: {date(selectedInvoice.dueDate)}</span>
                 </div>
-                <span style={{
-                  display: 'inline-block', padding: '6px 12px', borderRadius: '12px', fontSize: '13px', fontWeight: 700,
-                  background: selectedInvoice.status === 'PAID' ? 'var(--blue-soft)' : 'var(--orange-soft)',
-                  color: selectedInvoice.status === 'PAID' ? 'var(--blue)' : 'var(--orange)',
-                }}>
+                <span className={`inline-block py-1.5 px-3 rounded-[12px] text-[13px] font-bold ${
+                  selectedInvoice.status === 'PAID'
+                    ? 'bg-[var(--blue-soft)] text-[var(--blue)]'
+                    : 'bg-[var(--orange-soft)] text-[var(--orange)]'
+                }`}>
                   {status(selectedInvoice.status)}
                 </span>
               </div>
 
               {/* Customer + Payment Method */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label style={{ display: 'block', fontSize: '11px', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '4px' }}>Customer Name</label>
+                  <label className="block text-[11px] text-[var(--muted)] font-semibold uppercase mb-1">Customer Name</label>
                   <strong>
                     {saleDetails
                       ? customerById[saleDetails.customerId]?.fullName || `Customer #${saleDetails.customerId}`
@@ -375,73 +373,73 @@ export default function Invoices() {
                   </strong>
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '11px', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '4px' }}>Payment Method</label>
+                  <label className="block text-[11px] text-[var(--muted)] font-semibold uppercase mb-1">Payment Method</label>
                   <strong>{saleDetails ? status(saleDetails.paymentMethod) : '—'}</strong>
                 </div>
               </div>
 
               {/* Products / Line Items */}
-              <div style={{ borderTop: '1px solid var(--border)', paddingTop: '16px' }}>
-                <label style={{ display: 'block', fontSize: '11px', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '12px' }}>Products</label>
+              <div className="border-t border-[var(--border)] pt-4">
+                <label className="block text-[11px] text-[var(--muted)] font-semibold uppercase mb-3">Products</label>
                 {viewLoading ? (
-                  <p style={{ margin: 0, fontSize: '14px', color: 'var(--muted)' }}>Loading items…</p>
+                  <p className="m-0 text-[14px] text-[var(--muted)]">Loading items…</p>
                 ) : viewItems.length > 0 ? (
-                  <div style={{ overflowX: 'auto' }}>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
+                  <div className="overflow-x-auto">
+                    <table className="w-full border-collapse text-[14px]">
                       <thead>
-                        <tr style={{ borderBottom: '2px solid var(--border)' }}>
-                          <th style={{ textAlign: 'left', padding: '8px 10px', fontSize: '11px', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase' }}>Product</th>
-                          <th style={{ textAlign: 'center', padding: '8px 10px', fontSize: '11px', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase' }}>Qty</th>
-                          <th style={{ textAlign: 'right', padding: '8px 10px', fontSize: '11px', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase' }}>Unit Price</th>
-                          <th style={{ textAlign: 'right', padding: '8px 10px', fontSize: '11px', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase' }}>Total</th>
+                        <tr className="border-b-2 border-[var(--border)]">
+                          <th className="text-left py-2 px-2.5 text-[11px] text-[var(--muted)] font-semibold uppercase">Product</th>
+                          <th className="text-center py-2 px-2.5 text-[11px] text-[var(--muted)] font-semibold uppercase">Qty</th>
+                          <th className="text-right py-2 px-2.5 text-[11px] text-[var(--muted)] font-semibold uppercase">Unit Price</th>
+                          <th className="text-right py-2 px-2.5 text-[11px] text-[var(--muted)] font-semibold uppercase">Total</th>
                         </tr>
                       </thead>
                       <tbody>
                         {viewItems.map((item, idx) => (
-                          <tr key={idx} style={{ borderBottom: '1px solid var(--border)' }}>
-                            <td style={{ padding: '10px', fontWeight: 500 }}>{item.productName}</td>
-                            <td style={{ padding: '10px', textAlign: 'center' }}>{item.quantity}</td>
-                            <td style={{ padding: '10px', textAlign: 'right' }}>{currency(item.unitPrice)}</td>
-                            <td style={{ padding: '10px', textAlign: 'right', fontWeight: 700 }}>{currency(item.totalPrice)}</td>
+                          <tr key={idx} className="border-b border-[var(--border)]">
+                            <td className="p-[10px] font-medium">{item.productName}</td>
+                            <td className="p-[10px] text-center">{item.quantity}</td>
+                            <td className="p-[10px] text-right">{currency(item.unitPrice)}</td>
+                            <td className="p-[10px] text-right font-bold">{currency(item.totalPrice)}</td>
                           </tr>
                         ))}
                       </tbody>
                     </table>
                   </div>
                 ) : (
-                  <p style={{ margin: 0, fontSize: '14px', color: 'var(--muted)' }}>
+                  <p className="m-0 text-[14px] text-[var(--muted)]">
                     {selectedInvoice.saleId ? 'No line items found.' : 'No linked sale — item details unavailable.'}
                   </p>
                 )}
               </div>
 
               {/* Subtotal / Discount / Total */}
-              <div style={{ background: 'var(--app-bg)', padding: '16px', borderRadius: '12px', display: 'grid', gap: '10px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px' }}>
-                  <span style={{ color: 'var(--muted)' }}>Subtotal</span>
+              <div className="bg-[var(--app-bg)] p-4 rounded-[12px] grid gap-[10px]">
+                <div className="flex justify-between text-[14px]">
+                  <span className="text-[var(--muted)]">Subtotal</span>
                   <strong>{currency(modalSubtotal)}</strong>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px' }}>
-                  <span style={{ color: 'var(--muted)' }}>Discount</span>
-                  <span style={{ color: 'var(--orange)', fontWeight: 600 }}>− {currency(saleDetails?.discount ?? 0)}</span>
+                <div className="flex justify-between text-[14px]">
+                  <span className="text-[var(--muted)]">Discount</span>
+                  <span className="text-[var(--orange)] font-semibold">− {currency(saleDetails?.discount ?? 0)}</span>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '16px', fontWeight: 800, borderTop: '1px solid var(--border)', paddingTop: '10px' }}>
+                <div className="flex justify-between text-[16px] font-extrabold border-t border-[var(--border)] pt-[10px]">
                   <span>Total Amount</span>
-                  <span style={{ color: 'var(--blue)' }}>{currency(selectedInvoice.totalAmount)}</span>
+                  <span className="text-[var(--blue)]">{currency(selectedInvoice.totalAmount)}</span>
                 </div>
               </div>
 
               {/* Notes (if present) */}
               {selectedInvoice.notes && (
-                <div style={{ borderTop: '1px solid var(--border)', paddingTop: '16px' }}>
-                  <label style={{ display: 'block', fontSize: '11px', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '4px' }}>Notes</label>
-                  <p style={{ margin: 0, fontSize: '14px', whiteSpace: 'pre-line' }}>{selectedInvoice.notes}</p>
+                <div className="border-t border-[var(--border)] pt-4">
+                  <label className="block text-[11px] text-[var(--muted)] font-semibold uppercase mb-1">Notes</label>
+                  <p className="m-0 text-[14px] whitespace-pre-line">{selectedInvoice.notes}</p>
                 </div>
               )}
             </div>
 
             {/* Footer */}
-            <div className="modal-footer">
+            <div className="flex justify-end gap-3 py-[18px] px-6 bg-[var(--surface-soft)] border-t border-[var(--border)]">
               <Button variant="primary" onClick={closeView}>Close</Button>
             </div>
           </div>
