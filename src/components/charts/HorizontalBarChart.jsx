@@ -8,9 +8,9 @@ export default function HorizontalBarChart({ data }) {
           style={{ gridTemplateColumns: 'minmax(120px, 1fr) 2fr 44px' }}
         >
           <span>{item.label}</span>
-          <div className="h-[10px] bg-[#edf2fb] rounded-full overflow-hidden">
+          <div className="h-[10px] bg-border/30 rounded-full overflow-hidden">
             <i
-              className="block h-full rounded-[inherit] bg-gradient-to-r from-[var(--blue)] to-[#06b6d4]"
+              className="block h-full rounded-[inherit] bg-gradient-to-r from-blue to-[#06b6d4]"
               style={{ width: `${item.value}%` }}
             />
           </div>

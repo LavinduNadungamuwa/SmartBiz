@@ -5,7 +5,7 @@ export default function Toggle({ label, checked = false, onChange = () => {}, ar
 
   return (
     <label className={containerClasses}>
-      {label ? <span className="text-[var(--muted)] text-[13px] font-bold">{label}</span> : null}
+      {label ? <span className="text-muted text-[13px] font-bold">{label}</span> : null}
       <input
         type="checkbox"
         checked={checked}
@@ -13,10 +13,10 @@ export default function Toggle({ label, checked = false, onChange = () => {}, ar
         aria-label={ariaLabel}
         className="absolute opacity-0 peer"
       />
-      <i className="relative w-[46px] h-[26px] rounded-full bg-[var(--border)] cursor-pointer transition-colors duration-200 block
-                  after:content-[''] after:absolute after:w-5 after:h-5 after:left-[3px] after:top-[3px] after:rounded-full after:bg-[var(--surface)] after:shadow-[0_2px_8px_rgba(30,41,59,0.2)] after:transition-transform after:duration-180 peer-checked:after:translate-x-5
+      <i className="relative w-[46px] h-[26px] rounded-full bg-border cursor-pointer transition-colors duration-200 block
+                  after:content-[''] after:absolute after:w-5 after:h-5 after:left-[3px] after:top-[3px] after:rounded-full after:bg-surface after:shadow-[0_2px_8px_rgba(30,41,59,0.2)] after:transition-transform after:duration-180 peer-checked:after:translate-x-5
                   before:content-['☀'] before:absolute before:left-1.5 before:top-[3px] before:text-[12px] before:text-[#f6b73b]
-                  peer-checked:before:content-['☾'] peer-checked:before:left-auto peer-checked:before:right-1.5 peer-checked:before:text-[#cbd5e1] peer-checked:bg-[var(--blue)]" />
+                  peer-checked:before:content-['☾'] peer-checked:before:left-auto peer-checked:before:right-1.5 peer-checked:before:text-[#cbd5e1] peer-checked:bg-blue" />
     </label>
   );
 }

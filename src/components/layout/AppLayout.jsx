@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Topbar from './Topbar';
-import '../../styles/app.css';
+
 
 export default function AppLayout() {
   const [collapsed, setCollapsed] = useState(false);
@@ -11,7 +11,7 @@ export default function AppLayout() {
   return (
     <div
       className={[
-        'grid h-screen bg-[var(--app-bg)]',
+        'grid h-screen bg-app-bg',
         collapsed
           ? '[grid-template-columns:88px_minmax(0,1fr)]'
           : '[grid-template-columns:280px_minmax(0,1fr)]',

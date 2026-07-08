@@ -23,8 +23,8 @@ export default function PasswordStrength({ password }) {
         ))}
       </div>
       <span
-        className="text-[12px] min-w-[40px] text-right font-medium"
-        style={{ color: colors[score] || 'var(--muted)' }}
+        className="text-[12px] min-w-[40px] text-right font-medium text-muted"
+        style={colors[score] ? { color: colors[score] } : undefined}
       >
         {labels[score]}
       </span>

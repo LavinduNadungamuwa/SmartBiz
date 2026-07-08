@@ -11,20 +11,13 @@ export default function AuthBrandPanel({
 }) {
   return (
     <div
-      className="relative hidden md:flex flex-col justify-center w-[420px] shrink-0 h-full px-12 py-[60px] overflow-hidden border-r border-[var(--border)] backdrop-blur-sm"
-      style={{
-        background: 'linear-gradient(180deg, rgba(37,99,235,0.06), rgba(37,99,235,0.03))',
-      }}
+      className="relative hidden md:flex flex-col justify-center w-[420px] shrink-0 h-full px-12 py-[60px] overflow-hidden border-r border-border bg-gradient-to-b from-blue-500/[0.06] to-blue-500/[0.03] backdrop-blur-sm"
     >
       {/* Content */}
       <div className="relative z-10">
         {/* Logo */}
         <div
-          className="inline-flex items-center justify-center w-[52px] h-[52px] rounded-xl mb-7"
-          style={{
-            background: 'linear-gradient(135deg, var(--blue) 0%, var(--blue-600) 100%)',
-            boxShadow: '0 10px 40px rgba(37,99,235,0.08)',
-          }}
+          className="inline-flex items-center justify-center w-[52px] h-[52px] rounded-xl mb-7 bg-gradient-to-br from-blue to-blue-600 shadow-[0_10px_40px_rgba(37,99,235,0.08)]"
         >
           <span
             className="text-xl text-white"
@@ -36,10 +29,9 @@ export default function AuthBrandPanel({
 
         {/* Title */}
         <h1
-          className="text-[42px] leading-[1.05] tracking-[-1px] mb-3"
+          className="text-[42px] leading-[1.05] tracking-[-1px] mb-3 text-blue"
           style={{
             fontFamily: "'DM Serif Display', serif",
-            color: 'var(--blue)',
             textShadow: '0 6px 22px rgba(37,99,235,0.06)',
           }}
         >
@@ -48,8 +40,7 @@ export default function AuthBrandPanel({
 
         {/* Subtitle */}
         <p
-          className="text-sm leading-[1.6] max-w-[300px] mb-9"
-          style={{ color: 'var(--muted)' }}
+          className="text-sm leading-[1.6] max-w-[300px] mb-9 text-muted"
         >
           {subtitle}
         </p>
@@ -59,12 +50,10 @@ export default function AuthBrandPanel({
           {features.map((feature) => (
             <li
               key={feature}
-              className="flex items-center gap-3 text-sm"
-              style={{ color: 'var(--muted)' }}
+              className="flex items-center gap-3 text-sm text-muted"
             >
               <span
-                className="w-1.5 h-1.5 rounded-full shrink-0"
-                style={{ background: 'var(--blue)' }}
+                className="w-1.5 h-1.5 rounded-full shrink-0 bg-blue"
               />
               {feature}
             </li>

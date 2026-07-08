@@ -26,7 +26,7 @@ export default function Topbar({ onMenuClick }) {
   return (
     <header
       className="flex items-center gap-[18px] h-[72px] px-7 shrink-0
-                 bg-[var(--surface)] border-b border-[var(--border)] backdrop-blur-[12px]"
+                 bg-surface border-b border-border backdrop-blur-[12px]"
     >
       {/* Mobile hamburger — hidden on md+ */}
       <button
@@ -34,7 +34,7 @@ export default function Topbar({ onMenuClick }) {
         onClick={onMenuClick}
         aria-label="Open navigation"
         className="relative inline-flex items-center justify-center w-[38px] h-[38px]
-                   text-[var(--text)] border border-[var(--border)] bg-[var(--surface)]
+                   text-text border border-border bg-surface
                    rounded-[10px] cursor-pointer md:hidden"
       >
         <Icon name="menu" />
@@ -44,24 +44,24 @@ export default function Topbar({ onMenuClick }) {
       <div className="hidden items-center gap-[10px] md:hidden [.mobile-open_&]:flex">
         <span
           className="inline-flex items-center justify-center shrink-0 w-[34px] h-[34px] rounded-[10px]
-                     bg-gradient-to-br from-[var(--blue)] to-[#38bdf8] text-white font-extrabold text-[13px]"
+                     bg-gradient-to-br from-blue to-[#38bdf8] text-white font-extrabold text-[13px]"
         >
           SB
         </span>
-        <strong className="text-[var(--text)] text-[15px]">SmartBiz</strong>
+        <strong className="text-text text-[15px]">SmartBiz</strong>
       </div>
 
       {/* Global search — hidden on mobile */}
       <label
         className="hidden md:flex items-center gap-[10px] h-[44px] w-[min(520px,44vw)]
-                   px-[14px] text-[var(--muted)] bg-[var(--surface)]
-                   border border-[var(--border)] rounded-xl cursor-text"
+                   px-[14px] text-muted bg-surface
+                   border border-border rounded-xl cursor-text"
       >
         <Icon name="search" size={18} />
         <input
           type="search"
           placeholder="Search customers, invoices, products..."
-          className="w-full border-0 outline-none bg-transparent text-[var(--text)]"
+          className="w-full border-0 outline-none bg-transparent text-text"
         />
       </label>
 
@@ -72,14 +72,14 @@ export default function Topbar({ onMenuClick }) {
           type="button"
           aria-label="Notifications"
           className="relative inline-flex items-center justify-center w-[38px] h-[38px]
-                     text-[var(--text)] border border-[var(--border)] bg-[var(--surface)]
+                     text-text border border-border bg-surface
                      rounded-[10px] cursor-pointer"
         >
           <Icon name="bell" />
           {/* Notification dot */}
           <span
             className="absolute top-2 right-2 w-2 h-2 rounded-full
-                       bg-[var(--red)] border-2 border-[var(--surface)]"
+                       bg-red border-2 border-surface"
           />
         </button>
 
@@ -87,13 +87,13 @@ export default function Topbar({ onMenuClick }) {
         <button
           type="button"
           className="hidden md:inline-flex items-center gap-2 h-[38px] px-3
-                     border border-[var(--border)] rounded-[10px]
-                     text-[var(--text)] bg-[var(--surface)] font-semibold cursor-pointer"
+                     border border-border rounded-[10px]
+                     text-text bg-surface font-semibold cursor-pointer"
         >
           {businessName}
         </button>
 
-        {/* Dark-mode toggle — uses existing toggle-row styles from app.css */}
+        {/* Dark-mode toggle */}
         <Toggle
           checked={theme === 'dark'}
           onChange={() => setTheme((t) => (t === 'dark' ? 'light' : 'dark'))}
@@ -104,7 +104,7 @@ export default function Topbar({ onMenuClick }) {
         <div
           aria-label="User profile"
           className="inline-flex items-center justify-center w-[38px] h-[38px]
-                     rounded-full bg-[var(--text)] text-[var(--surface)]
+                     rounded-full bg-text text-surface
                      text-[13px] font-bold cursor-pointer overflow-hidden"
         >
           {businessLogo

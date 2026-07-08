@@ -75,26 +75,26 @@ export default function Dashboard() {
         {healthMetrics.map((metric) => (
           <article
             key={metric.label}
-            className="bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius)] shadow-[var(--shadow)] p-[18px]"
+            className="bg-surface border border-border rounded-radius shadow-shadow p-[18px]"
           >
             <span
               className={[
                 'block w-2.5 h-2.5 rounded-full',
-                metric.status === 'good' ? 'bg-[var(--green)]' : 'bg-[var(--orange)]',
+                metric.status === 'good' ? 'bg-green' : 'bg-orange',
               ].join(' ')}
             />
-            <p className="text-[var(--muted)] mt-[10px] mb-1">{metric.label}</p>
+            <p className="text-muted mt-[10px] mb-1">{metric.label}</p>
             <strong className="text-2xl">{metric.value}</strong>
-            <small className="block text-[var(--muted)] mt-1.5">{metric.note}</small>
+            <small className="block text-muted mt-1.5">{metric.note}</small>
           </article>
         ))}
       </section>
 
       {/* Recent Sales + Recent Invoices — 2 col */}
       <section className="grid grid-cols-2 gap-4 max-[1180px]:grid-cols-1">
-        <section className="card bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius)] shadow-[var(--shadow)] p-5">
+        <section className="card bg-surface border border-border rounded-radius shadow-shadow p-5">
           <div className="card-header flex justify-between gap-4 mb-[18px]">
-            <h2 className="m-0 text-[17px] font-bold text-[var(--text)]">Recent Sales</h2>
+            <h2 className="m-0 text-[17px] font-bold text-text">Recent Sales</h2>
           </div>
           <DataTable
             columns={['Sale ID', 'Customer', 'Amount', 'Date', 'Status']}
@@ -115,9 +115,9 @@ export default function Dashboard() {
             }
           />
         </section>
-        <section className="card bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius)] shadow-[var(--shadow)] p-5">
+        <section className="card bg-surface border border-border rounded-radius shadow-shadow p-5">
           <div className="card-header flex justify-between gap-4 mb-[18px]">
-            <h2 className="m-0 text-[17px] font-bold text-[var(--text)]">Recent Invoices</h2>
+            <h2 className="m-0 text-[17px] font-bold text-text">Recent Invoices</h2>
           </div>
           <DataTable
             columns={['Invoice Number', 'Sale', 'Total', 'Issue Date', 'Status']}
@@ -143,25 +143,25 @@ export default function Dashboard() {
       {/* Bottom row — 3 col, stretch-aligned */}
       <section className="grid grid-cols-3 gap-4 items-stretch max-[1180px]:grid-cols-1">
         {/* Inventory Alerts */}
-        <section className="card bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius)] shadow-[var(--shadow)] p-5">
+        <section className="card bg-surface border border-border rounded-radius shadow-shadow p-5">
           <div className="card-header flex justify-between gap-4 mb-[18px] max-sm:flex-col max-sm:items-start max-sm:gap-1">
-            <h2 className="m-0 text-[17px] font-bold text-[var(--text)]">Inventory Alerts</h2>
-            <p className="m-0 mt-1.5 text-[var(--muted)] leading-[1.55]">Live stock issues requiring attention</p>
+            <h2 className="m-0 text-[17px] font-bold text-text">Inventory Alerts</h2>
+            <p className="m-0 mt-1.5 text-muted leading-[1.55]">Live stock issues requiring attention</p>
           </div>
           <div className="grid gap-3">
             {lowStock.slice(0, 5).map((product) => (
               <div
                 key={product.id}
                 className={[
-                  'flex justify-between items-center gap-3 p-3 rounded-xl border border-[var(--border)]',
+                  'flex justify-between items-center gap-3 p-3 rounded-xl border border-border',
                   Number(product.stockQuantity || 0) <= 0
-                    ? 'bg-[var(--red-soft)]'
-                    : 'bg-[var(--orange-soft)]',
+                    ? 'bg-red-soft'
+                    : 'bg-orange-soft',
                 ].join(' ')}
               >
                 <div>
                   <strong className="block">{product.productName}</strong>
-                  <span className="block text-[var(--muted)] text-[13px] mt-[3px]">
+                  <span className="block text-muted text-[13px] mt-[3px]">
                     {number(product.stockQuantity)} units available
                   </span>
                 </div>
@@ -178,23 +178,23 @@ export default function Dashboard() {
         </ChartCard>
 
         {/* AI Insights mini card */}
-        <section className="card ai-card bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius)] shadow-[var(--shadow)] p-5 relative overflow-hidden after:content-[''] after:absolute after:inset-[auto_-40px_-60px_auto] after:w-[160px] after:h-[160px] after:rounded-full after:bg-[rgba(37,99,235,0.08)]">
-          <div className="ai-orb inline-flex items-center justify-center w-11 h-11 text-white bg-gradient-to-br from-[var(--blue)] to-[#0ea5e9] rounded-[14px] font-black mb-3">AI</div>
+        <section className="card ai-card bg-surface border border-border rounded-radius shadow-shadow p-5 relative overflow-hidden after:content-[''] after:absolute after:inset-[auto_-40px_-60px_auto] after:w-[160px] after:h-[160px] after:rounded-full after:bg-blue-soft">
+          <div className="ai-orb inline-flex items-center justify-center w-11 h-11 text-white bg-gradient-to-br from-blue to-[#0ea5e9] rounded-[14px] font-black mb-3">AI</div>
           <div className="card-header flex justify-between gap-4 mb-[18px] max-sm:flex-col max-sm:items-start max-sm:gap-1">
-            <h2 className="m-0 text-[17px] font-bold text-[var(--text)]">AI Insights</h2>
-            <p className="m-0 mt-1.5 text-[var(--muted)] leading-[1.55]">Recommendations from current database records</p>
+            <h2 className="m-0 text-[17px] font-bold text-text">AI Insights</h2>
+            <p className="m-0 mt-1.5 text-muted leading-[1.55]">Recommendations from current database records</p>
           </div>
           <div className="grid gap-3">
-            <p className="m-0 p-3 text-[#344054] bg-[var(--surface-soft)] border border-[var(--border)] rounded-xl">
+            <p className="m-0 p-3 text-text bg-surface-soft border border-border rounded-xl">
               {`Revenue currently totals ${currency(summary.totalRevenue)} with ${number(summary.totalSales)} recorded sales.`}
             </p>
-            <p className="m-0 p-3 text-[#344054] bg-[var(--surface-soft)] border border-[var(--border)] rounded-xl">
+            <p className="m-0 p-3 text-text bg-surface-soft border border-border rounded-xl">
               {lowStock.length ? `${lowStock.length} products need stock attention.` : 'Inventory levels look stable.'}
             </p>
-            <p className="m-0 p-3 text-[#344054] bg-[var(--surface-soft)] border border-[var(--border)] rounded-xl">
+            <p className="m-0 p-3 text-text bg-surface-soft border border-border rounded-xl">
               {invoices.some((invoice) => status(invoice.status) === 'Overdue') ? 'Overdue invoices need follow-up.' : 'No overdue invoice status found.'}
             </p>
-            <p className="m-0 p-3 text-[#344054] bg-[var(--surface-soft)] border border-[var(--border)] rounded-xl">
+            <p className="m-0 p-3 text-text bg-surface-soft border border-border rounded-xl">
               {expenses.length ? `Expense records total ${currency(summary.totalExpenses)}.` : 'No expenses have been recorded yet.'}
             </p>
           </div>

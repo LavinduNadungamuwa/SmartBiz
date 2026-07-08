@@ -13,7 +13,7 @@ export default function PasswordField({
   return (
     <div className={`mb-[14px] flex flex-col gap-[7px]${half ? ' flex-1 min-w-0' : ''}`}>
       <label
-        className="text-[13px] font-medium text-[var(--muted)]"
+        className="text-[13px] font-medium text-muted"
         htmlFor={name}
       >
         {label}
@@ -24,10 +24,10 @@ export default function PasswordField({
           name={name}
           type={showPassword ? 'text' : 'password'}
           autoComplete={autoComplete}
-          className={`auth-input w-full bg-[var(--surface)] border rounded-[10px] px-[14px] py-[11px] pr-11 text-sm text-[var(--text)] caret-[var(--text)] outline-none transition-[border-color,box-shadow,transform] duration-[140ms] placeholder:text-[var(--muted)] focus:border-[var(--blue)] focus:shadow-[0_0_0_3px_rgba(37,99,235,0.12)] focus:-translate-y-px${
+          className={`auth-input w-full bg-surface border rounded-[10px] px-[14px] py-[11px] pr-11 text-sm text-text caret-text outline-none transition-[border-color,box-shadow,transform] duration-[140ms] placeholder:text-muted focus:border-blue focus:ring-2 focus:ring-blue/20 focus:-translate-y-px${
             error
               ? ' border-[rgba(220,38,38,0.4)]'
-              : ' border-[var(--border)]'
+              : ' border-border'
           }`}
           placeholder={placeholder}
           value={value}
@@ -35,7 +35,7 @@ export default function PasswordField({
         />
         <button
           type="button"
-          className="absolute right-3 top-1/2 -translate-y-1/2 bg-transparent border-0 cursor-pointer text-[var(--muted)] flex p-1 hover:text-[var(--blue)] transition-colors duration-[140ms]"
+          className="absolute right-3 top-1/2 -translate-y-1/2 bg-transparent border-0 cursor-pointer text-muted flex p-1 hover:text-blue transition-colors duration-[140ms]"
           onClick={onToggleShow}
           aria-label={showPassword ? 'Hide password' : 'Show password'}
         >
@@ -43,7 +43,7 @@ export default function PasswordField({
         </button>
       </div>
       {error && (
-        <span className="text-[12px] text-[#ffbebe] -mt-0.5">{error}</span>
+        <span className="text-[12px] text-red -mt-0.5">{error}</span>
       )}
     </div>
   );

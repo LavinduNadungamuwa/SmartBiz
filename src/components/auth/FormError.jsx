@@ -3,7 +3,7 @@ export default function FormError({ message }) {
 
   return (
     <div
-      className="flex items-center gap-2.5 bg-[var(--red-soft)] border border-[rgba(220,38,38,0.12)] rounded-[8px] px-3 py-2.5 text-[var(--red)] text-[13px] mb-[18px]"
+      className="flex items-center gap-2.5 bg-red-50 dark:bg-rose-950/20 border border-red-200 dark:border-rose-900/40 rounded-[8px] px-3 py-2.5 text-red-600 dark:text-rose-400 text-[13px] mb-[18px]"
       role="alert"
     >
       <svg
